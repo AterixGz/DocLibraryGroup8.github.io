@@ -42,20 +42,29 @@ function Sidebar({ user }) {
             <i className="bi bi-gear me-2"></i> Administrator
           </a>
           {isDropdownOpen && (
-            <ul className="nav flex-column ms-3">
-              <li className="nav-item p-1">
-                <Link to="/my-document" className="nav-link sidebar-item">My Document</Link>
-              </li>
-              <li className="nav-item p-1">
-                <Link to="/document" className="nav-link sidebar-item">Document Management</Link>
-              </li>
-              <li className="nav-item p-1">
-                <Link to="/permission" className="nav-link sidebar-item">Permission Management</Link>
-              </li>
-              <li className="nav-item p-1">
-                <Link to="/reports" className="nav-link sidebar-item">Reports</Link>
-              </li>
-            </ul>
+          <ul className="nav flex-column ms-3">
+          <li className="nav-item p-1">
+            <Link to="/my-document" className="nav-link sidebar-item">
+              <i className="bi bi-file-earmark-text"></i> My Document
+            </Link>
+          </li>
+          <li className="nav-item p-1">
+            <Link to="/document" className="nav-link sidebar-item">
+              <i className="bi bi-folder"></i> Document Management
+            </Link>
+          </li>
+          <li className="nav-item p-1">
+            <Link to="/permission" className="nav-link sidebar-item">
+              <i className="bi bi-shield-lock"></i> Permission Management
+            </Link>
+          </li>
+          <li className="nav-item p-1">
+            <Link to="/reports" className="nav-link sidebar-item">
+              <i className="bi bi-bar-chart"></i> Reports
+            </Link>
+          </li>
+        </ul>
+        
           )}
         </li>
         <li className="nav-item p-1">

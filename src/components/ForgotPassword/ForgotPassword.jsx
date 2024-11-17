@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ForgotPassword.css";
+import logo from "../ForgotPassword/Logo.png"; // Import your logo image
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -36,6 +37,7 @@ const ForgotPassword = () => {
     <div className="forgot-password-page">
       <div className="forgot-password-container">
         <div className="forgot-password-form">
+          <img src={logo} alt="Logo" className="forgot-password-logo" /> {/* Logo Image */}
           <h2 className="forgot-password-title">ลืมรหัสผ่าน?</h2>
           <p className="forgot-password-text">กรอกอีเมลของคุณเพื่อรับลิงก์รีเซ็ตรหัสผ่าน</p>
           <form onSubmit={handleSubmit}>
