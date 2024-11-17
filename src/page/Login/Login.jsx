@@ -44,7 +44,7 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
     <div className="login-page">
       <div className="login-container">
         <div className="login-form">
-          <h2>ยินดีต้อนรับ</h2>
+          <h2 className="login-form__title">ยินดีต้อนรับ</h2>
           <form onSubmit={handleLogin}>
             <label className="login-form__label">ชื่อผู้ใช้*</label>
             <input

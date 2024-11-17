@@ -32,6 +32,11 @@
   background: url("./NewLogo.png") no-repeat;
   background-size: 300px 70px;  /* กำหนดขนาดของโลโก้ */
   background-position: top 2rem left 10rem;  /* ตำแหน่งของโลโก้ */
+  
+}
+
+.login-form__title {
+  margin-top: 100px;
 }
 
 .logo {
