@@ -50,7 +50,7 @@ const ForgotPassword = () => {
             />
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting}   
               className="forgot-password-button"
             >
               {isSubmitting ? "กำลังส่ง..." : "ส่งลิงก์รีเซ็ตรหัสผ่าน"}

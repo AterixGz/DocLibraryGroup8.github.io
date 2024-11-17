@@ -13,14 +13,14 @@ import Help from "./components/Help/Help";
 import Profile from "./components/Profile/Profile";
 import Login from "./page/Login/Login";
 import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
-import MyDocument from "./components/MyDocument/MyDocument"; // Import MyDocument component
+import MyDocument from "./components/MyDocument/MyDocument";
 import { verifyUser } from "./data/users";
 
 import "./App.css";
 
 function App() {
   const [token, setToken] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("guest"); // กำหนดค่าเริ่มต้นเป็น "guest"
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [userData, setUserData] = useState(null);
@@ -29,6 +29,7 @@ function App() {
     if (username && password) {
       const user = verifyUser(username, password);
       if (user) {
+        setRole(user.role); // หากมีข้อมูลผู้ใช้, อัพเดต role
         setUserData(user);
       } else {
         console.error("Invalid credentials");
@@ -60,18 +61,21 @@ function App() {
   return (
     <BrowserRouter>
       <div className="d-flex">
-        <Sidebar user={userData} />
+        {role !== "guest" && <Sidebar user={userData} />}
         <div className="content-container">
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/administrator" element={<Administrator />} />
-            <Route path="/my-document" element={<MyDocument />} />
-            <Route path="/document" element={<Document />} />
-            <Route path="/permission" element={<Permission />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/help" element={<Help />} />
-            <Route path="/profile" element={<Profile username={username} password={password} />} />
-            {/* Add MyDocument route */}
+            <Route path="/" element={<Home role={role} />} /> {/* ส่ง role ไปที่ Home */}
+            {role !== "guest" && (
+              <>
+                <Route path="/administrator" element={<Administrator />} />
+                <Route path="/my-document" element={<MyDocument />} />
+                <Route path="/document" element={<Document />} />
+                <Route path="/permission" element={<Permission />} />
+                <Route path="/reports" element={<Reports />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/profile" element={<Profile username={username} password={password} />} />
+              </>
+            )}
           </Routes>
         </div>
       </div>

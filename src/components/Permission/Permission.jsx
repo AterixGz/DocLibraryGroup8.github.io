@@ -68,6 +68,7 @@ function Permission() {
               <th style={{ width: '20%' }} className="align-right">การจัดการเอกสาร</th>
               <th style={{ width: '20%' }} className="align-right">การจัดการสิทธิ์เข้าถึง</th>
               <th style={{ width: '20%' }} className="align-right">การจัดการรายงาน</th>
+              <th style={{ width: '20%' }} className="align-right"></th>
             </tr>
           </thead>
           <tbody>

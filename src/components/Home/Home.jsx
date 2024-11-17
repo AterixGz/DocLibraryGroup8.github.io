@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Home.css';
 
-const Home = () => {
+const Home = ({ role }) => {
     const [documents, setDocuments] = useState([
         { id: 1, name: "เอกสาร 1", docu: "123456", date: "01-01-2565", year: 2565, category: "หมวดหมู่ A" },
         { id: 2, name: "เอกสาร 2", docu: "789012", date: "15-02-2565", year: 2565, category: "หมวดหมู่ B" },
@@ -49,7 +49,7 @@ const Home = () => {
     });
 
     return (
-        <div className="home-container">
+        <div className={`home-container ${role === "guest" ? "guest-home" : ""}`}>
             <div className="main-content">
                 <h1 className='title-doc'>ค้นหาเอกสารทั้งหมด</h1>
                 <div className="search-bar">
@@ -124,7 +124,7 @@ const Home = () => {
                         </div>
                     </div>
                 )}
-                
+
                 <div className="fil-buttons-container">
                     <button className='fil-buttons'>ประเภทเอกสาร</button>
                     <button className='fil-buttons'>ปีงบประมาณ</button>
@@ -133,7 +133,7 @@ const Home = () => {
 
                 <div className='download-buttons'>
                     <button className='downloadm'><span><i className="bi bi-check-lg"></i></span>&nbsp;เลือกหลายรายการ</button>
-                    <button className='downloadm'><span><i className="fi fi-ss-down-to-line" style={{ color: "#F14D31" }}></i></span>&nbsp;ดาวน์โหลด</button>
+                    <button className='downloadm'><span><i className="fi fi-ss-down-to-line" style={{ color: "#fff" }}></i></span>&nbsp;ดาวน์โหลด</button>
                 </div>
                 <table className='document-table'>
                     <thead>

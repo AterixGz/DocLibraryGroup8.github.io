@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import "./Login.css";
 import { verifyUser } from "../../data/users";
 
@@ -7,6 +7,7 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
   const usernameRef = useRef();
   const passwordRef = useRef();
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -27,6 +28,7 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
       setRole(userInfo.role);
       setUsername(username);
       setPassword(password);
+      navigate("/"); // Redirect to home after login
     }
   };
 
@@ -35,6 +37,7 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
     setRole("guest");
     setUsername("guest");
     setPassword("");
+    navigate("/"); // Redirect to home for guest login
   };
 
   return (
@@ -67,7 +70,7 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 <i
-                  className={showPassword ? "bi bi-eye"  : "bi bi-eye-slash"}
+                  className={showPassword ? "bi bi-eye" : "bi bi-eye-slash"}
                 ></i>
               </button>
             </div>
