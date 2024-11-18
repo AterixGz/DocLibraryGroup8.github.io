@@ -21,6 +21,9 @@ const SliderComponent = ({ slides }) => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+  };
   return (
     <div className="slider-container">
       <button className="slider-button prev" onClick={prevSlide}>
@@ -34,14 +37,15 @@ const SliderComponent = ({ slides }) => {
           <div className="slider-slide" key={index}>
             <img src={slide.image} alt={slide.title} />
             <div className="slider-content">
-              <h3>{slide.subtitle}</h3>
-              <h1>{slide.title}</h1>
-              <p>{slide.description}</p>
+              <h2 className='white'>{slide.subtitle}</h2>
+              {/* <h1>{slide.title}</h1> */}
+
               <div className="slider-stats">
                 {slide.stats.map((stat, statIndex) => (
                   <div key={statIndex} className="slider-stat-item">
-                    <h2>{stat.value}</h2>
-                    <p>{stat.label}</p>
+                    <h3>{stat.label}</h3>
+                    <h1>{stat.value}</h1>
+                    <h3>{stat.unit}</h3>
                   </div>
                 ))}
               </div>
@@ -53,6 +57,18 @@ const SliderComponent = ({ slides }) => {
       <button className="slider-button next" onClick={nextSlide}>
         &gt;
       </button>
+
+      <div className="slider-indicators">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            className={`indicator-dot ${
+              currentSlide === index ? 'active' : ''
+            }`}
+            onClick={() => goToSlide(index)}
+          />
+        ))}
+      </div>
     </div>
   );
 };

@@ -13,7 +13,7 @@ function Document() {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const allowedFileTypes = ["application/pdf", "image/png", "application/zip"];
+  const allowedFileTypes = ["application/pdf", "image/png", "application/zip"]; // กำหนดประเภทไฟล์ที่อนุญาต
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -62,8 +62,9 @@ function Document() {
       fileName: file ? file.name : null,
       fileSize: file ? file.size : null,
     };
-
+    // แสดงข้อมูลใน console
     console.log(documentData);
+    // แสดงข้อความสำเร็จและล้างฟอร์ม
     alert("บันทึกสำเร็จ!");
     setUploadSuccess(true);
     resetForm();

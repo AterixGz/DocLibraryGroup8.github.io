@@ -1,10 +1,9 @@
 /* Document.css */
 
-.upload-page-container{
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    height: 100vh;
-   
+#titleDocument {
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 20px;
    
 }
 .upload-container{
@@ -17,7 +16,7 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.upload-page-title {
+#titleDocument {
     color: #333;
     font-size: 24px;
     margin-bottom: 20px;
