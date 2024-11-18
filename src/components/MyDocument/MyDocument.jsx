@@ -1,14 +1,28 @@
 import React from "react";
 import "./MyDocument.css";
 
-const MyDocument = () => {
-  const documents = Array(10).fill({
+const documents = [
+  {
     name: "หนังสือรับรองการให้ความเห็นชอบเป็นผู้ตรวจสอบปีที่ตราเอียม.pdf",
     type: "หนังสือรับรอง",
     department: "กรมศิลปากรธรรมชาติ",
-    date: "20 พ.ค. 2024",
-  });
+    date: "20 พ.ย. 2024",
+  },
+  {
+    name: "เอกสารการวางแผนการเงิน.pdf",
+    type: "เอกสารทั่วไป",
+    department: "กรมการเงิน",
+    date: "10 พ.ย. 2024",
+  },
+  {
+    name: "รายงานผลการดำเนินงานปี 2024.pdf",
+    type: "รายงาน",
+    department: "ฝ่ายบริหาร",
+    date: "15 ต.ค. 2024",
+  },
+];
 
+const MyDocument = () => {
   return (
     <div className="my-document-container">
       <h2 className="my-document-title">My Document</h2>
@@ -35,7 +49,11 @@ const MyDocument = () => {
           {documents.map((doc, index) => (
             <tr key={index}>
               <td className="document-name">
-                <img src="/path/to/pdf-icon.png" alt="PDF Icon" className="pdf-icon" />
+                <img
+                  src="/img/pdf-icon.png"
+                  alt="PDF Icon"
+                  className="pdf-icon"
+                />
                 {doc.name}
               </td>
               <td>{doc.type}</td>

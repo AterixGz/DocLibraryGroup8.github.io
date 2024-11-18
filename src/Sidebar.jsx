@@ -11,10 +11,17 @@ function Sidebar({ user }) {
   const toggleSidebar = () => setSidebarActive(!isSidebarActive);
 
   return (
-    <div className={`sidebar-container d-flex flex-column justify-content-between p-3 vh-100 ${isSidebarActive ? "active" : ""}`}>
+    <div
+      className={`sidebar-container d-flex flex-column justify-content-between p-3 vh-100 ${
+        isSidebarActive ? "active" : ""
+      }`}
+    >
       {/* Logo Section */}
       <div className="logo-section mb-4">
-        <Link to="/" className="text-decoration-none d-flex align-items-center mb-3">
+        <Link
+          to="/"
+          className="text-decoration-none d-flex align-items-center mb-3"
+        >
           <img
             src="/img/Logo2.png"
             alt="Logo"
@@ -38,33 +45,44 @@ function Sidebar({ user }) {
           </Link>
         </li>
         <li className="nav-item p-1">
-          <a href="#" className="nav-link sidebar-item" onClick={toggleDropdown}>
+          <a
+            href="#"
+            className="nav-link sidebar-item"
+            onClick={toggleDropdown}
+          >
             <i className="bi bi-gear me-2"></i> Administrator
           </a>
           {isDropdownOpen && (
-          <ul className="nav flex-column ms-3">
-          <li className="nav-item p-1">
-            <Link to="/my-document" className="nav-link sidebar-item">
-              <i className="bi bi-file-earmark-text"></i> My Document
-            </Link>
-          </li>
-          <li className="nav-item p-1">
-            <Link to="/document" className="nav-link sidebar-item">
-              <i className="bi bi-folder"></i> Document Management
-            </Link>
-          </li>
-          <li className="nav-item p-1">
-            <Link to="/permission" className="nav-link sidebar-item">
-              <i className="bi bi-shield-lock"></i> Permission Management
-            </Link>
-          </li>
-          <li className="nav-item p-1">
-            <Link to="/reports" className="nav-link sidebar-item">
-              <i className="bi bi-bar-chart"></i> Reports
-            </Link>
-          </li>
-        </ul>
-        
+            <ul className="nav flex-column ms-3">
+              <li className="nav-item p-1">
+                <Link to="/my-document" className="nav-link sidebar-item">
+                  <i className="bi bi-file-earmark-text"></i> My Document
+                </Link>
+              </li>
+              <li className="nav-item p-1">
+                <Link
+                  to="/document"
+                  className="nav-link sidebar-item d-flex align-items-center justify-content-center"
+                >
+                  <i className="bi bi-folder"></i>
+                  <span className="ms-2">Document Management</span>
+                </Link>
+              </li>
+              <li className="nav-item p-1">
+                <Link
+                  to="/permission"
+                  className="nav-link sidebar-item d-flex align-items-center justify-content-center"
+                >
+                  <i className="bi bi-shield-lock"></i>
+                  <span className="ms-2">Permission Management</span>
+                </Link>
+              </li>
+              <li className="nav-item p-1">
+                <Link to="/reports" className="nav-link sidebar-item">
+                  <i className="bi bi-bar-chart"></i> Reports
+                </Link>
+              </li>
+            </ul>
           )}
         </li>
         <li className="nav-item p-1">
@@ -77,7 +95,10 @@ function Sidebar({ user }) {
       {/* Footer Section */}
       <div className="footer-section mt-auto">
         <hr className="divider" />
-        <Link to="/profile" className="footer-link d-flex align-items-center text-decoration-none">
+        <Link
+          to="/profile"
+          className="footer-link d-flex align-items-center text-decoration-none"
+        >
           <img
             src={user?.avatar || "/img/default-avatar.png"}
             alt="Profile"
@@ -89,13 +110,19 @@ function Sidebar({ user }) {
               objectFit: "cover",
             }}
           />
-          <span className="user-name">{user ? `${user.firstName} ${user.lastName}` : "User Name"}</span>
+          <span className="user-name">
+            {user ? `${user.firstName} ${user.lastName}` : "User Name"}
+          </span>
         </Link>
       </div>
 
       {/* Toggle Sidebar Button */}
       <div className="toggle-menu" onClick={toggleSidebar}>
-        <i className={`bx ${isSidebarActive ? "bxs-left-arrow" : "bxs-right-arrow"}`}></i>
+        <i
+          className={`bx ${
+            isSidebarActive ? "bxs-left-arrow" : "bxs-right-arrow"
+          }`}
+        ></i>
       </div>
     </div>
   );

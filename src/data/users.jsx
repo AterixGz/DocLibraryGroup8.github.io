@@ -37,6 +37,18 @@ const users = [
     position: "เจ้าหน้าที่",
     avatar: "/img/user2-avatar.png"  // Correct path to avatar
   },
+  { 
+    username: "user3", 
+    password: "password3", 
+    token: "token3", 
+    role: "user", 
+    firstName: "สมหมาย", 
+    lastName: "ขยันเกิน", 
+    email: "somhai@example.com", 
+    department: "การตลาดล่าง", 
+    position: "เจ้าหน้าที่ระดับสูง",
+    avatar: "/img/user2-avatar.png"  // Correct path to avatar
+  },
   // { 
   //   username: "guest", 
   //   password: "guestpassword", 

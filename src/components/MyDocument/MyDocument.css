@@ -1,4 +1,5 @@
 .my-document-container {
+<<<<<<< Updated upstream
     padding: 20px;
     background-color: #f9f9f9;
     width: 100%;
@@ -72,3 +73,77 @@
     background-color: #f1f1f1;
   }
   
+=======
+  padding: 20px;
+  background-color: #fff;
+  width: 100%;
+  margin-left: 250px; /* ให้ sidebar อยู่เหมือนเดิม */
+}
+
+.my-document-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.filter-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-button {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.document-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.document-table th,
+.document-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.document-table th {
+  font-weight: bold;
+  color: #666;
+}
+
+.document-table th .sort-icon {
+  font-size: 0.8rem;
+  margin-left: 5px;
+  color: #999;
+}
+
+.document-table td.document-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pdf-icon {
+  width: 20px;
+  height: auto;
+}
+
+.more-options {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.document-table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+>>>>>>> Stashed changes
