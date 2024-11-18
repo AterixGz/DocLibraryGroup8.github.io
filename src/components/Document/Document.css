@@ -3,8 +3,8 @@
 .upload-page-container{
     padding: 20px;
     font-family: Arial, sans-serif;
-    height: 100vh;
-    margin-left: 250px;
+    height: 100%;
+    
    
 }
 .upload-container{
@@ -57,8 +57,8 @@
 
 .btn-success{
     position: absolute;
-    left: 270px;
-    bottom: 50px;
+    top:auto;
+    left: 10px;
     width: 10%;
     padding: 10px;
     font-size: 16px;
