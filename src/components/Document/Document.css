@@ -1,10 +1,11 @@
 /* Document.css */
 
 .upload-page-container{
-    margin-left: 250px;
     padding: 20px;
     font-family: Arial, sans-serif;
-    
+    height: 100vh;
+    margin-left: 250px;
+   
 }
 .upload-container{
     position: absolute;                     
@@ -16,7 +17,7 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
+.upload-page-title {
     color: #333;
     font-size: 24px;
     margin-bottom: 20px;
@@ -30,10 +31,11 @@ h2 {
 }
 
 .upload-form input[type="text"],
+.upload-form input[type="number"],
 .upload-form input[type="file"],
 .upload-form select,
 .upload-form textarea {
-    width: 60%;
+    width: 50%;
     padding: 10px;
     font-size: 14px;
     color: #333;
@@ -47,29 +49,28 @@ h2 {
     background-color: #f9f9f9;
 }
 
-.upload-form input[type="file"] {
-    padding: 8px;
-}
 
 .upload-form textarea {
     height: 80px;
     resize: none;
 }
 
-.btn-success {
-    width: 60%;
+.btn-success{
+    position: absolute;
+    left: 270px;
+    bottom: 50px;
+    width: 10%;
     padding: 10px;
     font-size: 16px;
     color: #ffffff;
     background-color: #28a745;
     border: none;
-    border-radius: 4px;
-    margin-top: 10px;
-    cursor: pointer;;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 .btn-success:hover {
-    background-color: #218838;
+    background-color: #328821;
 }
 
 .usage-terms {
@@ -112,20 +113,7 @@ h2 {
     margin-top: 20px;
 }
 
-.upload-page-container .file-upload-section:hover {
-    background-color: #ffe5b3;
-}
-
 .upload-page-container .upload-page-container h2 {
     color: #333;
     font-weight: bold;
-}
-
-.upload-page-container .upload-form .btn.btn-success {
-    background-color: #f7941e;
-    border: none;
-}
-
-.upload-page-container .upload-form .btn.btn-success:hover {
-    background-color: #ff9800;
 }
