@@ -1,9 +1,10 @@
 import React from 'react';
-
+import './TableSection.css';
 function TableSection() {
   return (
     <section className="table-section">
-      <table>
+      <h3 id='title-report-table'>หน่วยงาน</h3>
+      <table id='table-report'>
         <thead>
           <tr>
             <th>หน่วยงาน</th>
@@ -12,8 +13,8 @@ function TableSection() {
           </tr>
         </thead>
         <tbody>
-          {[...Array(5)].map((_, index) => (
-            <tr key={index}>
+          {[...Array(4)].map((_, index) => (
+            <tr className='border-bottom-document-report' key={index}>
               <td>หน่วยงานXXX</td>
               <td>357 ฉบับ</td>
               <td>19/10/2024</td>
@@ -21,12 +22,12 @@ function TableSection() {
           ))}
         </tbody>
       </table>
-      <div className="pagination">
-        <button>หน้าแรก</button>
-        <button>ก่อนหน้า</button>
-        <span>1 / 10</span>
-        <button>ต่อไป</button>
-        <button>สุดท้าย</button>
+      <div className="pagination-report">
+        <button className='pagination-button-report'>หน้าแรก</button>
+        <button className='pagination-button-report'>ก่อนหน้า</button>
+        <span id='span-pagination'>1 / 10</span>
+        <button className='pagination-button-report'>ต่อไป</button>
+        <button className='pagination-button-report'>สุดท้าย</button>
       </div>
     </section>
   );
