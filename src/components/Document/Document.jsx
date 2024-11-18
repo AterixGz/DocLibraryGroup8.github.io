@@ -71,7 +71,7 @@ function Document() {
 
   return (
     <div className="upload-page-container">
-      <h2 id='titleDocument'>อัปโหลดเอกสาร</h2>
+      <h2 className="upload-page-title">อัปโหลดเอกสาร</h2>
       <form onSubmit={handleSubmit} className="upload-form">
         <label>ชื่อเอกสาร <span style={{ color: "red" }}>*</span></label>
         <input
