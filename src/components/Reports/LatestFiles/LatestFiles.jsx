@@ -4,7 +4,7 @@ import './LatestFiles.css';
 
 function LatestFiles({ title }) {
 
-  const LinktoThis = title === "ไฟล์ที่เพิ่มล่าสุด" ? "/reports/ไฟล์ที่เพิ่ม" : "/reports/ไฟล์ที่ลบ"
+  const LinktoThis = title === "ไฟล์ที่เพิ่มล่าสุด" ? "/reports/addfilelist" : "/reports/removefilelist"
   return (
     <section className="latest-files">
       <h3 className='latest-files-title'>{title}</h3>

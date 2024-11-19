@@ -9,8 +9,8 @@ import Administrator from "./components/Administrator/Administrator";
 import Document from "./components/Document/Document";
 import Permission from "./components/Permission/Permission";
 import Reports from "./components/Reports/Reports";
-import addFileReport from "./components/Reports/ไฟล์ที่เพิ่ม/addFile"
-import removeFileReport from "./components/Reports/ไฟล์ที่ลบ/removeFile"
+import AddFileReport from "./components/Reports/addFileList/addFile"
+import RemoveFileReport from "./components/Reports/removeFileList/removeFile"
 import Help from "./components/Help/Help";
 import Profile from "./components/Profile/Profile";
 import Login from "./page/Login/Login";
@@ -74,8 +74,8 @@ function App() {
                 <Route path="/document" element={<Document />} />
                 <Route path="/permission" element={<Permission />} />
                 <Route path="/reports" element={<Reports />} />
-                <Route path="/reports/ไฟล์ที่เพิ่ม" element={<addFileReport />} />
-                <Route path="/reports/ไฟล์ที่ลบ" element={<removeFileReport />} />
+                <Route path="/reports/addfilelist" element={<AddFileReport />} />
+                <Route path="/reports/removefilelist" element={<RemoveFileReport />} />
                 <Route path="/help" element={<Help />} />
                 <Route path="/profile" element={<Profile username={username} password={password} />} />
               </>
