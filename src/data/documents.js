@@ -27,7 +27,7 @@ const documents = [
     date: "2023-12-30",
     uploader: "สมหญิง ขยันทำ",
     fileUrl: "/documents/doc3.xlsx",
-    icon: "/img/excel-icon.png", // ไอคอนเฉพาะสำหรับ Excel
+    icon: "/img/pdf-icon.png", // ไอคอนเฉพาะสำหรับ Excel
   },
 ];
 

@@ -1,74 +1,101 @@
 .my-document-container {
-    padding: 20px;
-    background-color: #f9f9f9;
-    width: 100%;
-  }
-  
-  .my-document-title {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-decoration: underline;
-  }
-  
-  .filter-section {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  
-  .filter-button {
-    background-color: #f0f0f0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 8px 12px;
-    font-size: 1rem;
-    cursor: pointer;
-  }
-  
-  .document-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .document-table th,
-  .document-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .document-table th {
-    font-weight: bold;
-    color: #666;
-  }
-  
-  .document-table th .sort-icon {
-    font-size: 0.8rem;
-    margin-left: 5px;
-    color: #999;
-  }
-  
-  .document-table td.document-name {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .pdf-icon {
-    width: 20px;
-    height: auto;
-  }
-  
-  .more-options {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #333;
-    cursor: pointer;
-  }
-  
-  .document-table tbody tr:hover {
-    background-color: #f1f1f1;
-  }
-  
+  padding: 20px;
+  background-color: #ffffff;
+  width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.my-document-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #ff6600;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.filter-section {
+  display: flex;
+  justify-content: left;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.filter-button {
+  background-color: #ff6600;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-button:hover {
+  background-color: #e05500;
+  transform: scale(1.05);
+}
+
+.document-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.document-table th,
+.document-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.document-table th {
+  background-color: #f8f8f8;
+  font-weight: bold;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.document-table td.document-name {
+  align-items: center;
+  gap: 10px; /* ระยะห่างระหว่างไอคอนกับข้อความ */
+}
+
+.document-table td a {
+  color: #000000;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.document-table td a:hover {
+  color: #F14D31;
+}
+
+.file-icon {
+  width: 32px; /* ปรับขนาดไอคอนให้เหมาะสม */
+  height: auto;
+  vertical-align: middle;
+}
+
+.more-options {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.more-options:hover {
+  color: #ff6600;
+}
+
+.document-table tbody tr:hover {
+  background-color: #fff5e6;
+}
