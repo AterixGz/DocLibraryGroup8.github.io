@@ -1,33 +1,40 @@
 import "./Permission.css";
 import React, { useState, useEffect } from "react";
-import users from "../../data/users"; // Import users.js
+import users from "../../data/users";
 
 function Permission() {
-  const [inputValue, setInputValue] = useState(""); // สำหรับเก็บค่าที่กรอกในช่องค้นหา
-  const [namesList, setNamesList] = useState([]); // สำหรับเก็บรายการชื่อบุคลากร
-  const [filteredNamesList, setFilteredNamesList] = useState([]); // สำหรับเก็บรายชื่อที่กรองตามชื่อ
+  const [inputValue, setInputValue] = useState("");
+  const [namesList, setNamesList] = useState([]);
+  const [filteredNamesList, setFilteredNamesList] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
+  const [newUser, setNewUser] = useState({
+    firstName: "",
+    lastName: "",
+    username: "",
+    documentAccess: false,
+    permission: false,
+    report: false,
+  });
 
-  // ฟังก์ชันที่ใช้ในการเพิ่มข้อมูลจาก users.js มาแสดงใน namesList
   useEffect(() => {
     const usersList = users.map((user) => ({
       name: user.firstName + " " + user.lastName,
       username: user.username,
-      documentAccess: false, // การเข้าถึงเอกสาร (toggle)
-      permission: false, // การจัดการสิทธิ์เข้าถึง (toggle)
-      report: false, // การจัดการรายงาน (toggle)
+      documentAccess: false,
+      permission: false,
+      report: false,
     }));
     setNamesList(usersList);
-    setFilteredNamesList(usersList); // กำหนดให้รายชื่อที่แสดงแรกเริ่มเป็นรายชื่อทั้งหมด
-  }, []); // ทำงานครั้งเดียวเมื่อคอมโพเนนต์โหลด
+    setFilteredNamesList(usersList);
+  }, []);
 
-  // ฟังก์ชันจัดการการค้นหาชื่อพนักงาน
   const handleSearch = (e) => {
-    setInputValue(e.target.value); // อัพเดทค่า input
-    const searchTerm = e.target.value.toLowerCase(); // แปลงข้อความที่ค้นหามาเป็น lowercase เพื่อให้ค้นหาได้ไม่แยกตัวพิมพ์ใหญ่/เล็ก
+    setInputValue(e.target.value);
+    const searchTerm = e.target.value.toLowerCase();
     const filtered = namesList.filter((person) =>
       person.name.toLowerCase().includes(searchTerm) || person.username.toLowerCase().includes(searchTerm)
     );
-    setFilteredNamesList(filtered); // อัพเดตรายชื่อที่แสดงผลหลังจากการค้นหา
+    setFilteredNamesList(filtered);
   };
 
   const handleDelete = (index) => {
@@ -45,11 +52,48 @@ function Permission() {
     alert("ข้อมูลทั้งหมดได้รับการยืนยัน!");
   };
 
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setNewUser({
+      firstName: "",
+      lastName: "",
+      username: "",
+      documentAccess: false,
+      permission: false,
+      report: false,
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewUser((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddUser = () => {
+    if (newUser.firstName && newUser.lastName && newUser.username) {
+      const newPerson = {
+        name: `${newUser.firstName} ${newUser.lastName}`,
+        username: newUser.username,
+        documentAccess: newUser.documentAccess,
+        permission: newUser.permission,
+        report: newUser.report,
+      };
+      setNamesList((prev) => [...prev, newPerson]);
+      setFilteredNamesList((prev) => [...prev, newPerson]);
+      handleModalClose();
+    } else {
+      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+    }
+  };
+
   return (
     <div className="permission-container">
       <h3>จัดการสิทธิ์ในการเข้าถึง</h3>
 
-      {/* ช่องค้นหาชื่อพนักงาน */}
       <div className="search-container">
         <input
           type="text"
@@ -59,16 +103,19 @@ function Permission() {
         />
       </div>
 
-      {/* ตารางแสดงรายชื่อบุคลากร */}
+      <button className="add-btn" onClick={handleModalOpen}>
+        เพิ่มบุคลากร
+      </button>
+
       <div className="names-list">
         <table>
           <thead>
             <tr>
-              <th style={{ width: '40%' }}>บุคลากร</th>
-              <th style={{ width: '20%' }} className="align-right">การจัดการเอกสาร</th>
-              <th style={{ width: '20%' }} className="align-right">การจัดการสิทธิ์เข้าถึง</th>
-              <th style={{ width: '20%' }} className="align-right">การจัดการรายงาน</th>
-              <th style={{ width: '20%' }} className="align-right"></th>
+              <th>บุคลากร</th>
+              <th className="align-right">การจัดการเอกสาร</th>
+              <th className="align-right">การจัดการสิทธิ์เข้าถึง</th>
+              <th className="align-right">การจัดการรายงาน</th>
+              <th className="align-right"></th>
             </tr>
           </thead>
           <tbody>
@@ -117,7 +164,7 @@ function Permission() {
                       className="btn-danger"
                       onClick={() => handleDelete(index)}
                     >
-                      <i className="bi bi-trash"></i>
+                      ลบ
                     </button>
                   </td>
                 </tr>
@@ -132,6 +179,44 @@ function Permission() {
           ยืนยัน
         </button>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>เพิ่มบุคลากรใหม่</h3>
+            <input
+              type="text"
+              name="firstName"
+              placeholder="ชื่อ"
+              value={newUser.firstName}
+              onChange={handleInputChange}
+            />
+            <input
+              type="text"
+              name="lastName"
+              placeholder="นามสกุล"
+              value={newUser.lastName}
+              onChange={handleInputChange}
+            />
+            <input
+              type="text"
+              name="username"
+              placeholder="รหัสผู้ใช้"
+              value={newUser.username}
+              onChange={handleInputChange}
+            />
+            <div className="modal-btns">
+              <button className="confirm-btn" onClick={handleAddUser}>
+                เพิ่ม
+              </button>
+              <button className="btn-danger" onClick={handleModalClose}>
+                ยกเลิก
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
