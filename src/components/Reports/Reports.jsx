@@ -1,5 +1,5 @@
 import React from "react";
-import Slider from "react-slick";
+import { useLocation } from 'react-router-dom';
 import SliderComponent from "./SliderComponent/SliderComponent"
 import FileSummary from "./FileSummary/FileSummary";
 import LatestFiles from "./LatestFiles/LatestFiles";
@@ -50,6 +50,7 @@ const slides = [
 ];
 
 const Reports = () => {
+  const location = useLocation();
   return (
     <>
       <div className="aWholeContent">

@@ -1,7 +1,10 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 import './LatestFiles.css';
 
 function LatestFiles({ title }) {
+
+  const LinktoThis = title === "ไฟล์ที่เพิ่มล่าสุด" ? "/reports/ไฟล์ที่เพิ่ม" : "/reports/ไฟล์ที่ลบ"
   return (
     <section className="latest-files">
       <h3 className='latest-files-title'>{title}</h3>
@@ -23,7 +26,9 @@ function LatestFiles({ title }) {
           ))}
         </tbody>
       </table>
-      <button className='button-see-more'>ดูเพิ่มเติม</button>
+      <Link to={LinktoThis}>
+        <button className='button-see-more'>ดูเพิ่มเติม</button>
+      </Link>
     </section>
   );
 }
