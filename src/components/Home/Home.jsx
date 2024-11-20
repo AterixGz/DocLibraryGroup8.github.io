@@ -4,12 +4,7 @@ import FileData from '../../data/FileData';
 
 const Home = ({ role }) => {
     const [documents, setDocuments] = useState([]);
-
-    useEffect(() => {
-        // โหลดข้อมูลจาก FileData.jsx
-        setDocuments(FileData);
-    }, []);
-
+    const [previewFile, setPreviewFile] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [filters, setFilters] = useState({
         documentName: "",
@@ -17,6 +12,34 @@ const Home = ({ role }) => {
         category: "",
         department: "",
     });
+    const [sortOption, setSortOption] = useState('date-asc');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10); // จำนวนเอกสารต่อหน้า
+
+    useEffect(() => {
+        setDocuments(FileData);
+    }, []);
+
+    const sortDocuments = (documents, option, order) => {
+        return documents.sort((a, b) => {
+            if (option === 'date') {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                return order === 'asc' ? dateA - dateB : dateB - dateA;
+            } else if (option === 'name') {
+                return order === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+            } else if (option === 'category') {
+                return order === 'asc' ? a.type.localeCompare(b.type) : b.type.localeCompare(a.type);
+            }
+            return 0;
+        });
+    };
+
+    const handleSortChange = (event) => {
+        const [option, order] = event.target.value.split('-');
+        setSortOption(event.target.value);
+        setDocuments(prevDocuments => sortDocuments([...prevDocuments], option, order));
+    };
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
@@ -24,11 +47,20 @@ const Home = ({ role }) => {
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
-        setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
+        const cleanedValue = value.trim().toLowerCase().replace(/&/g, 'และ');
+        setFilters((prevFilters) => ({ ...prevFilters, [name]: cleanedValue }));
+    };
+
+    const handlePreview = (fileUrl) => {
+        setPreviewFile(fileUrl);
+    };
+
+    const closePreview = () => {
+        setPreviewFile(null);
     };
 
     const filteredDocuments = documents.filter(doc => {
-        const search = searchTerm.toLowerCase();
+        const search = searchTerm.trim().toLowerCase();
         return (
             doc.name.toLowerCase().includes(search) ||
             doc.type.toLowerCase().includes(search) ||
@@ -37,12 +69,44 @@ const Home = ({ role }) => {
         );
     }).filter(doc => {
         return (
-            (!filters.documentName || doc.name.toLowerCase().includes(filters.documentName.toLowerCase())) &&
+            (!filters.documentName || doc.name.toLowerCase().includes(filters.documentName)) &&
             (!filters.date || doc.date === filters.date) &&
-            (!filters.category || doc.type === filters.category) &&
-            (!filters.department || doc.department === filters.department)
+            (!filters.category || doc.type.toLowerCase().includes(filters.category.toLowerCase())) &&
+            (!filters.department || doc.department.toLowerCase().includes(filters.department.toLowerCase()))
         );
     });
+
+    const sortedDocuments = sortDocuments(filteredDocuments, ...sortOption.split('-'));
+
+    const indexOfLastDocument = currentPage * itemsPerPage;
+    const indexOfFirstDocument = indexOfLastDocument - itemsPerPage;
+    const currentDocuments = sortedDocuments.slice(indexOfFirstDocument, indexOfLastDocument);
+
+    const totalPages = Math.ceil(sortedDocuments.length / itemsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleFirstPage = () => {
+        setCurrentPage(1);
+    };
+
+    const handleLastPage = () => {
+        setCurrentPage(totalPages);
+    };
 
     return (
         <div className={`home-container ${role === "guest" ? "guest-home" : ""}`}>
@@ -58,6 +122,41 @@ const Home = ({ role }) => {
                     />
                 </div>
 
+                <div className="dropdown">
+                    <label className="filter-label">จัดเรียงตาม: </label>
+                    <select onChange={handleSortChange} value={sortOption} className="sort-dropdown">
+                        <option value="date-asc">วันที่ (น้อยไปหามาก)</option>
+                        <option value="date-desc">วันที่ (มากไปหาน้อย)</option>
+                        <option value="name-asc">ชื่อ (ก-ฮ)</option>
+                        <option value="name-desc">ชื่อ (ฮ-ก)</option>
+                    </select>
+                    <label className="filter-labels">ประเภทเอกสาร:</label>
+                    <select
+                        onChange={handleFilterChange}
+                        value={filters.category}
+                        name="category"
+                        className="sort-dropdown"
+                    >
+                        <option value="">เลือกประเภทเอกสาร</option>
+                        <option value="ผลการดำเนินงาน">ผลการดำเนินงาน</option>
+                        <option value="รายงานประจำปี">รายงานประจำปี</option>
+                        <option value="รายงานปริมาณการผลิตรายเดือน">รายงานปริมาณการผลิตรายเดือน</option>
+                        <option value="การขาย มูลค่า และค่าภาคหลวง">การขาย มูลค่า และค่าภาคหลวง</option>
+                        <option value="การจัดสรรค่าภาคหลวงให้ท้องถิ่น">การจัดสรรค่าภาคหลวงให้ท้องถิ่น</option>
+                        <option value="การจัดหาปิโตรเลียม">การจัดหาปิโตรเลียม</option>
+                        <option value="ปริมาณสำรองปิโตรเลียม">ปริมาณสำรองปิโตรเลียม</option>
+                    </select>
+                    <span className='items-per-page'>
+                        <label className='filter-label'>แสดงข้อมูล:</label>
+                        <select onChange={(e) => setItemsPerPage(Number(e.target.value))} value={itemsPerPage} className="sort-dropdown">
+                            <option value={5}>5 ข้อมูล</option>
+                            <option value={10}>10 ข้อมูล</option>
+                            <option value={15}>15 ข้อมูล</option>
+                            <option value={30}>30 ข้อมูล</option>
+                        </select>
+                    </span>
+                </div>
+                <hr className='hr-top'></hr>
                 <table className="document-table">
                     <thead>
                         <tr>
@@ -66,30 +165,54 @@ const Home = ({ role }) => {
                             <th>ประเภทเอกสาร</th>
                             <th>วันที่ลง</th>
                             <th>หน่วยงาน</th>
-                            <th>เครื่องมือ</th>
+                            {role !== "guest" && <th>เครื่องมือ</th>}
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredDocuments.map((doc, index) => (
+                        {currentDocuments.map((doc, index) => (
                             <tr key={doc.id}>
-                                <td>{index + 1}</td>
-                                <td>{doc.name}</td>
+                                <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                                <td>
+                                    {role === "guest" ? (
+                                        doc.name
+                                    ) : (
+                                        <a href="#" onClick={() => handlePreview(doc.FileUrl)} className="preview-link">
+                                            {doc.name}
+                                        </a>
+                                    )}
+                                </td>
                                 <td>{doc.type}</td>
                                 <td>{doc.date}</td>
                                 <td>{doc.department}</td>
-                                <td>
-                                    <a
-                                        className="download-link"
-                                        href={doc.FileUrl}
-                                        download={doc.name}
-                                    >
-                                        ดาวน์โหลด
-                                    </a>
-                                </td>
+                                {role !== "guest" && (
+                                    <td>
+                                        <a className="download-link" href={doc.FileUrl} download={doc.name}>
+                                            ดาวน์โหลด
+                                        </a>
+                                    </td>
+                                )}
                             </tr>
                         ))}
                     </tbody>
                 </table>
+
+                <div className="page-button">
+                    <button className="bp bp-outline-og page-space" onClick={handleFirstPage} disabled={currentPage === 1}>หน้าแรก</button>
+                    <button className="bp bp-outline-og page-space" onClick={handlePrevPage} disabled={currentPage === 1}>หน้าก่อนหน้า</button>
+                    <span className="page-space">{currentPage} / {totalPages}</span>
+                    <button className="bp bp-outline-og page-space" onClick={handleNextPage} disabled={currentPage === totalPages}>หน้าถัดไป</button>
+                    <button className="bp bp-outline-og page-space" onClick={handleLastPage} disabled={currentPage === totalPages}>หน้าสุดท้าย</button>
+                </div>
+
+                {/* Preview Modal */}
+                {previewFile && (
+                    <div className="preview-modal">
+                        <div className="modal-content">
+                            <button onClick={closePreview} className="close-button">ปิด</button>
+                            <iframe src={previewFile} className="preview-iframe" title="Preview Document"></iframe>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -231,7 +231,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-07-17",
         year: "2567",
-        FileUrl: "../../public/filedata/026_ReportsellJul67.pdf",
+        FileUrl: "../../public/filedata/026_ReportsellJuly67.pdf",
     },
     {
         id: 27,
@@ -312,7 +312,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-12-16",
         year: "2567",
-        FileUrl: "../../public/filedata/029_AlloMuPer4_67.pdf",
+        FileUrl: "../../public/filedata/029_AlloSaoPer4_67.pdf",
     },
     {
         id: 36,
@@ -339,7 +339,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-09-16",
         year: "2567",
-        FileUrl: "../../public/filedata/030_AlloMuPer3_67.pdf",
+        FileUrl: "../../public/filedata/030_AlloSaoPer3_67.pdf",
     },
     {
         id: 39,

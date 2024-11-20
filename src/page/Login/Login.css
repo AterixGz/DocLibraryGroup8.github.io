@@ -68,6 +68,12 @@
   margin-bottom: 1rem;
 }
 
+.login-form__input:focus {
+  outline: none;
+    border-color: #FF4D02;
+    box-shadow: 0 0 5px rgba(255, 77, 2, 0.3);
+}
+
 .login-button {
   width: 100%;
   padding: 0.75rem;
