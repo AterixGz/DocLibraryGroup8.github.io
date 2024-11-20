@@ -5,6 +5,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2566-05-20",
+        year: "2566",
         FileUrl: '../../public/filedata/001_Report66.pdf',
     },
     {
@@ -13,6 +14,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2563-04-15",
+        year: "2563",
         FileUrl: "../../public/filedata/006_Sum63.pdf",
     },
     {
@@ -21,6 +23,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2563-12-25",
+        year: "2563",
         FileUrl: "../../public/filedata/011_Rateyour63.pdf",
     },
     {
@@ -29,6 +32,7 @@ const Filedata = [
         type: "รายงานประจำปี",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2566-12-29",
+        year: "2566",
         FileUrl: "../../public/filedata/016_ReportYear66.pdf",
     },
     {
@@ -37,6 +41,7 @@ const Filedata = [
         type: "รายงานปริมาณการผลิตรายเดือน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-10-30",
+        year: "2567",
         FileUrl: "../../public/filedata/021_ReportmanuOct67.pdf",
     },
     {
@@ -45,6 +50,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2565-12-30",
+        year: "2565",
         FileUrl: "../../public/filedata/002_Sum65.pdf",
     },
     {
@@ -53,6 +59,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2560-12-15",
+        year: "2560",
         FileUrl: "../../public/filedata/007_Acc60.pdf",
     },
     {
@@ -61,6 +68,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2562-12-25",
+        year: "2562",
         FileUrl: "../../public/filedata/012_Rateyour62.pdf",
     },
     {
@@ -69,6 +77,7 @@ const Filedata = [
         type: "รายงานประจำปี",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2565-12-31",
+        year: "2565",
         FileUrl: "../../public/filedata/017_ReportYear65.pdf",
     },
     {
@@ -77,6 +86,7 @@ const Filedata = [
         type: "รายงานปริมาณการผลิตรายเดือน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-09-24",
+        year: "2567",
         FileUrl: "../../public/filedata/022_ReportmanuSep67.pdf",
     },
     {
@@ -85,6 +95,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2565-09-30",
+        year: "2565",
         FileUrl: "../../public/filedata/003_Report65.pdf",
     },
     {
@@ -93,6 +104,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2559-09-15",
+        year: "2559",
         FileUrl: "../../public/filedata/008_Acc59.pdf",
     },
     {
@@ -101,6 +113,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2561-07-23",
+        year: "2561",
         FileUrl: "../../public/filedata/013_Sumpati61.pdf",
     },
     {
@@ -109,6 +122,7 @@ const Filedata = [
         type: "รายงานประจำปี",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2564-12-27",
+        year: "2564",
         FileUrl: "../../public/filedata/018_ReportYear64.pdf",
     },
     {
@@ -117,6 +131,7 @@ const Filedata = [
         type: "รายงานปริมาณการผลิตรายเดือน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-08-24",
+        year: "2567",
         FileUrl: "../../public/filedata/023_ReportmanuAug67.pdf",
     },
     {
@@ -125,6 +140,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2564-12-22",
+        year: "2564",
         FileUrl: "../../public/filedata/004_Report64.pdf",
     },
     {
@@ -133,6 +149,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2565-07-15",
+        year: "2565",
         FileUrl: "../../public/filedata/009_Rateyour65.pdf",
     },
     {
@@ -141,6 +158,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2560-11-02",
+        year: "2560",
         FileUrl: "../../public/filedata/014_Sumpati60.pdf",
     },
     {
@@ -149,6 +167,7 @@ const Filedata = [
         type: "รายงานประจำปี",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2563-12-10",
+        year: "2563",
         FileUrl: "../../public/filedata/019_ReportYear63.pdf",
     },
     {
@@ -157,6 +176,7 @@ const Filedata = [
         type: "การขาย มูลค่า และค่าภาคหลวง",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-09-28",
+        year: "2567",
         FileUrl: "../../public/filedata/024_ReportsellSep67.pdf",
     },
     {
@@ -165,6 +185,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2563-12-16",
+        year: "2563",
         FileUrl: "../../public/filedata/005_Report63.pdf",
     },
     {
@@ -173,6 +194,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2564-09-02",
+        year: "2564",
         FileUrl: "../../public/filedata/010_Rateyour64.pdf",
     },
     {
@@ -181,6 +203,7 @@ const Filedata = [
         type: "ผลการดำเนินงาน",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2559-12-08",
+        year: "2559",
         FileUrl: "../../public/filedata/015_Sumpati59.pdf",
     },
     {
@@ -189,6 +212,7 @@ const Filedata = [
         type: "รายงานประจำปี",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2562-11-27",
+        year: "2562",
         FileUrl: "../../public/filedata/020_ReportYear62.pdf",
     },
     {
@@ -197,6 +221,7 @@ const Filedata = [
         type: "การขาย มูลค่า และค่าภาคหลวง",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-08-29",
+        year: "2567",
         FileUrl: "../../public/filedata/025_ReportsellAug67.pdf",
     },
     {
@@ -205,6 +230,7 @@ const Filedata = [
         type: "การขาย มูลค่า และค่าภาคหลวง",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-07-17",
+        year: "2567",
         FileUrl: "../../public/filedata/026_ReportsellJul67.pdf",
     },
     {
@@ -213,6 +239,7 @@ const Filedata = [
         type: "การจัดหาปิโตรเลียม",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-05-05",
+        year: "2567",
         FileUrl: "../../public/filedata/031_Procure67.xlsx",
     },
     {
@@ -221,6 +248,7 @@ const Filedata = [
         type: "ปริมาณสำรองปิโตรเลียม",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2565-12-30",
+        year: "2565",
         FileUrl: "../../public/filedata/036_Reserve65.xlsx",
     },
     {
@@ -229,6 +257,7 @@ const Filedata = [
         type: "การจัดสรรค่าภาคหลวงให้ท้องถิ่น",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-11-16",
+        year: "2567",
         FileUrl: "../../public/filedata/027_AlloMuPer4_67.pdf",
     },
     {
@@ -237,6 +266,7 @@ const Filedata = [
         type: "การจัดหาปิโตรเลียม",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2566-06-12",
+        year: "2566",
         FileUrl: "../../public/filedata/032_Procure66.xlsx",
     },
     {
@@ -245,6 +275,7 @@ const Filedata = [
         type: "ปริมาณสำรองปิโตรเลียม",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2564-12-14",
+        year: "2564",
         FileUrl: "../../public/filedata/037_Reserve64.xlsx",
     },
     {
@@ -253,6 +284,7 @@ const Filedata = [
         type: "การจัดสรรค่าภาคหลวงให้ท้องถิ่น",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-08-16",
+        year: "2567",
         FileUrl: "../../public/filedata/028_AlloMuPer3_67.pdf",
     },
     {
@@ -261,6 +293,7 @@ const Filedata = [
         type: "การจัดหาปิโตรเลียม",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2565-04-01",
+        year: "2565",
         FileUrl: "../../public/filedata/033_Procure65.xlsx",
     },
     {
@@ -269,6 +302,7 @@ const Filedata = [
         type: "การขนถ่ายปิโตรเลียมในอ่าวไทย",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-07-17",
+        year: "2567",
         FileUrl: "../../public/filedata/038_Transport.xlsx",
     },
     {
@@ -277,6 +311,7 @@ const Filedata = [
         type: "การจัดสรรค่าภาคหลวงให้ท้องถิ่น",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-12-16",
+        year: "2567",
         FileUrl: "../../public/filedata/029_AlloMuPer4_67.pdf",
     },
     {
@@ -285,6 +320,7 @@ const Filedata = [
         type: "การจัดหาปิโตรเลียม",
         department: "กรมเชื้อเพลิงธรรมชาติ", 
         date: "2564-03-14",
+        year: "2564",
         FileUrl: "../../public/filedata/034_Procure64.xlsx",
     },
     {
@@ -293,6 +329,7 @@ const Filedata = [
         type: "รายชื่อผู้มีสิทธิสำรวจและผลิตปิโตรเลียม",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-01-03",
+        year: "2567",
         FileUrl: "../../public/filedata/039_Namelist.xlsx",
     },
     {
@@ -301,6 +338,7 @@ const Filedata = [
         type: "การจัดสรรค่าภาคหลวงให้ท้องถิ่น",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-09-16",
+        year: "2567",
         FileUrl: "../../public/filedata/030_AlloMuPer3_67.pdf",
     },
     {
@@ -309,6 +347,7 @@ const Filedata = [
         type: "ปริมาณสำรองปิโตรเลียม",
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2566-05-21",
+        year: "2566",
         FileUrl: "../../public/filedata/035_Reserve66.xlsx",
     },
 ]
