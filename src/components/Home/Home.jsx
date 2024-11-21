@@ -12,9 +12,11 @@ const Home = ({ role }) => {
         category: "",
         department: "",
     });
-    const [sortOption, setSortOption] = useState('date-asc');
+    const [sortOption, setSortOption] = useState('date-desc');
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10); // จำนวนเอกสารต่อหน้า
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [showCheckbox, setShowCheckbox] = useState(false);
+    const [selectedDocuments, setSelectedDocuments] = useState([]);
 
     useEffect(() => {
         setDocuments(FileData);
@@ -57,6 +59,30 @@ const Home = ({ role }) => {
 
     const closePreview = () => {
         setPreviewFile(null);
+    };
+
+    const toggleCheckbox = () => {
+        setShowCheckbox((prev) => !prev);
+        setSelectedDocuments([]);
+    };
+
+    const handleSelectDocument = (id) => {
+        setSelectedDocuments((prev) =>
+            prev.includes(id) ? prev.filter((docId) => docId !== id) : [...prev, id]
+        );
+    };
+
+    const handleDownloadSelected = () => {
+        const filesToDownload = documents.filter((doc) =>
+            selectedDocuments.includes(doc.id)
+        );
+
+        filesToDownload.forEach((file) => {
+            const link = document.createElement('a');
+            link.href = file.FileUrl;
+            link.download = file.name;
+            link.click();
+        });
     };
 
     const filteredDocuments = documents.filter(doc => {
@@ -115,7 +141,7 @@ const Home = ({ role }) => {
                 <div className="search-bar">
                     <input
                         type="text"
-                        placeholder="ค้นหาเอกสาร..."
+                        placeholder="ค้นหาเอกสาร (ชื่อ, ประเภท, วันที่, หน่วยงาน)"
                         value={searchTerm}
                         onChange={handleSearch}
                         className="search-input"
@@ -125,8 +151,8 @@ const Home = ({ role }) => {
                 <div className="dropdown">
                     <label className="filter-label">จัดเรียงตาม: </label>
                     <select onChange={handleSortChange} value={sortOption} className="sort-dropdown">
-                        <option value="date-asc">วันที่ (น้อยไปหามาก)</option>
-                        <option value="date-desc">วันที่ (มากไปหาน้อย)</option>
+                        <option value="date-desc">ล่าสุด</option>
+                        <option value="date-asc">เก่าที่สุด</option>
                         <option value="name-asc">ชื่อ (ก-ฮ)</option>
                         <option value="name-desc">ชื่อ (ฮ-ก)</option>
                     </select>
@@ -146,7 +172,7 @@ const Home = ({ role }) => {
                         <option value="การจัดหาปิโตรเลียม">การจัดหาปิโตรเลียม</option>
                         <option value="ปริมาณสำรองปิโตรเลียม">ปริมาณสำรองปิโตรเลียม</option>
                     </select>
-                    <span className='items-per-page'>
+                    {/* <span className='items-per-page'>
                         <label className='filter-label'>แสดงข้อมูล:</label>
                         <select onChange={(e) => setItemsPerPage(Number(e.target.value))} value={itemsPerPage} className="sort-dropdown">
                             <option value={5}>5 ข้อมูล</option>
@@ -154,12 +180,31 @@ const Home = ({ role }) => {
                             <option value={15}>15 ข้อมูล</option>
                             <option value={30}>30 ข้อมูล</option>
                         </select>
-                    </span>
+                    </span> */}
+                </div>
+                <div className="multi-select-actions">
+                    {role !== "guest" && (
+                        <>
+                            <button onClick={toggleCheckbox} className="toggle-checkbox-btn">
+                                {showCheckbox ? "ยกเลิกการเลือก" : "เลือกหลายรายการ"}
+                            </button>
+                            {showCheckbox && (
+                                <button
+                                    onClick={handleDownloadSelected}
+                                    disabled={selectedDocuments.length === 0}
+                                    className="download-selected-btn"
+                                >
+                                    ดาวน์โหลดเอกสารที่เลือก ({selectedDocuments.length})
+                                </button>
+                            )}
+                        </>
+                    )}
                 </div>
                 <hr className='hr-top'></hr>
                 <table className="document-table">
                     <thead>
                         <tr>
+                            {showCheckbox && <th></th>}
                             <th>ลำดับ</th>
                             <th>ชื่อเอกสาร</th>
                             <th>ประเภทเอกสาร</th>
@@ -171,6 +216,16 @@ const Home = ({ role }) => {
                     <tbody>
                         {currentDocuments.map((doc, index) => (
                             <tr key={doc.id}>
+                                {showCheckbox && (
+                                    <td>
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-round"
+                                            checked={selectedDocuments.includes(doc.id)}
+                                            onChange={() => handleSelectDocument(doc.id)}
+                                        />
+                                    </td>
+                                )}
                                 <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
                                 <td>
                                     {role === "guest" ? (

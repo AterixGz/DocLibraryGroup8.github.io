@@ -6,6 +6,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2566-05-20",
         year: "2566",
+        time: "16:47",
         FileUrl: '../../public/filedata/001_Report66.pdf',
     },
     {
@@ -15,6 +16,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2563-04-15",
         year: "2563",
+        time: "12:34",
         FileUrl: "../../public/filedata/006_Sum63.pdf",
     },
     {
@@ -24,6 +26,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2563-12-25",
         year: "2563",
+        time: "17:22",
         FileUrl: "../../public/filedata/011_Rateyour63.pdf",
     },
     {
@@ -33,6 +36,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2566-12-29",
         year: "2566",
+        time: "10:33",
         FileUrl: "../../public/filedata/016_ReportYear66.pdf",
     },
     {
@@ -42,6 +46,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-10-30",
         year: "2567",
+        time: "11:40",
         FileUrl: "../../public/filedata/021_ReportmanuOct67.pdf",
     },
     {
@@ -51,6 +56,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2565-12-30",
         year: "2565",
+        time: "15:30",
         FileUrl: "../../public/filedata/002_Sum65.pdf",
     },
     {
@@ -60,6 +66,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2560-12-15",
         year: "2560",
+        time: "09:25",
         FileUrl: "../../public/filedata/007_Acc60.pdf",
     },
     {
@@ -69,6 +76,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2562-12-25",
         year: "2562",
+        time: "13:50",
         FileUrl: "../../public/filedata/012_Rateyour62.pdf",
     },
     {
@@ -78,6 +86,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2565-12-31",
         year: "2565",
+        time: "14:10",
         FileUrl: "../../public/filedata/017_ReportYear65.pdf",
     },
     {
@@ -87,6 +96,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-09-24",
         year: "2567",
+        time: "10:55",
         FileUrl: "../../public/filedata/022_ReportmanuSep67.pdf",
     },
     {
@@ -96,6 +106,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2565-09-30",
         year: "2565",
+        time: "12:05",
         FileUrl: "../../public/filedata/003_Report65.pdf",
     },
     {
@@ -105,6 +116,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2559-09-15",
         year: "2559",
+        time: "17:50",
         FileUrl: "../../public/filedata/008_Acc59.pdf",
     },
     {
@@ -114,6 +126,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2561-07-23",
         year: "2561",
+        time: "08:30",
         FileUrl: "../../public/filedata/013_Sumpati61.pdf",
     },
     {
@@ -123,6 +136,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2564-12-27",
         year: "2564",
+        time: "14:40",
         FileUrl: "../../public/filedata/018_ReportYear64.pdf",
     },
     {
@@ -132,6 +146,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-08-24",
         year: "2567",
+        time: "17:15",
         FileUrl: "../../public/filedata/023_ReportmanuAug67.pdf",
     },
     {
@@ -141,6 +156,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2564-12-22",
         year: "2564",
+        time: "16:35",
         FileUrl: "../../public/filedata/004_Report64.pdf",
     },
     {
@@ -150,6 +166,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2565-07-15",
         year: "2565",
+        time: "09:05",
         FileUrl: "../../public/filedata/009_Rateyour65.pdf",
     },
     {
@@ -159,6 +176,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2560-11-02",
         year: "2560",
+        time: "13:20",
         FileUrl: "../../public/filedata/014_Sumpati60.pdf",
     },
     {
@@ -168,6 +186,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2563-12-10",
         year: "2563",
+        time: "11:45",
         FileUrl: "../../public/filedata/019_ReportYear63.pdf",
     },
     {
@@ -177,6 +196,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-09-28",
         year: "2567",
+        time: "16:10",
         FileUrl: "../../public/filedata/024_ReportsellSep67.pdf",
     },
     {
@@ -186,6 +206,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2563-12-16",
         year: "2563",
+        time: "09:55",
         FileUrl: "../../public/filedata/005_Report63.pdf",
     },
     {
@@ -195,6 +216,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2564-09-02",
         year: "2564",
+        time: "10:20",
         FileUrl: "../../public/filedata/010_Rateyour64.pdf",
     },
     {
@@ -204,6 +226,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2559-12-08",
         year: "2559",
+        time: "13:45",
         FileUrl: "../../public/filedata/015_Sumpati59.pdf",
     },
     {
@@ -213,6 +236,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2562-11-27",
         year: "2562",
+        time: "08:15",
         FileUrl: "../../public/filedata/020_ReportYear62.pdf",
     },
     {
@@ -222,6 +246,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-08-29",
         year: "2567",
+        time: "14:23",
         FileUrl: "../../public/filedata/025_ReportsellAug67.pdf",
     },
     {
@@ -231,6 +256,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-07-17",
         year: "2567",
+        time: "07:52",
         FileUrl: "../../public/filedata/026_ReportsellJuly67.pdf",
     },
     {
@@ -240,6 +266,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-05-05",
         year: "2567",
+        time: "15:30",
         FileUrl: "../../public/filedata/031_Procure67.xlsx",
     },
     {
@@ -249,6 +276,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2565-12-30",
         year: "2565",
+        time: "11:24",
         FileUrl: "../../public/filedata/036_Reserve65.xlsx",
     },
     {
@@ -258,6 +286,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-11-16",
         year: "2567",
+        time: "11:40",
         FileUrl: "../../public/filedata/027_AlloMuPer4_67.pdf",
     },
     {
@@ -267,6 +296,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2566-06-12",
         year: "2566",
+        time: "14:53",
         FileUrl: "../../public/filedata/032_Procure66.xlsx",
     },
     {
@@ -276,6 +306,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2564-12-14",
         year: "2564",
+        time: "12:33",
         FileUrl: "../../public/filedata/037_Reserve64.xlsx",
     },
     {
@@ -285,6 +316,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-08-16",
         year: "2567",
+        time: "10:52",
         FileUrl: "../../public/filedata/028_AlloMuPer3_67.pdf",
     },
     {
@@ -294,6 +326,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2565-04-01",
         year: "2565",
+        time: "17:12",
         FileUrl: "../../public/filedata/033_Procure65.xlsx",
     },
     {
@@ -303,6 +336,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-07-17",
         year: "2567",
+        time: "09:00",
         FileUrl: "../../public/filedata/038_Transport.xlsx",
     },
     {
@@ -312,6 +346,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-12-16",
         year: "2567",
+        time: "13:28",
         FileUrl: "../../public/filedata/029_AlloSaoPer4_67.pdf",
     },
     {
@@ -321,6 +356,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ", 
         date: "2564-03-14",
         year: "2564",
+        time: "10:52",
         FileUrl: "../../public/filedata/034_Procure64.xlsx",
     },
     {
@@ -330,6 +366,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-01-03",
         year: "2567",
+        time: "15:11",
         FileUrl: "../../public/filedata/039_Namelist.xlsx",
     },
     {
@@ -339,6 +376,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2567-09-16",
         year: "2567",
+        time: "17:38",
         FileUrl: "../../public/filedata/030_AlloSaoPer3_67.pdf",
     },
     {
@@ -348,6 +386,7 @@ const Filedata = [
         department: "กรมเชื้อเพลิงธรรมชาติ",
         date: "2566-05-21",
         year: "2566",
+        time: "18:04",
         FileUrl: "../../public/filedata/035_Reserve66.xlsx",
     },
 ]
