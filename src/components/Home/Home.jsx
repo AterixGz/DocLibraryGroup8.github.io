@@ -72,6 +72,17 @@ const Home = ({ role }) => {
         );
     };
 
+    const handleSelectAll = () => {
+        if (selectedDocuments.length === currentDocuments.length) {
+            // ยกเลิกการเลือกทั้งหมด
+            setSelectedDocuments([]);
+        } else {
+            // เลือกทั้งหมด
+            setSelectedDocuments(currentDocuments.map(doc => doc.id));
+        }
+    };
+
+
     const handleDownloadSelected = () => {
         const filesToDownload = documents.filter((doc) =>
             selectedDocuments.includes(doc.id)
@@ -189,13 +200,21 @@ const Home = ({ role }) => {
                                 {showCheckbox ? "ยกเลิกการเลือก" : "เลือกหลายรายการ"}
                             </button>
                             {showCheckbox && (
-                                <button
-                                    onClick={handleDownloadSelected}
-                                    disabled={selectedDocuments.length === 0}
-                                    className="download-selected-btn"
-                                >
-                                    ดาวน์โหลดเอกสารที่เลือก ({selectedDocuments.length})
-                                </button>
+                                <>
+                                    <button
+                                        onClick={handleSelectAll}
+                                        className="toggle-select-all-btn"
+                                    >
+                                        {selectedDocuments.length === currentDocuments.length ? "ยกเลิกการเลือกทั้งหมด" : "เลือกทั้งหมด"}
+                                    </button>
+                                    <button
+                                        onClick={handleDownloadSelected}
+                                        disabled={selectedDocuments.length === 0}
+                                        className="download-selected-btn"
+                                    >
+                                        ดาวน์โหลดเอกสารที่เลือก ({selectedDocuments.length})
+                                    </button>
+                                </>
                             )}
                         </>
                     )}

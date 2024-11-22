@@ -366,3 +366,27 @@
     transform: translateY(-2px) ; /* Slight lift effect */
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
 }
+
+.toggle-select-all-btn {
+    background-color: #F14D31;
+    color: white;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    margin-right: 1rem;
+}
+
+.toggle-select-all-btn:hover {
+    background-color: #c22d13;
+    transform: translateY(-3px);
+}
+
+.toggle-select-all-btn:active {
+    background-color: #f77d68;
+    transform: translateY(0);
+}
