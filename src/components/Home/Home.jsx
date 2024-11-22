@@ -281,12 +281,12 @@ const Home = ({ role }) => {
                         <thead>
                             <tr>
                                 {showCheckbox && <th></th>}
-                                <th>ลำดับ</th>
+                                <th className="th-num">ลำดับ</th>
                                 <th>ชื่อเอกสาร</th>
                                 <th>ประเภทเอกสาร</th>
                                 <th>วันที่ลง</th>
                                 <th>หน่วยงาน</th>
-                                {role !== "guest" && <th>เครื่องมือ</th>}
+                                {role !== "guest" && <th className="th-to">เครื่องมือ</th>}
                             </tr>
                         </thead>
                         <tbody>
