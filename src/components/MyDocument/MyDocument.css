@@ -45,6 +45,7 @@
 }
 
 /* ตาราง */
+
 .document-table {
   width: 100%;
   border-collapse: collapse;
@@ -63,6 +64,14 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
+.th-number {
+  border-radius: 8px 0  0 ;
+}
+
+.th-tool {
+  border-radius: 0 8px 0  0 ;
+}
+
 .document-table th {
   background-color: #f8f8f8;
   font-weight: bold;
@@ -77,6 +86,8 @@
 .document-table tbody tr:hover {
   background-color: #fff7f0;
 }
+
+
 
 /* ไอคอนและลิงก์ในตาราง */
 .document-table td.document-name {
@@ -240,6 +251,7 @@
 @media (max-width: 768px) {
   .document-table th, .document-table td {
     padding: 10px;
+  
   }
 
   .document-table td {
