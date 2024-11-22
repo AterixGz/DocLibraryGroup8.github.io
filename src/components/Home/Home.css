@@ -199,22 +199,32 @@
 }
 
 .bp-outline-og {
-    color: #F14D31; /* สีตัวอักษร */
-    background-color: transparent;
-    border-color: #F14D31; /* สีกรอบ */
+    background-color:#F14D31;
+    color: white;
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .bp-outline-og:hover {
-    color: #fff;
-    background-color: #F14D31; /* สีพื้นหลังเมื่อเอาเมาส์ชี้ */
-    border-color: #F14D31; /* สีกรอบเมื่อเอาเมาส์ชี้ */
+    background-color: #e05500;
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .bp-outline-og:disabled {
-    color: #d1d0d0; /* สีตัวอักษรเมื่อปุ่มไม่สามารถกดได้ */
-    background-color: transparent;
-    border-color: #d1d0d0; /* สีกรอบเมื่อปุ่มไม่สามารถกดได้ */
+    background-color: #e0e0e0;
     cursor: not-allowed;
+    box-shadow: none;
+}
+
+.bp-outline-og:active {
+    background-color: #e05500;
+    transform: scale(0.95);
 }
 
 .filter-label{
@@ -337,4 +347,22 @@
     height: 10px;
     border-radius: 50%;
     background-color: #F14D31; /* ทำให้มีจุดกลมๆ ภายใน */
+}
+
+.download-link {
+    background-color: #F14D31; /* Green background */
+    color: white !important; /* White text */
+    font-size: 14px; /* Font size */
+    padding: 10px 20px; /* Padding */
+    border: none; /* Remove border */
+    border-radius: 25px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: all 0.3s ease; /* Smooth transition */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.download-link:hover {
+    background-color: #F14D31; /* Darker green on hover */
+    transform: translateY(-2px) ; /* Slight lift effect */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
 }

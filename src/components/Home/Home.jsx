@@ -254,7 +254,7 @@ const Home = ({ role }) => {
                 <div className="page-button">
                     <button className="bp bp-outline-og page-space" onClick={handleFirstPage} disabled={currentPage === 1}>หน้าแรก</button>
                     <button className="bp bp-outline-og page-space" onClick={handlePrevPage} disabled={currentPage === 1}>หน้าก่อนหน้า</button>
-                    <span className="page-space">{currentPage} / {totalPages}</span>
+                    <span className="page-space">{currentPage} OF {totalPages}</span>
                     <button className="bp bp-outline-og page-space" onClick={handleNextPage} disabled={currentPage === totalPages}>หน้าถัดไป</button>
                     <button className="bp bp-outline-og page-space" onClick={handleLastPage} disabled={currentPage === totalPages}>หน้าสุดท้าย</button>
                 </div>
