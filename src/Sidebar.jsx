@@ -12,7 +12,7 @@ function Sidebar({ user }) {
 
   return (
     <div
-      className={`sidebar-container d-flex flex-column justify-content-between p-3 vh-100 ${
+      className={`sidebar-container d-flex flex-column justify-content-between vh-100 ${
         isSidebarActive ? "active" : ""
       }`}
     >
@@ -23,22 +23,17 @@ function Sidebar({ user }) {
           className="text-decoration-none d-flex align-items-center mb-3"
         >
           <img
-            src="/img/Logo2.png"
+            src="/img/Logo2.png" // Replace with the correct path to match the uploaded logo
             alt="Logo"
-            className="logo-image me-2"
-            style={{
-              width: "215px",
-              height: "100px",
-              borderRadius: "10px",
-              padding: "1px",
-            }}
+            className="logo-image styled-logo"
           />
         </Link>
+
         <hr className="divider" />
       </div>
 
       {/* Menu Section */}
-      <ul className="nav nav-pills flex-column mb-auto">
+      <ul className="nav nav-pills flex-column mb-auto p-3 ">
         <li className="nav-item p-1">
           <Link to="/" className="nav-link sidebar-item">
             <i className="bi bi-house me-2"></i> Home

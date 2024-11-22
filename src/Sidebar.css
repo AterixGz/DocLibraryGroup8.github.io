@@ -55,10 +55,26 @@
 }
 
 .logo-image {
-  width: 40px;
-  height: 40px;
   object-fit: contain;
+  display: block;
+  margin: 0 auto; /* Centers the logo */
+  background-color: white; /* Background for a clean look */
+  border-radius: 8px; /* Slightly rounded corners */
+  border: 2px solid #ffffff; /* Adds a border around the logo */
+  padding: 5px; /* Creates spacing between the image and border */
 }
+
+.styled-logo {
+  width: 215px; /* Adjust width based on the uploaded image */
+  height: auto; /* Automatically adjusts height proportionally */
+  border-radius: 0  1rem 1rem 0; /* Rounded corners */
+  padding: 5px; /* Inner spacing around the logo */
+  background-color: white; /* Matches the white background */
+  margin-top: 4rem;
+  
+}
+
+
 
 .logo-text {
   font-size: 1.2rem;
