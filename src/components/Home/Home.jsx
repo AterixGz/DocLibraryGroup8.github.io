@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Home.css';
 import FileData from '../../data/FileData';
+import { motion as m } from "framer-motion";
 
 const Home = ({ role }) => {
     const [documents, setDocuments] = useState([]);
@@ -146,6 +147,13 @@ const Home = ({ role }) => {
     };
 
     return (
+        <m.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        >
+
+        
         <div className={`home-container ${role === "guest" ? "guest-home" : ""}`}>
             <div className={`main-content ${role === "guest" ? "guest-main" : ""}`}>
                 <h1 className="title-doc">ค้นหาเอกสารทั้งหมด</h1>
@@ -289,6 +297,7 @@ const Home = ({ role }) => {
                 )}
             </div>
         </div>
+        </m.div>
     );
 };
 
