@@ -8,6 +8,7 @@ const Filedata = [
         year: "2566",
         time: "16:47",
         FileUrl: '../../public/filedata/001_Report66.pdf',
+        uploadedBy: "นายสมชาย ใจดี"  // Added uploader
     },
     {
         id: 2,
@@ -18,6 +19,7 @@ const Filedata = [
         year: "2563",
         time: "12:34",
         FileUrl: "../../public/filedata/006_Sum63.pdf",
+        uploadedBy: "นางสาวสมชาย ใจดี"
     },
     {
         id: 3,
@@ -28,6 +30,7 @@ const Filedata = [
         year: "2563",
         time: "17:22",
         FileUrl: "../../public/filedata/011_Rateyour63.pdf",
+        uploadedBy: "นายสมชาย ใจดี"
     },
     {
         id: 4,
