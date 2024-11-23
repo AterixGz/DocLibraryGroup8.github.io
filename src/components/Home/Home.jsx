@@ -454,11 +454,11 @@ const Home = ({ role }) => {
         </span>{" "}
         &nbsp;
         {isSingleDownload ? (
-            <span>ดาวน์โหลดเอกสารเสร็จสิ้น</span>
+            <span><b>ดาวน์โหลดเอกสารเสร็จสิ้น</b></span>
         ) : (
             <span>
-                ดาวน์โหลดเอกสารเสร็จสิ้นทั้งหมด{" "}
-                <strong>{selectedDocuments.length}</strong> รายการ
+                <b>ดาวน์โหลดเอกสารเสร็จสิ้นทั้งหมด{" "}</b>
+                <strong>{selectedDocuments.length}</strong> <b>รายการ</b>
             </span>
         )}
         <span
@@ -471,10 +471,6 @@ const Home = ({ role }) => {
         <div className="progress-bar"></div>
     </div>
 )}
-
-
-
-
                 </div>
             </div>
         </m.div>
