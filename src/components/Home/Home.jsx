@@ -21,6 +21,9 @@ const Home = ({ role }) => {
     const [selectedDocuments, setSelectedDocuments] = useState([]);
     const [alertMessage, setAlertMessage] = useState(null);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [isDownloadComplete, setIsDownloadComplete] = useState(false);
+    const [isSingleDownload, setIsSingleDownload] = useState(false); // สำหรับดาวน์โหลดรายตัว
+
 
 
 
@@ -86,8 +89,9 @@ const Home = ({ role }) => {
 
     const toggleCheckbox = () => {
         setShowCheckbox((prev) => !prev);
-        setSelectedDocuments([]);
-        setIsDownloading(false); // Reset isDownloading when unselecting multiple items
+        setSelectedDocuments([]); // Reset การเลือกเมื่อ toggle
+        setIsDownloading(false); // Reset การดาวน์โหลด
+        setIsDownloadComplete(false); // ซ่อน popup
     };
 
     const handleSelectDocument = (id) => {
@@ -106,20 +110,47 @@ const Home = ({ role }) => {
         }
     };
 
+    const handleSingleDownload = (fileUrl, fileName) => {
+        setIsSingleDownload(true); // ตั้งค่าให้เป็นการดาวน์โหลดรายตัว
+        setIsDownloadComplete(true); // แสดง popup
+
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = fileName;
+        link.click();
+
+        // ตั้งเวลาให้ popup หายไปใน 5 วินาที
+        setTimeout(() => {
+            setIsDownloadComplete(false);
+            setIsSingleDownload(false); // รีเซ็ตสถานะ
+        }, 5000);
+    };
+
+
+
+
     const handleDownloadSelected = () => {
+        setIsSingleDownload(false); // ยืนยันว่าเป็นการดาวน์โหลดหลายไฟล์
+        setIsDownloadComplete(true); // แสดง popup
+
         const filesToDownload = documents.filter((doc) =>
             selectedDocuments.includes(doc.id)
         );
-    
+
         filesToDownload.forEach((file) => {
             const link = document.createElement("a");
             link.href = file.FileUrl;
             link.download = file.name;
             link.click();
         });
-    
-        setIsDownloading(true); // Set isDownloading to true when download starts
+
+        // ตั้งเวลาให้ popup หายไปใน 5 วินาที
+        setTimeout(() => {
+            setIsDownloadComplete(false);
+        }, 5000);
     };
+
+
 
     const filteredDocuments = documents
         .filter((doc) => {
@@ -266,7 +297,7 @@ const Home = ({ role }) => {
                     </div>
                     <div className="multi-select-actions">
                         {role !== "guest" && (
-                            <th  className={`checkbox-th ${isDownloading ? 'no-radius' : ''}`}>
+                            <th className={`checkbox-th ${isDownloading ? 'no-radius' : ''}`}>
                                 <button
                                     onClick={toggleCheckbox}
                                     className="toggle-checkbox-btn"
@@ -342,9 +373,10 @@ const Home = ({ role }) => {
                                         <td>
                                             <a
                                                 className="download-link"
-                                                href={doc.FileUrl}
-                                                download={doc.name}
-                                                onClick={(e) => e.stopPropagation()}
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // ป้องกันการ trigger การเลือกแถว
+                                                    handleSingleDownload(doc.FileUrl, doc.name); // เรียกฟังก์ชัน handleSingleDownload
+                                                }}
                                             >
                                                 ดาวน์โหลด
                                             </a>
@@ -415,6 +447,33 @@ const Home = ({ role }) => {
                             </div>
                         </div>
                     )}
+                    {isDownloadComplete && (
+    <div className="download-popup">
+        <span>
+            <i className="bi bi-check-circle"></i>
+        </span>{" "}
+        &nbsp;
+        {isSingleDownload ? (
+            <span>ดาวน์โหลดเอกสารเสร็จสิ้น</span>
+        ) : (
+            <span>
+                ดาวน์โหลดเอกสารเสร็จสิ้นทั้งหมด{" "}
+                <strong>{selectedDocuments.length}</strong> รายการ
+            </span>
+        )}
+        <span
+            onClick={() => setIsDownloadComplete(false)}
+            style={{ cursor: "pointer" }}
+        >
+            &nbsp;
+            <i className="bi bi-x-lg"></i>
+        </span>
+        <div className="progress-bar"></div>
+    </div>
+)}
+
+
+
 
                 </div>
             </div>
