@@ -3,6 +3,7 @@ import "./Home.css";
 import FileData from "../../data/FileData";
 import { motion as m } from "framer-motion";
 
+
 const Home = ({ role }) => {
     const [documents, setDocuments] = useState([]);
     const [previewFile, setPreviewFile] = useState(null);
@@ -18,6 +19,10 @@ const Home = ({ role }) => {
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [showCheckbox, setShowCheckbox] = useState(false);
     const [selectedDocuments, setSelectedDocuments] = useState([]);
+    const [alertMessage, setAlertMessage] = useState(null);
+    const [isDownloading, setIsDownloading] = useState(false);
+
+
 
     useEffect(() => {
         setDocuments(FileData);
@@ -48,20 +53,31 @@ const Home = ({ role }) => {
         setDocuments((prevDocuments) =>
             sortDocuments([...prevDocuments], option, order)
         );
+        setCurrentPage(1); // รีเซ็ตหน้าเป็นหน้าแรก
     };
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
+        setCurrentPage(1); // รีเซ็ตหน้าเป็นหน้าแรก
     };
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         const cleanedValue = value.trim().toLowerCase().replace(/&/g, "และ");
         setFilters((prevFilters) => ({ ...prevFilters, [name]: cleanedValue }));
+        setCurrentPage(1); // รีเซ็ตหน้าเป็นหน้าแรก
     };
 
     const handlePreview = (fileUrl) => {
-        setPreviewFile(fileUrl);
+        if (fileUrl.endsWith(".xlsx")) {
+            setAlertMessage("ไม่สามารถแสดงตัวอย่างไฟล์ Excel ได้ในขณะนี้");
+        } else {
+            setPreviewFile(fileUrl);
+        }
+    };
+
+    const closeAlert = () => {
+        setAlertMessage(null);
     };
 
     const closePreview = () => {
@@ -71,6 +87,7 @@ const Home = ({ role }) => {
     const toggleCheckbox = () => {
         setShowCheckbox((prev) => !prev);
         setSelectedDocuments([]);
+        setIsDownloading(false); // Reset isDownloading when unselecting multiple items
     };
 
     const handleSelectDocument = (id) => {
@@ -93,13 +110,15 @@ const Home = ({ role }) => {
         const filesToDownload = documents.filter((doc) =>
             selectedDocuments.includes(doc.id)
         );
-
+    
         filesToDownload.forEach((file) => {
             const link = document.createElement("a");
             link.href = file.FileUrl;
             link.download = file.name;
             link.click();
         });
+    
+        setIsDownloading(true); // Set isDownloading to true when download starts
     };
 
     const filteredDocuments = documents
@@ -247,7 +266,7 @@ const Home = ({ role }) => {
                     </div>
                     <div className="multi-select-actions">
                         {role !== "guest" && (
-                            <>
+                            <th  className={`checkbox-th ${isDownloading ? 'no-radius' : ''}`}>
                                 <button
                                     onClick={toggleCheckbox}
                                     className="toggle-checkbox-btn"
@@ -273,7 +292,7 @@ const Home = ({ role }) => {
                                         </button>
                                     </>
                                 )}
-                            </>
+                            </th>
                         )}
                     </div>
                     <hr className="hr-top"></hr>
@@ -322,10 +341,10 @@ const Home = ({ role }) => {
                                     {role !== "guest" && (
                                         <td>
                                             <a
-                                                 className="download-link"
-                                                 href={doc.FileUrl}
-                                                 download={doc.name}
-                                                 onClick={(e) => e.stopPropagation()}
+                                                className="download-link"
+                                                href={doc.FileUrl}
+                                                download={doc.name}
+                                                onClick={(e) => e.stopPropagation()}
                                             >
                                                 ดาวน์โหลด
                                             </a>
@@ -372,8 +391,8 @@ const Home = ({ role }) => {
 
                     {/* Preview Modal */}
                     {previewFile && (
-                        <div className="preview-modal">
-                            <div className="modal-content">
+                        <div className="preview-modal" onClick={closePreview}>
+                            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                                 <button onClick={closePreview} className="close-button">
                                     ปิด
                                 </button>
@@ -385,6 +404,18 @@ const Home = ({ role }) => {
                             </div>
                         </div>
                     )}
+                    {/* Alert Modal */}
+                    {alertMessage && (
+                        <div className="alert-modal" onClick={closeAlert}>
+                            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                                <button onClick={closeAlert} className="close-button">
+                                    ปิด
+                                </button>
+                                <p>{alertMessage}</p>
+                            </div>
+                        </div>
+                    )}
+
                 </div>
             </div>
         </m.div>
