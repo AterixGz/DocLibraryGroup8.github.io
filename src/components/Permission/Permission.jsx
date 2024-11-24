@@ -31,8 +31,10 @@ function Permission() {
   const handleSearch = (e) => {
     setInputValue(e.target.value);
     const searchTerm = e.target.value.toLowerCase();
-    const filtered = namesList.filter((person) =>
-      person.name.toLowerCase().includes(searchTerm) || person.username.toLowerCase().includes(searchTerm)
+    const filtered = namesList.filter(
+      (person) =>
+        person.name.toLowerCase().includes(searchTerm) ||
+        person.username.toLowerCase().includes(searchTerm)
     );
     setFilteredNamesList(filtered);
   };
@@ -101,21 +103,21 @@ function Permission() {
           onChange={handleSearch}
           placeholder="ค้นหาชื่อพนักงานหรือรหัสผู้ใช้งาน"
         />
+        <button className="btn btn-primary add-btn" onClick={handleModalOpen}>
+          <i className="bi bi-plus"></i>
+        </button>
       </div>
-
-      <button className="add-btn" onClick={handleModalOpen}>
-        เพิ่มบุคลากร
-      </button>
 
       <div className="names-list">
         <table>
           <thead>
             <tr>
-              <th>บุคลากร</th>
-              <th className="align-right">การจัดการเอกสาร</th>
-              <th className="align-right">การจัดการสิทธิ์เข้าถึง</th>
-              <th className="align-right">การจัดการรายงาน</th>
-              <th className="align-right"></th>
+              <th className="align-left">บุคลากร</th>
+              <th className="align-center"></th>
+              <th className="align-center">การจัดการเอกสาร</th>
+              <th className="align-center">การจัดการสิทธิ์เข้าถึง</th>
+              <th className="align-center">การจัดการรายงาน</th>
+              <th className="align-center"></th>
             </tr>
           </thead>
           <tbody>
@@ -129,6 +131,7 @@ function Permission() {
               filteredNamesList.map((person, index) => (
                 <tr key={index}>
                   <td>{person.name}</td>
+                  <td></td>
                   <td className="align-center">
                     <label className="switch">
                       <input
@@ -160,11 +163,8 @@ function Permission() {
                     </label>
                   </td>
                   <td>
-                    <button
-                      className="btn-danger"
-                      onClick={() => handleDelete(index)}
-                    >
-                      ลบ
+                    <button class="btn-danger" onclick="handleDelete(1)">
+                      <i class="bi bi-trash"></i>
                     </button>
                   </td>
                 </tr>

@@ -181,8 +181,8 @@
 .permission-container .switch {
     position: relative;
     display: inline-block;
-    width: 50px;
-    height: 25px;
+    width: 60px; /* ขยายความกว้าง */
+    height: 34px; /* ขยายความสูง */
 }
 
 .permission-container .switch input {
@@ -199,29 +199,30 @@
     right: 0;
     bottom: 0;
     background-color: #ddd;
-    border-radius: 25px;
+    border-radius: 40px; /* ทำมุมให้โค้งมากขึ้น */
     transition: 0.4s;
 }
 
 .permission-container .slider:before {
     position: absolute;
     content: "";
-    height: 19px;
-    width: 19px;
-    left: 3px;
-    bottom: 3px;
+    height: 27px; /* ขยายขนาดวงกลม */
+    width: 27px; /* ขยายขนาดวงกลม */
+    left: 4px; /* ปรับตำแหน่งวงกลม */
+    bottom: 4px; /* ปรับตำแหน่งวงกลม */
     background-color: white;
     border-radius: 50%;
     transition: 0.4s;
 }
 
 .permission-container input:checked + .slider {
-    background-color: #977465;
+    background-color: #FF4D02; /* สีเมื่อเปิด */
 }
 
 .permission-container input:checked + .slider:before {
-    transform: translateX(25px);
+    transform: translateX(26px); /* ขยับวงกลมไปขวา */
 }
+
 
 /* Alignment helpers */
 .permission-container .align-right {
@@ -236,6 +237,47 @@
 .permission-container .confirm-btn-container {
     text-align: center;
     margin-top: 20px;
+    
+}
+
+.permission-container .add-btn {
+    width: 42px; /* กำหนดความกว้าง */
+    height: 42px; /* กำหนดความสูง */
+    padding: 0; /* ไม่มีระยะห่างด้านใน */
+    border-radius: 8px; /* มุมโค้งเล็กน้อย */
+    display: flex;
+    justify-content: center; /* จัดให้อยู่กึ่งกลางแนวนอน */
+    align-items: center; /* จัดให้อยู่กึ่งกลางแนวตั้ง */
+    background-color: #FF4D02;
+    color: white;
+    border: none;
+    font-size: 20px; /* ขนาดไอคอน */
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.permission-container .add-btn i {
+    font-size: 20px; /* ลดขนาดไอคอน */
+}
+
+.permission-container .btn-danger {
+    width: 42px; /* กำหนดความกว้าง */
+    height: 42px; /* กำหนดความสูง */
+    padding: 0; /* ไม่มีระยะห่างด้านใน */
+    border-radius: 8px; /* มุมโค้งเล็กน้อย */
+    display: flex;
+    justify-content: center; /* จัดให้อยู่กึ่งกลางแนวนอน */
+    align-items: center; /* จัดให้อยู่กึ่งกลางแนวตั้ง */
+    background-color: #FF4D02;
+    color: white;
+    border: none;
+    font-size: 20px; /* ขนาดไอคอน */
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.permission-container .btn-danger i {
+    font-size: 20px; /* ลดขนาดไอคอน */
 }
 
 /* Modal styles */
@@ -275,7 +317,12 @@
     justify-content: space-between;
     margin-top: 20px;
   }
-  
+
+  .search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  } 
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
