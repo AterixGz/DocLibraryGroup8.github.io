@@ -41,7 +41,13 @@ function Document(props) {
     const validFiles = newFiles.filter(validateFile);
 
     if (validFiles.length) {
-      const updatedList = [...filesList, ...validFiles];
+      const updatedList = [
+        ...filesList,
+        ...validFiles.map((file) => ({
+          file,
+          uploadTime: new Date().toLocaleString(), // เพิ่มวันที่และเวลาที่อัปโหลด
+        })),
+      ];
       setFilesList(updatedList);
       addFiles(validFiles); // เพิ่มไฟล์ไปยัง Context
       setErrorMessage("");
@@ -82,10 +88,11 @@ function Document(props) {
       department,
       hashtag,
       additionalNotes,
-      files: filesList.map((file) => ({
-        name: file.name,
-        size: file.size,
-        type: file.type,
+      files: filesList.map((item) => ({
+        name: item.file.name,
+        size: item.file.size,
+        type: item.file.type,
+        uploadTime: item.uploadTime, // เพิ่มเวลาที่อัปโหลด
       })),
     };
 
@@ -94,6 +101,7 @@ function Document(props) {
     setUploadSuccess(true);
     resetForm();
   };
+
 
   const onDragEnter = () => wrapperRef.current.classList.add("dragover");
   const onDragLeave = () => wrapperRef.current.classList.remove("dragover");
@@ -109,144 +117,149 @@ function Document(props) {
 
   return (
     <div className="upload-page-container">
-  <h2 className="upload-page-title">อัปโหลดเอกสาร</h2>
-  
-  <div className="upload-content">
-    {/* Left Section: Input Form */}
-    <div className="upload-form-container">
-      <form onSubmit={handleSubmit} className="upload-form">
-        <label>
-          ชื่อเอกสาร <span style={{ color: "red" }}>*</span>
-        </label>
-        <input
-          type="text"
-          value={documentName}
-          onChange={(e) => setDocumentName(e.target.value)}
-          placeholder="กรอกชื่อเอกสาร"
-          required
-        />
+      <h2 className="upload-page-title">อัปโหลดเอกสาร</h2>
 
-        <label>
-          เลขเอกสาร <span style={{ color: "red" }}>*</span>
-        </label>
-        <input
-          type="number"
-          value={documentNumber}
-          onChange={(e) => setDocumentNumber(e.target.value)}
-          placeholder="xxxxxxxx"
-          min={1}
-          required
-        />
+      <div className="upload-content">
+        {/* Left Section: Input Form */}
+        <div className="upload-form-container">
+          <form onSubmit={handleSubmit} className="upload-form">
+            <label>
+              ชื่อเอกสาร <span style={{ color: "red" }}>*</span>
+            </label>
+            <input
+              type="text"
+              value={documentName}
+              onChange={(e) => setDocumentName(e.target.value)}
+              placeholder="กรอกชื่อเอกสาร"
+              required
+            />
 
-        <label>
-          ปีงบประมาณ <span style={{ color: "red" }}>*</span>
-        </label>
-        <select
-          value={fiscalYear}
-          onChange={(e) => setFiscalYear(e.target.value)}
-          required
-        >
-          <option value="">เลือก</option>
-          <option value="2565">2565</option>
-          <option value="2566">2566</option>
-          <option value="2567">2567</option>
-        </select>
+            <label>
+              เลขเอกสาร <span style={{ color: "red" }}>*</span>
+            </label>
+            <input
+              type="number"
+              value={documentNumber}
+              onChange={(e) => setDocumentNumber(e.target.value)}
+              placeholder="xxxxxxxx"
+              min={1}
+              required
+            />
 
-        <label>
-          ประเภทเอกสาร <span style={{ color: "red" }}>*</span>
-        </label>
-        <select
-          value={documentType}
-          onChange={(e) => setDocumentType(e.target.value)}
-          required
-        >
-          <option value="">เลือกประเภท</option>
-          <option value="ประเภท 1">หนังสือประชาสัมพันธ์</option>
-          <option value="ประเภท 2">รายงานการประชุม</option>
-          <option value="ประเภท 3">รายงานประจำปี</option>
-          <option value="ประเภท 4">หนังสือรับรอง</option>
-          <option value="ประเภท 5">หนังสือสั่งการข้อบังคับ</option>
-        </select>
+            <label>
+              ปีงบประมาณ <span style={{ color: "red" }}>*</span>
+            </label>
+            <select
+              value={fiscalYear}
+              onChange={(e) => setFiscalYear(e.target.value)}
+              required
+            >
+              <option value="">เลือก</option>
+              <option value="2565">2565</option>
+              <option value="2566">2566</option>
+              <option value="2567">2567</option>
+            </select>
 
-        <label>
-          หน่วยงาน <span style={{ color: "red" }}>*</span>
-        </label>
-        <select
-          value={department}
-          onChange={(e) => setDepartment(e.target.value)}
-          required
-        >
-          <option value="">เลือกหน่วยงาน</option>
-          <option value="หน่วยงาน 1">สำนักงานรัฐมนตรี</option>
-          <option value="หน่วยงาน 2">สำนักงานปลัดกระทรวงพลังงาน</option>
-          <option value="หน่วยงาน 3">กรมเชื้อเพลิงธรรมชาติ</option>
-          <option value="หน่วยงาน 4">กรมพัฒนาพลังงานทดแทน</option>
-          <option value="หน่วยงาน 5">สำนักงานนโยบายและแผนงาน</option>
-        </select>
+            <label>
+              ประเภทเอกสาร <span style={{ color: "red" }}>*</span>
+            </label>
+            <select
+              value={documentType}
+              onChange={(e) => setDocumentType(e.target.value)}
+              required
+            >
+              <option value="">เลือกประเภทเอกสาร</option>
+              <option value="ผลการดำเนินงาน">ผลการดำเนินงาน</option>
+              <option value="รายงานประจำปี">รายงานประจำปี</option>
+              <option value="รายงานปริมาณการผลิตรายเดือน">
+                รายงานปริมาณการผลิตรายเดือน
+              </option>
+              <option value="การขาย มูลค่า และค่าภาคหลวง">
+                การขาย มูลค่า และค่าภาคหลวง
+              </option>
+              <option value="การจัดสรรค่าภาคหลวงให้ท้องถิ่น">
+                การจัดสรรค่าภาคหลวงให้ท้องถิ่น
+              </option>
+              <option value="การจัดหาปิโตรเลียม">การจัดหาปิโตรเลียม</option>
+              <option value="ปริมาณสำรองปิโตรเลียม">
+                ปริมาณสำรองปิโตรเลียม
+              </option>
+            </select>
 
-        <label>คำเกี่ยวข้อง # (hashtag)</label>
-        <input
-          type="text"
-          value={hashtag}
-          onChange={(e) => setHashtag(e.target.value)}
-        />
+            <label>
+              หน่วยงาน <span style={{ color: "red" }}>*</span>
+            </label>
+            <select
+             
+            >
+              <option value="กรมเชื้อเพลิงธรรมชาติ">กรมเชื้อเพลิงธรรมชาติ</option>
+            
+            </select>
 
-        <label>คำอธิบายเพิ่มเติม</label>
-        <textarea
-          value={additionalNotes}
-          onChange={(e) => setAdditionalNotes(e.target.value)}
-        ></textarea> <br />
+            <label>คำเกี่ยวข้อง # (hashtag)</label>
+            <input
+              type="text"
+              value={hashtag}
+              onChange={(e) => setHashtag(e.target.value)}
+            />
 
-        <button type="submit" className="btn btn-success">
-          บันทึก
-        </button>
-      </form>
-    </div>
-
-    {/* Right Section: File Upload */}
-    <div className="upload-file-container">
-      <div
-        ref={wrapperRef}
-        className="drop-file-input"
-        onDragEnter={onDragEnter}
-        onDragLeave={onDragLeave}
-        onDrop={onDrop}
-      >
-        <div className="drop-file-input__label">
-          <img src={uploadImg} alt="upload" />
-          <p>Drag and drop your files here</p>
+            <label>คำอธิบายเพิ่มเติม</label>
+            <textarea
+              value={additionalNotes}
+              onChange={(e) => setAdditionalNotes(e.target.value)}
+              ></textarea> <br />
+              
+            <button type="submit" className="btn btn-success">
+              บันทึก 
+            </button>
+            {errorMessage && <span className="error-message">{errorMessage}</span>}
+            
+          </form>
         </div>
-        <input type="file" multiple onChange={handleFileChange} />
-      </div>
 
-      {filesList.length > 0 ? (
-        <div className="drop-file-preview">
-          <p className="drop-file-preview__title">Ready to Upload</p>
-          {filesList.map((item, index) => (
-            <div key={index} className="drop-file-preview__item">
-              <img
-                src={ImageConfig[item.type.split("/")[1]] || ImageConfig["default"]}
-                alt={item.name}
-              />
-              <div className="drop-file-preview__item__info">
-                <p>{item.name}</p>
-                <p>{(item.size / 1024).toFixed(2)} KB</p>
-              </div>
-              <span
-                className="drop-file-preview__item__del"
-                onClick={() => fileRemove(item)}
-              >
-                x
-              </span>
+        {/* Right Section: File Upload */}
+        <div className="upload-file-container">
+          <div
+            ref={wrapperRef}
+            className="drop-file-input"
+            onDragEnter={onDragEnter}
+            onDragLeave={onDragLeave}
+            onDrop={onDrop}
+          >
+            <div className="drop-file-input__label">
+              <img src={uploadImg} alt="upload" />
+              <p>Drag and drop your files here</p>
             </div>
-          ))}
-        </div>
-      ) : null}
+            <input type="file" multiple onChange={handleFileChange} />
+          </div>
 
-      {errorMessage && <p className="error-message">{errorMessage}</p>}
+          {filesList.length > 0 ? (
+            <div className="drop-file-preview">
+              <p className="drop-file-preview__title">Ready to Upload</p>
+              {filesList.map((item, index) => (
+                <div key={index} className="drop-file-preview__item">
+                  <img
+                    src={ImageConfig[item.file.type.split("/")[1]] || ImageConfig["default"]}
+                    alt={item.file.name}
+                  />
+                  <div className="drop-file-preview__item__info">
+                    <p>{item.file.name}</p>
+                    <p>{(item.file.size / 1024).toFixed(2)} KB</p>
+                    <p>อัปโหลดเมื่อ: {item.uploadTime}</p> {/* แสดงวันที่และเวลา */}
+                  </div>
+                  <span
+                    className="drop-file-preview__item__del"
+                    onClick={() => fileRemove(item)}
+                  >
+                    x
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
   );
 }
