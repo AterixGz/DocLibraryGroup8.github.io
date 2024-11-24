@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./Home.css";
-import FileData from "../../data/FileData";
+import { FileContext } from "../FileContext/FileContext"; // Import FileContext
+import FileData from "../../data/FileData"; // ใช้ไฟล์ข้อมูลเอกสารเดิม
 import { motion as m } from "framer-motion";
 
-
 const Home = ({ role }) => {
-    const [documents, setDocuments] = useState([]);
+    const { uploadedFiles} = useContext(FileContext);  // ดึงข้อมูลจาก FileContext
+    const [documents, setDocuments] = useState(FileData); // ใช้ FileData เป็นข้อมูลหลัก
+
+    // const [documents, setDocuments] = useState([]);
     const [previewFile, setPreviewFile] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [filters, setFilters] = useState({
@@ -29,8 +32,8 @@ const Home = ({ role }) => {
 
 
     useEffect(() => {
-        setDocuments(FileData);
-    }, []);
+        setDocuments([...FileData, ...uploadedFiles]);  // รวมไฟล์ที่อัปโหลดเข้ามาใน FileContext
+    }, [uploadedFiles]);  // รีเฟรชเอกสารเมื่อมีการอัปโหลดไฟล์ใหม่
 
     const sortDocuments = (documents, option, order) => {
         return documents.sort((a, b) => {

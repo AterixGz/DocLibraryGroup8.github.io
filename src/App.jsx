@@ -18,6 +18,8 @@ import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
 import MyDocument from "./components/MyDocument/MyDocument";
 import { verifyUser } from "./data/users";
 
+import FileProvider from "./components/FileContext/FileContext";
+
 import "./App.css";
 
 function App() {
@@ -61,6 +63,7 @@ function App() {
   }
 
   return (
+    <FileProvider>
     <BrowserRouter>
       <div className="d-flex">
         {role !== "guest" && <Sidebar user={userData} onLogout={handleLogout} />}
@@ -84,6 +87,7 @@ function App() {
         </div>
       </div>
     </BrowserRouter>
+    </FileProvider>
   );
 }
 

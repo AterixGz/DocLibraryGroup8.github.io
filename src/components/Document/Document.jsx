@@ -1,8 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import "./Document.css";
 import { ImageConfig } from "../../components/config/imgConfig";
 import uploadImg from "../../assets/upload.png";
 import PropTypes from "prop-types";
+import { FileContext } from "../FileContext/FileContext";
 
 
 function Document(props) {
@@ -16,6 +17,8 @@ function Document(props) {
   const [filesList, setFilesList] = useState([]);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const { addFiles } = useContext(FileContext); // ใช้งาน Context
 
   const wrapperRef = useRef(null);
   const allowedFileTypes = ["application/pdf", "image/png", "application/zip"];
@@ -40,7 +43,7 @@ function Document(props) {
     if (validFiles.length) {
       const updatedList = [...filesList, ...validFiles];
       setFilesList(updatedList);
-      props.onFileChange?.(updatedList);
+      addFiles(validFiles); // เพิ่มไฟล์ไปยัง Context
       setErrorMessage("");
     }
 
