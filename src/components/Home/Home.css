@@ -463,20 +463,32 @@
 }
 
 .download-popup {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: rgb(209, 243, 209); /* สีเขียวสำหรับบอกความสำเร็จ */
+  position: absolute;
+  right: 20px; /* ตำแหน่งด้านขวา */
+  min-width: 300px;
+  background-color: #f1f1f1;
   color: green;
-  border-color: green;
-  padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 10px 15px;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: bottom 0.3s ease, opacity 0.3s ease;
   z-index: 1000;
-  font-size: 14px;
-  animation: fade-in-out 1.5s forwards;
-  overflow: hidden; /* เพื่อป้องกันหลอดเกิน */
+  opacity: 1;
 }
+
+.download-popup.hidden {
+  opacity: 0;
+}
+
+.download-popup span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 
 .download-popup .progress-bar {
   position: absolute;

@@ -23,6 +23,7 @@ const Home = ({ role }) => {
     const [isDownloading, setIsDownloading] = useState(false);
     const [isDownloadComplete, setIsDownloadComplete] = useState(false);
     const [isSingleDownload, setIsSingleDownload] = useState(false); // สำหรับดาวน์โหลดรายตัว
+    const [downloadPopups, setDownloadPopups] = useState([]);
 
 
 
@@ -101,41 +102,67 @@ const Home = ({ role }) => {
     };
 
     const handleSelectAll = () => {
-        if (selectedDocuments.length === currentDocuments.length) {
-            // ยกเลิกการเลือกทั้งหมด
-            setSelectedDocuments([]);
+        const currentDocumentIds = currentDocuments.map((doc) => doc.id);
+
+        if (currentDocumentIds.every((id) => selectedDocuments.includes(id))) {
+            // ยกเลิกการเลือกทั้งหมดในหน้านั้น
+            setSelectedDocuments((prev) =>
+                prev.filter((id) => !currentDocumentIds.includes(id))
+            );
         } else {
-            // เลือกทั้งหมด
-            setSelectedDocuments(currentDocuments.map((doc) => doc.id));
+            // เลือกทั้งหมดในหน้านั้น
+            setSelectedDocuments((prev) => [
+                ...prev,
+                ...currentDocumentIds.filter((id) => !prev.includes(id)),
+            ]);
         }
     };
 
-    const handleSingleDownload = (fileUrl, fileName) => {
-        setIsSingleDownload(true); // ตั้งค่าให้เป็นการดาวน์โหลดรายตัว
-        setIsDownloadComplete(true); // แสดง popup
 
+    const handleSingleDownload = (fileUrl, fileName) => {
+        setIsSingleDownload(true);
+
+        const newPopup = {
+            id: Date.now(),
+            message: `ดาวน์โหลดเอกสารเสร็จสิ้น`,
+            isSingle: true,
+        };
+
+        setDownloadPopups((prev) => [...prev, newPopup]);
+
+        // ตั้งเวลาให้ popup หายไปหลัง 5 วินาที
+        setTimeout(() => {
+            setDownloadPopups((prev) => prev.filter((popup) => popup.id !== newPopup.id));
+        }, 5000);
+
+        // Trigger download
         const link = document.createElement("a");
         link.href = fileUrl;
         link.download = fileName;
         link.click();
-
-        // ตั้งเวลาให้ popup หายไปใน 5 วินาที
-        setTimeout(() => {
-            setIsDownloadComplete(false);
-            setIsSingleDownload(false); // รีเซ็ตสถานะ
-        }, 5000);
     };
 
 
 
-
     const handleDownloadSelected = () => {
-        setIsSingleDownload(false); // ยืนยันว่าเป็นการดาวน์โหลดหลายไฟล์
-        setIsDownloadComplete(true); // แสดง popup
+        setIsSingleDownload(false);
 
         const filesToDownload = documents.filter((doc) =>
             selectedDocuments.includes(doc.id)
         );
+
+        const newPopup = {
+            id: Date.now(),
+            message: `ดาวน์โหลดเอกสารทั้งหมด ${selectedDocuments.length} รายการเสร็จสิ้น`,
+            isSingle: false,
+        };
+
+        setDownloadPopups((prev) => [...prev, newPopup]);
+
+        // ตั้งเวลาให้ popup หายไปหลัง 5 วินาที
+        setTimeout(() => {
+            setDownloadPopups((prev) => prev.filter((popup) => popup.id !== newPopup.id));
+        }, 5000);
 
         filesToDownload.forEach((file) => {
             const link = document.createElement("a");
@@ -143,11 +170,11 @@ const Home = ({ role }) => {
             link.download = file.name;
             link.click();
         });
+    };
 
-        // ตั้งเวลาให้ popup หายไปใน 5 วินาที
-        setTimeout(() => {
-            setIsDownloadComplete(false);
-        }, 5000);
+    // Function to close popup by ID
+    const closeDownloadPopup = (id) => {
+        setDownloadPopups((prev) => prev.filter((popup) => popup.id !== id));
     };
 
 
@@ -310,10 +337,11 @@ const Home = ({ role }) => {
                                             onClick={handleSelectAll}
                                             className="toggle-select-all-btn"
                                         >
-                                            {selectedDocuments.length === currentDocuments.length
+                                            {currentDocuments.every((doc) => selectedDocuments.includes(doc.id))
                                                 ? "ยกเลิกการเลือกทั้งหมด"
                                                 : "เลือกทั้งหมด"}
                                         </button>
+
                                         <button
                                             onClick={handleDownloadSelected}
                                             disabled={selectedDocuments.length === 0}
@@ -448,29 +476,51 @@ const Home = ({ role }) => {
                         </div>
                     )}
                     {isDownloadComplete && (
-    <div className="download-popup">
-        <span>
-            <i className="bi bi-check-circle"></i>
-        </span>{" "}
-        &nbsp;
-        {isSingleDownload ? (
-            <span><b>ดาวน์โหลดเอกสารเสร็จสิ้น</b></span>
-        ) : (
-            <span>
-                <b>ดาวน์โหลดเอกสารเสร็จสิ้นทั้งหมด{" "}</b>
-                <strong>{selectedDocuments.length}</strong> <b>รายการ</b>
-            </span>
-        )}
-        <span
-            onClick={() => setIsDownloadComplete(false)}
-            style={{ cursor: "pointer" }}
-        >
-            &nbsp;
-            <i className="bi bi-x-lg"></i>
-        </span>
-        <div className="progress-bar"></div>
-    </div>
-)}
+                        <div className="download-popup">
+                            <span>
+                                <i className="bi bi-check-circle"></i>
+                            </span>{" "}
+                            &nbsp;
+                            {isSingleDownload ? (
+                                <span><b>ดาวน์โหลดเอกสารเสร็จสิ้น</b></span>
+                            ) : (
+                                <span>
+                                    <b>ดาวน์โหลดเอกสารเสร็จสิ้นทั้งหมด{" "}</b>
+                                    <strong>{selectedDocuments.length}</strong> <b>รายการ</b>
+                                </span>
+                            )}
+                            <span
+                                onClick={() => setIsDownloadComplete(false)}
+                                style={{ cursor: "pointer" }}
+                            >
+                                &nbsp;
+                                <i className="bi bi-x-lg"></i>
+                            </span>
+                            <div className="progress-bar"></div>
+                        </div>
+                    )}
+                    {downloadPopups.map((popup, index) => (
+                        <div
+                            key={popup.id}
+                            className={`download-popup ${popup.hidden ? "hidden" : ""}`}
+                            style={{
+                                bottom: `${20 + index * 60}px`, // ระยะห่างจากด้านล่าง และเลื่อน popup ขึ้นด้านบน
+                            }}
+                        >
+                            <span>
+                                <i className="bi bi-check-circle"></i>
+                            </span>
+                            &nbsp;
+                            <span><b>{popup.message}</b></span>
+                            <span
+                                onClick={() => closeDownloadPopup(popup.id)}
+                                style={{ cursor: "pointer" }}
+                            >
+                                &nbsp;<i className="bi bi-x-lg"></i>
+                            </span>
+                            <div className="progress-bar"></div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </m.div>
