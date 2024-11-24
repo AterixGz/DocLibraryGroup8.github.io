@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { verifyUser } from "../../data/users";
-import './Profile.css';
+import "./Profile.css";
 
 function Profile({ username, password }) {
   const [userData, setUserData] = useState(null);
@@ -20,30 +20,33 @@ function Profile({ username, password }) {
 
   return (
     <div className="profile">
-      <h1 className="profile__header">User Profile</h1>
+      <h1 className="profile__header">โปรไฟล์</h1>
+      <hr className="dividermain" />
       <div className="profile__avatar-container">
         <img src={userData.avatar} alt="Profile" className="profile__avatar" />
       </div>
-      
+
       <div className="profile__info">
-        <div className="profile__form-group">
-          <label>First Name</label>
-          <input type="text" value={userData.firstName} readOnly />
+        <div className="profile__form-group--name">
+          <div className="profile__form-group">
+            <label>ชื่อจริง</label>
+            <input type="text" value={userData.firstName} readOnly />
+          </div>
+          <div className="profile__form-group">
+            <label>นามสกุล</label>
+            <input type="text" value={userData.lastName} readOnly />
+          </div>
         </div>
         <div className="profile__form-group">
-          <label>Last Name</label>
-          <input type="text" value={userData.lastName} readOnly />
-        </div>
-        <div className="profile__form-group">
-          <label>Email</label>
+          <label>E-mail</label>
           <input type="text" value={userData.email} readOnly />
         </div>
         <div className="profile__form-group">
-          <label>Department</label>
+          <label>แผนก</label>
           <input type="text" value={userData.department} readOnly />
         </div>
         <div className="profile__form-group">
-          <label>Position</label>
+          <label>ตำแหน่ง</label>
           <input type="text" value={userData.position} readOnly />
         </div>
       </div>

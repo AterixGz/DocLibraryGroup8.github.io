@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -9,8 +9,8 @@ import Administrator from "./components/Administrator/Administrator";
 import Document from "./components/Document/Document";
 import Permission from "./components/Permission/Permission";
 import Reports from "./components/Reports/Reports";
-import AddFileReport from "./components/Reports/addFileList/addFile"
-import RemoveFileReport from "./components/Reports/removeFileList/removeFile"
+import AddFileReport from "./components/Reports/addFileList/addFile";
+import RemoveFileReport from "./components/Reports/removeFileList/removeFile";
 import Help from "./components/Help/Help";
 import Profile from "./components/Profile/Profile";
 import Login from "./page/Login/Login";
@@ -22,7 +22,7 @@ import "./App.css";
 
 function App() {
   const [token, setToken] = useState("");
-  const [role, setRole] = useState("guest"); // กำหนดค่าเริ่มต้นเป็น "guest"
+  const [role, setRole] = useState("guest");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [userData, setUserData] = useState(null);
@@ -31,7 +31,7 @@ function App() {
     if (username && password) {
       const user = verifyUser(username, password);
       if (user) {
-        setRole(user.role); // หากมีข้อมูลผู้ใช้, อัพเดต role
+        setRole(user.role);
         setUserData(user);
       } else {
         console.error("Invalid credentials");
@@ -39,22 +39,22 @@ function App() {
     }
   }, [username, password]);
 
+  // Log-out handler
+  const handleLogout = () => {
+    setToken(""); // Clear token
+    setRole("guest"); // Reset role to guest
+    setUserData(null); // Clear user data
+    setUsername(""); // Clear username
+    setPassword(""); // Clear password
+  };
+
   if (!token) {
     return (
       <BrowserRouter>
         <Routes>
+          <Route path="/login" element={<Login setToken={setToken} setRole={setRole} setUsername={setUsername} setPassword={setPassword} />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route
-            path="*"
-            element={
-              <Login
-                setToken={setToken}
-                setRole={setRole}
-                setUsername={setUsername}
-                setPassword={setPassword}
-              />
-            }
-          />
+          <Route path="*" element={<Login setToken={setToken} setRole={setRole} setUsername={setUsername} setPassword={setPassword} />} />
         </Routes>
       </BrowserRouter>
     );
@@ -63,10 +63,10 @@ function App() {
   return (
     <BrowserRouter>
       <div className="d-flex">
-        {role !== "guest" && <Sidebar user={userData} />}
+        {role !== "guest" && <Sidebar user={userData} onLogout={handleLogout} />}
         <div className="content-container">
           <Routes>
-            <Route path="/" element={<Home role={role} />} /> {/* ส่ง role ไปที่ Home */}
+            <Route path="/" element={<Home role={role} />} />
             {role !== "guest" && (
               <>
                 <Route path="/administrator" element={<Administrator />} />

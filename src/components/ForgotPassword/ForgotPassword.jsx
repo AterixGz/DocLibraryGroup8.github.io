@@ -6,6 +6,7 @@ import logo from "../ForgotPassword/Logo.png"; // Import your logo image
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");  // New state to track message type
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
@@ -17,13 +18,25 @@ const ForgotPassword = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage("");
+    setMessageType("");  // Reset message type on new submission
+
+    // Validate email format
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      setMessage("กรุณากรอกอีเมลที่ถูกต้อง.");
+      setMessageType("error");  // Set message type to error
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       // Simulate sending reset link
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setMessage("ลิงก์รีเซ็ตรหัสผ่านถูกส่งไปยังอีเมลของคุณแล้ว.");
+      setMessageType("success");  // Set message type to success
     } catch (error) {
       setMessage("เกิดข้อผิดพลาด กรุณาลองอีกครั้ง.");
+      setMessageType("error");  // Set message type to error
     } finally {
       setIsSubmitting(false);
     }
@@ -58,7 +71,11 @@ const ForgotPassword = () => {
               {isSubmitting ? "กำลังส่ง..." : "ส่งลิงก์รีเซ็ตรหัสผ่าน"}
             </button>
           </form>
-          {message && <p className="forgot-password-message">{message}</p>}
+          {message && (
+            <p className={`forgot-password-message ${messageType === "error" ? "error-message" : "success-message"}`}>
+              {message}
+            </p>
+          )}
 
           <button onClick={handleBackToLogin} className="forgot-password-back-button">
             กลับสู่หน้าเข้าสู่ระบบ

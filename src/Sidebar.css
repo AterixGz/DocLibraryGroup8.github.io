@@ -20,33 +20,32 @@
   overflow-y: auto;
 }
 
-/* Sidebar general styles */
+/* Sidebar item styles */
 .sidebar-item {
   color: #ffffff !important;
   padding: 10px;
   width: 13.2rem;
-  border-radius:  1rem 0 0 1rem  ;
+  border-radius: 1rem 0 0 1rem;
   text-decoration: none;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-
 /* Hover effect */
 .sidebar-item:hover {
-  background-color: #E97B68;  /* สีพื้นหลังเมื่อ hover เป็นสีขาวอ่อน */
+  background-color: #E97B68;  /* Light hover color */
   color: white !important;
   background-color: #E97B68;
   width: 13.2rem;
-  border-radius:  1rem 0 0 1rem  ;
+
 }
 
 .sidebar-item.active {
-  background-color: #E97B68;  /* เปลี่ยนสีพื้นหลังเป็นสีขาวเมื่อ active */
-  color: #f14d31 !important;  /* เปลี่ยนสีตัวอักษรเป็นสีที่คุณต้องการ */
+  background-color: #E97B68;  /* Active state background */
+  color: #f14d31 !important;  /* Active state text color */
   font-weight: bold;
-  transform: scale(1.02); /* ขยายเล็กน้อยเมื่อ active */
+  transform: scale(1.02); /* Slightly enlarge when active */
   width: 13.2rem;
-  border-radius:  1rem 0 0 1rem  ;
+  border-radius: 1rem 0 0 1rem;
 }
 
 /* Administrator dropdown */
@@ -55,40 +54,34 @@
 }
 
 .nav-link.sidebar-item.active {
-  background-color: #ffffff; /* เปลี่ยนพื้นหลังเป็นสีขาวเมื่อ active */
-  color: white !important; /* สีตัวอักษรในเมนูที่ active */
+  background-color: #ffffff; /* Active background for the dropdown */
+  color: white !important; /* Active text color in the dropdown */
 }
 
-/* เพิ่มเส้นขอบให้กับเมนูเมื่อเปิด dropdown */
+/* Add border for dropdown menu when open */
 .nav.flex-column.ms-3 {
-
   border-radius: 8px;
   padding: 5px;
- 
 }
 
-/* ลบ padding ใน ul */
+/* Remove padding in ul */
 .no-padding {
-  padding-left: 10px !important; /* ลบ padding ทั้งหมด */
+  padding-left: 10px !important;
 }
 
-
-
-
-/* ลักษณะของเมนูเมื่ออยู่ในสถานะ active */
+/* Active link styles */
 .nav-link.sidebar-item.active {
   background-color: #E97B68;
   color: #f14d31;
   width: 13.07rem;
-  border-radius:  1rem 0 0 1rem  ;
+
 }
 
-/* เพิ่มสีพื้นหลังและเงาสำหรับเมนูที่คลิก */
+/* Transition effect for nav items */
 .nav-item.p-1 {
   transition: background-color 0.3s ease, transform 0.2s ease;
-  align-items: center; /* จัดไอคอนให้อยู่ตรงกลางในแนวตั้ง */
+  align-items: center; /* Align icons vertically */
 }
-
 
 /* Footer link */
 .footer-link {
@@ -107,11 +100,11 @@
 }
 
 .footer-link:active {
-  color: #f8bdaa; /* สีเข้มขึ้นเมื่อกด */
-  transform: scale(0.98); /* ลดขนาดเล็กลงเล็กน้อย */
+  color: #f8bdaa; /* Darker color when active */
+  transform: scale(0.98); /* Slightly shrink when active */
 }
 
-/* รูปโปรไฟล์ใน Footer */
+/* Profile image in Footer */
 .footer-profile-image {
   width: 50px;
   height: 50px;
@@ -126,11 +119,9 @@
 }
 
 .footer-profile-image:active {
-  transform: scale(0.95); /* ขนาดลดลงเล็กน้อย */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* เพิ่มเงาเมื่อกด */
-
+  transform: scale(0.95); /* Shrink slightly when clicked */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add shadow on click */
 }
-
 
 /* Logo section */
 .logo-section {
@@ -146,21 +137,18 @@
   margin: 0 auto; /* Centers the logo */
   background-color: white; /* Background for a clean look */
   border-radius: 8px; /* Slightly rounded corners */
-  border: 2px solid #ffffff; /* Adds a border around the logo */
-  padding: 5px; /* Creates spacing between the image and border */
+  border: 2px solid #ffffff; /* Border around the logo */
+  padding: 5px; /* Spacing between image and border */
 }
 
 .styled-logo {
-  width: 215px; /* Adjust width based on the uploaded image */
-  height: auto; /* Automatically adjusts height proportionally */
-  border-radius: 0  1rem 1rem 0; /* Rounded corners */
-  padding: 5px; /* Inner spacing around the logo */
-  background-color: white; /* Matches the white background */
+  width: 215px; /* Adjust width based on the logo */
+  height: auto; /* Adjust height proportionally */
+  border-radius: 0 1rem 1rem 0; /* Rounded corners */
+  padding: 5px; /* Inner spacing */
+  background-color: white;
   margin-top: 4rem;
-  
 }
-
-
 
 .logo-text {
   font-size: 1.2rem;
@@ -179,7 +167,7 @@
   padding: 10px;
   color: #ffffff;
   text-align: center;
-  border-radius: 0 0  1rem;
+  border-radius: 0 0 1rem;
 }
 
 .footer-link {
@@ -199,12 +187,41 @@
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #ffffff;
-  margin-right: 2rem;
+  margin-right: 1rem;
 }
 
+/* Footer Section */
+.footer-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 15px;
+  background-color: #E97B68;
+  margin-top: auto;
+  border-radius: 0 0 1rem 1rem;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+}
 
+.footer-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Ensure profile info and image are on opposite sides */
+  text-decoration: none;
+  width: 100%;
+  color: #ffffff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
 
-/* Footer */
+.footer-link:hover {
+  background-color: #f14d31; /* Hover effect to match sidebar color */
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
 
 .user-name {
   font-size: 1rem;
@@ -213,81 +230,96 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-right: 10px; /* Padding to avoid text getting too close to image */
 }
-
-
-.footer-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px;
-  background-color: #E97B68;
-  margin-top: auto;
-}
-
-.divider {
-  width: 100%;
-  border: 0;
-  margin: 0 0 5px 0;
-}
-
-.footer-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Push text and image to opposite sides */
-  text-decoration: none;
-  width: 100%; /* Ensure the link takes full width */
-  padding: 10px;
-  color: #333;
-  transition: color 0.3s ease;
-}
-
-.footer-link:hover {
-  color: #f14d31;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  margin-right: 20px;
-  
-}
-
-
 
 .footer-profile-image {
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #f14d31;
-  transition: transform 0.3s ease;
+  border: 2px solid #ffffff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .footer-profile-image:hover {
   transform: scale(1.1);
 }
 
-/* icon */
-
-/* ปรับตำแหน่งไอคอนให้ต่ำลง */
-.nav-link.sidebar-item {
-  display: flex;
-  align-items: center;  /* ทำให้ไอคอนและข้อความจัดในแนวตั้ง */
+.footer-profile-image:active {
+  transform: scale(0.95); /* Shrink slightly when clicked */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add shadow on click */
 }
 
-/* ปรับให้ไอคอนลงมาหน่อย */
+.btn-danger {
+  font-size: 1rem;
+  color: #ffffff;
+  background-color: #E97B68;
+  border: none;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-danger:hover {
+  background-color: #F14D31;
+}
+
+.btn-danger:active {
+  background-color: #ff7043;
+  transform: scale(0.98);
+}
+
+/* Divider styling */
+.divider {
+  background-color: #ff7043;
+ 
+  margin: -3px 0;
+}
+
+
+/* Icon adjustments */
+.nav-link.sidebar-item {
+  display: flex;
+  align-items: center;  /* Align icon and text vertically */
+}
+
 .nav-link.sidebar-item i {
-  margin-top: 3px;  /* เพิ่ม margin-top เพื่อให้ไอคอนลงมา */
+  margin-top: 3px;  /* Adjust icon position */
   margin-right: 1rem;
 }
 
-/* ปรับให้ไอคอนใหญ่ขึ้น */
 .icon-large {
-  font-size: 1.5rem;  /* สามารถปรับเพิ่มหรือลดขนาดได้ตามต้องการ */
+  font-size: 1.5rem;  /* Can adjust icon size as needed */
 }
 
-/* ปรับให้ไอคอนลงมาหน่อย */
 .icon-adjust {
-  margin-top: 3px;  /* ปรับ margin-top เพื่อให้ไอคอนเลื่อนลง */
+  margin-top: 3px;  /* Adjust margin for icon */
+}
+
+/* Sidebar general styles */
+.sidebar-container {
+  position: fixed;
+  top: 0;
+  left: -250px;  /* Start off-screen */
+  bottom: 0;
+  width: 250px;
+  min-width: 250px;
+  max-width: 250px;
+  background-color: #F14D31;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 0 1rem 1rem 0;
+  animation: slideIn 0.5s ease-out forwards; /* Slide-in effect */
+}
+
+/* Slide-in animation for the sidebar */
+@keyframes slideIn {
+  from {
+    left: -250px;  /* Off-screen initially */
+  }
+  to {
+    left: 0;  /* Slide to the final position */
+  }
 }
