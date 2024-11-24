@@ -247,11 +247,11 @@ const MyDocument = ({ role }) => {
                 </table>
 
                 <div className="pagination">
-                    <button className="pagination-btn" onClick={handleFirstPage} disabled={currentPage === 1}>First</button>
-                    <button className="pagination-btn" onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+                    <button className="pagination-btn" onClick={handleFirstPage} disabled={currentPage === 1}>หน้าแรก</button>
+                    <button className="pagination-btn" onClick={handlePrevPage} disabled={currentPage === 1}>หน้าก่อนหน้า</button>
                     <span className="pagination-info">{currentPage} of {totalPages}</span>
-                    <button className="pagination-btn" onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
-                    <button className="pagination-btn" onClick={handleLastPage} disabled={currentPage === totalPages}>Last</button>
+                    <button className="pagination-btn" onClick={handleNextPage} disabled={currentPage === totalPages}>หน้าถัดไป</button>
+                    <button className="pagination-btn" onClick={handleLastPage} disabled={currentPage === totalPages}>หน้าสุดท้าย</button>
                 </div>
 
                 {previewFile && (

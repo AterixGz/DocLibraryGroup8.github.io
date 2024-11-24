@@ -3,6 +3,7 @@ import "./Home.css";
 import FileData from "../../data/FileData";
 import { motion as m } from "framer-motion";
 
+
 const Home = ({ role }) => {
     const [documents, setDocuments] = useState([]);
     const [previewFile, setPreviewFile] = useState(null);
@@ -18,6 +19,13 @@ const Home = ({ role }) => {
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [showCheckbox, setShowCheckbox] = useState(false);
     const [selectedDocuments, setSelectedDocuments] = useState([]);
+    const [alertMessage, setAlertMessage] = useState(null);
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [isDownloadComplete, setIsDownloadComplete] = useState(false);
+    const [isSingleDownload, setIsSingleDownload] = useState(false); // สำหรับดาวน์โหลดรายตัว
+
+
+
 
     useEffect(() => {
         setDocuments(FileData);
@@ -48,20 +56,31 @@ const Home = ({ role }) => {
         setDocuments((prevDocuments) =>
             sortDocuments([...prevDocuments], option, order)
         );
+        setCurrentPage(1); // รีเซ็ตหน้าเป็นหน้าแรก
     };
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
+        setCurrentPage(1); // รีเซ็ตหน้าเป็นหน้าแรก
     };
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         const cleanedValue = value.trim().toLowerCase().replace(/&/g, "และ");
         setFilters((prevFilters) => ({ ...prevFilters, [name]: cleanedValue }));
+        setCurrentPage(1); // รีเซ็ตหน้าเป็นหน้าแรก
     };
 
     const handlePreview = (fileUrl) => {
-        setPreviewFile(fileUrl);
+        if (fileUrl.endsWith(".xlsx")) {
+            setAlertMessage("ไม่สามารถแสดงตัวอย่างไฟล์ Excel ได้ในขณะนี้");
+        } else {
+            setPreviewFile(fileUrl);
+        }
+    };
+
+    const closeAlert = () => {
+        setAlertMessage(null);
     };
 
     const closePreview = () => {
@@ -70,7 +89,9 @@ const Home = ({ role }) => {
 
     const toggleCheckbox = () => {
         setShowCheckbox((prev) => !prev);
-        setSelectedDocuments([]);
+        setSelectedDocuments([]); // Reset การเลือกเมื่อ toggle
+        setIsDownloading(false); // Reset การดาวน์โหลด
+        setIsDownloadComplete(false); // ซ่อน popup
     };
 
     const handleSelectDocument = (id) => {
@@ -89,7 +110,29 @@ const Home = ({ role }) => {
         }
     };
 
+    const handleSingleDownload = (fileUrl, fileName) => {
+        setIsSingleDownload(true); // ตั้งค่าให้เป็นการดาวน์โหลดรายตัว
+        setIsDownloadComplete(true); // แสดง popup
+
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = fileName;
+        link.click();
+
+        // ตั้งเวลาให้ popup หายไปใน 5 วินาที
+        setTimeout(() => {
+            setIsDownloadComplete(false);
+            setIsSingleDownload(false); // รีเซ็ตสถานะ
+        }, 5000);
+    };
+
+
+
+
     const handleDownloadSelected = () => {
+        setIsSingleDownload(false); // ยืนยันว่าเป็นการดาวน์โหลดหลายไฟล์
+        setIsDownloadComplete(true); // แสดง popup
+
         const filesToDownload = documents.filter((doc) =>
             selectedDocuments.includes(doc.id)
         );
@@ -100,7 +143,14 @@ const Home = ({ role }) => {
             link.download = file.name;
             link.click();
         });
+
+        // ตั้งเวลาให้ popup หายไปใน 5 วินาที
+        setTimeout(() => {
+            setIsDownloadComplete(false);
+        }, 5000);
     };
+
+
 
     const filteredDocuments = documents
         .filter((doc) => {
@@ -247,7 +297,7 @@ const Home = ({ role }) => {
                     </div>
                     <div className="multi-select-actions">
                         {role !== "guest" && (
-                            <>
+                            <th className={`checkbox-th ${isDownloading ? 'no-radius' : ''}`}>
                                 <button
                                     onClick={toggleCheckbox}
                                     className="toggle-checkbox-btn"
@@ -273,7 +323,7 @@ const Home = ({ role }) => {
                                         </button>
                                     </>
                                 )}
-                            </>
+                            </th>
                         )}
                     </div>
                     <hr className="hr-top"></hr>
@@ -322,10 +372,11 @@ const Home = ({ role }) => {
                                     {role !== "guest" && (
                                         <td>
                                             <a
-                                                 className="download-link"
-                                                 href={doc.FileUrl}
-                                                 download={doc.name}
-                                                 onClick={(e) => e.stopPropagation()}
+                                                className="download-link"
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // ป้องกันการ trigger การเลือกแถว
+                                                    handleSingleDownload(doc.FileUrl, doc.name); // เรียกฟังก์ชัน handleSingleDownload
+                                                }}
                                             >
                                                 ดาวน์โหลด
                                             </a>
@@ -372,8 +423,8 @@ const Home = ({ role }) => {
 
                     {/* Preview Modal */}
                     {previewFile && (
-                        <div className="preview-modal">
-                            <div className="modal-content">
+                        <div className="preview-modal" onClick={closePreview}>
+                            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                                 <button onClick={closePreview} className="close-button">
                                     ปิด
                                 </button>
@@ -385,6 +436,41 @@ const Home = ({ role }) => {
                             </div>
                         </div>
                     )}
+                    {/* Alert Modal */}
+                    {alertMessage && (
+                        <div className="alert-modal" onClick={closeAlert}>
+                            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                                <button onClick={closeAlert} className="close-button">
+                                    ปิด
+                                </button>
+                                <p>{alertMessage}</p>
+                            </div>
+                        </div>
+                    )}
+                    {isDownloadComplete && (
+    <div className="download-popup">
+        <span>
+            <i className="bi bi-check-circle"></i>
+        </span>{" "}
+        &nbsp;
+        {isSingleDownload ? (
+            <span><b>ดาวน์โหลดเอกสารเสร็จสิ้น</b></span>
+        ) : (
+            <span>
+                <b>ดาวน์โหลดเอกสารเสร็จสิ้นทั้งหมด{" "}</b>
+                <strong>{selectedDocuments.length}</strong> <b>รายการ</b>
+            </span>
+        )}
+        <span
+            onClick={() => setIsDownloadComplete(false)}
+            style={{ cursor: "pointer" }}
+        >
+            &nbsp;
+            <i className="bi bi-x-lg"></i>
+        </span>
+        <div className="progress-bar"></div>
+    </div>
+)}
                 </div>
             </div>
         </m.div>

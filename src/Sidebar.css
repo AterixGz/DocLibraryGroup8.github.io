@@ -12,6 +12,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  border-radius: 0 1rem 1rem 0;
 }
 
 .sidebar {
@@ -19,32 +20,117 @@
   overflow-y: auto;
 }
 
-/* Menu items */
+/* Sidebar general styles */
 .sidebar-item {
   color: #ffffff !important;
   padding: 10px;
-  border-radius: 8px;
+  width: 13.2rem;
+  border-radius:  1rem 0 0 1rem  ;
   text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
+
+/* Hover effect */
 .sidebar-item:hover {
-  background-color: #e64a19;
-  color: #ffffff !important;
+  background-color: #E97B68;  /* สีพื้นหลังเมื่อ hover เป็นสีขาวอ่อน */
+  color: white !important;
+  background-color: #E97B68;
+  width: 13.2rem;
+  border-radius:  1rem 0 0 1rem  ;
 }
 
-.sidebar-item:focus,
-.nav-link:focus {
-  color: #ffffff !important;
-  background-color: inherit !important;
-  outline: none !important;
-  box-shadow: none !important;
+.sidebar-item.active {
+  background-color: #E97B68;  /* เปลี่ยนสีพื้นหลังเป็นสีขาวเมื่อ active */
+  color: #f14d31 !important;  /* เปลี่ยนสีตัวอักษรเป็นสีที่คุณต้องการ */
+  font-weight: bold;
+  transform: scale(1.02); /* ขยายเล็กน้อยเมื่อ active */
+  width: 13.2rem;
+  border-radius:  1rem 0 0 1rem  ;
 }
 
-.sidebar-item.active,
-.nav-link.active {
-  background-color: #ff7043;
-  color: #ffffff !important;
+/* Administrator dropdown */
+.nav-link.sidebar-item {
+  cursor: pointer;
 }
+
+.nav-link.sidebar-item.active {
+  background-color: #ffffff; /* เปลี่ยนพื้นหลังเป็นสีขาวเมื่อ active */
+  color: white !important; /* สีตัวอักษรในเมนูที่ active */
+}
+
+/* เพิ่มเส้นขอบให้กับเมนูเมื่อเปิด dropdown */
+.nav.flex-column.ms-3 {
+
+  border-radius: 8px;
+  padding: 5px;
+ 
+}
+
+/* ลบ padding ใน ul */
+.no-padding {
+  padding-left: 10px !important; /* ลบ padding ทั้งหมด */
+}
+
+
+
+
+/* ลักษณะของเมนูเมื่ออยู่ในสถานะ active */
+.nav-link.sidebar-item.active {
+  background-color: #E97B68;
+  color: #f14d31;
+  width: 13.07rem;
+  border-radius:  1rem 0 0 1rem  ;
+}
+
+/* เพิ่มสีพื้นหลังและเงาสำหรับเมนูที่คลิก */
+.nav-item.p-1 {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  align-items: center; /* จัดไอคอนให้อยู่ตรงกลางในแนวตั้ง */
+}
+
+
+/* Footer link */
+.footer-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  width: 100%;
+  padding: 10px;
+  color: #333;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.footer-link:hover {
+  color: #f14d31;
+}
+
+.footer-link:active {
+  color: #f8bdaa; /* สีเข้มขึ้นเมื่อกด */
+  transform: scale(0.98); /* ลดขนาดเล็กลงเล็กน้อย */
+}
+
+/* รูปโปรไฟล์ใน Footer */
+.footer-profile-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f14d31;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.footer-profile-image:hover {
+  transform: scale(1.1);
+}
+
+.footer-profile-image:active {
+  transform: scale(0.95); /* ขนาดลดลงเล็กน้อย */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* เพิ่มเงาเมื่อกด */
+
+}
+
 
 /* Logo section */
 .logo-section {
@@ -93,6 +179,7 @@
   padding: 10px;
   color: #ffffff;
   text-align: center;
+  border-radius: 0 0  1rem;
 }
 
 .footer-link {
@@ -112,9 +199,95 @@
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #ffffff;
+  margin-right: 2rem;
 }
 
+
+
+/* Footer */
+
 .user-name {
-  font-size: 0.9rem;
-  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.footer-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  background-color: #E97B68;
+  margin-top: auto;
+}
+
+.divider {
+  width: 100%;
+  border: 0;
+  margin: 0 0 5px 0;
+}
+
+.footer-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Push text and image to opposite sides */
+  text-decoration: none;
+  width: 100%; /* Ensure the link takes full width */
+  padding: 10px;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #f14d31;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  
+}
+
+
+
+.footer-profile-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f14d31;
+  transition: transform 0.3s ease;
+}
+
+.footer-profile-image:hover {
+  transform: scale(1.1);
+}
+
+/* icon */
+
+/* ปรับตำแหน่งไอคอนให้ต่ำลง */
+.nav-link.sidebar-item {
+  display: flex;
+  align-items: center;  /* ทำให้ไอคอนและข้อความจัดในแนวตั้ง */
+}
+
+/* ปรับให้ไอคอนลงมาหน่อย */
+.nav-link.sidebar-item i {
+  margin-top: 3px;  /* เพิ่ม margin-top เพื่อให้ไอคอนลงมา */
+  margin-right: 1rem;
+}
+
+/* ปรับให้ไอคอนใหญ่ขึ้น */
+.icon-large {
+  font-size: 1.5rem;  /* สามารถปรับเพิ่มหรือลดขนาดได้ตามต้องการ */
+}
+
+/* ปรับให้ไอคอนลงมาหน่อย */
+.icon-adjust {
+  margin-top: 3px;  /* ปรับ margin-top เพื่อให้ไอคอนเลื่อนลง */
 }

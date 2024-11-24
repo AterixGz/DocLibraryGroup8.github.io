@@ -72,7 +72,7 @@ margin: 1rem 3rem;
 
 .Document-type {
 /* background-color: #292020; */
-
+min-width: 250px;
 width: 20%;
 height: 80%;
 margin: 1rem 3rem;
