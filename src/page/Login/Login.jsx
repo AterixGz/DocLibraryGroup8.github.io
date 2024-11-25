@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
 import { verifyUser } from "../../data/users";
 
@@ -7,28 +7,31 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
   const usernameRef = useRef();
   const passwordRef = useRef();
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [errorMessage, setErrorMessage] = useState("");
+  const [inputError, setInputError] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
     const username = usernameRef.current.value.trim();
     const password = passwordRef.current.value.trim();
 
-    // Clear input fields after capturing the values
     usernameRef.current.value = "";
     passwordRef.current.value = "";
 
-    // Verify user credentials
     const userInfo = verifyUser(username, password);
     if (userInfo === null) {
-      alert("ชื่อผู้ใช้หรือรหัสผ่านผิด");
+      setErrorMessage("ชื่อผู้ใช้หรือรหัสผ่านผิด");
+      setInputError(true); // Highlight the input fields
       usernameRef.current.focus();
     } else {
+      setErrorMessage("");
+      setInputError(false); // Reset input styles
       setToken(userInfo.token);
       setRole(userInfo.role);
       setUsername(username);
       setPassword(password);
-      navigate("/"); // Redirect to home after login
+      navigate("/");
     }
   };
 
@@ -37,7 +40,7 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
     setRole("guest");
     setUsername("guest");
     setPassword("");
-    navigate("/"); // Redirect to home for guest login
+    navigate("/");
   };
 
   return (
@@ -46,22 +49,34 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
         <div className="login-form">
           <h2 className="login-form__title">ยินดีต้อนรับ</h2>
           <form onSubmit={handleLogin}>
-            <label className="login-form__label">ชื่อผู้ใช้*</label>
+            {/* Username */}
+            <label
+              className={`login-form__label ${inputError ? "error-label" : ""}`}
+            >
+              ชื่อผู้ใช้*
+            </label>
             <input
               type="text"
               placeholder="กรอกชื่อผู้ใช้"
               ref={usernameRef}
               required
-              className="login-form__input"
+              className={`login-form__input ${inputError ? "input-error" : ""}`}
             />
-            <label className="login-form__label">รหัสผ่าน*</label>
+            {/* Password */}
+            <label
+              className={`login-form__label ${inputError ? "error-label" : ""}`}
+            >
+              รหัสผ่าน*
+            </label>
             <div className="password-container">
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="กรอกรหัสผ่าน"
                 ref={passwordRef}
                 required
-                className="login-form__input password-input"
+                className={`login-form__input password-input ${
+                  inputError ? "input-error" : ""
+                }`}
               />
               <button
                 type="button"
@@ -79,6 +94,11 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
               เข้าสู่ระบบ
             </button>
           </form>
+          {errorMessage && (
+            <div className="error-message">
+              <i className="bi bi-exclamation-circle-fill"></i> {errorMessage}
+            </div>
+          )}
           <Link to="/forgot-password" className="forgot-password">
             ลืมรหัสผ่าน ?
           </Link>
