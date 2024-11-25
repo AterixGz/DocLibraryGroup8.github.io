@@ -41,6 +41,7 @@ const Filedata = [
         year: "2566",
         time: "10:33",
         FileUrl: "../../public/filedata/016_ReportYear66.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 5,
@@ -51,6 +52,7 @@ const Filedata = [
         year: "2567",
         time: "11:40",
         FileUrl: "../../public/filedata/021_ReportmanuOct67.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 6,
@@ -61,6 +63,7 @@ const Filedata = [
         year: "2565",
         time: "15:30",
         FileUrl: "../../public/filedata/002_Sum65.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 7,
@@ -71,6 +74,7 @@ const Filedata = [
         year: "2560",
         time: "09:25",
         FileUrl: "../../public/filedata/007_Acc60.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 8,
@@ -81,6 +85,7 @@ const Filedata = [
         year: "2562",
         time: "13:50",
         FileUrl: "../../public/filedata/012_Rateyour62.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 9,
@@ -91,6 +96,7 @@ const Filedata = [
         year: "2565",
         time: "14:10",
         FileUrl: "../../public/filedata/017_ReportYear65.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 10,
@@ -101,6 +107,7 @@ const Filedata = [
         year: "2567",
         time: "10:55",
         FileUrl: "../../public/filedata/022_ReportmanuSep67.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 11,
@@ -111,6 +118,7 @@ const Filedata = [
         year: "2565",
         time: "12:05",
         FileUrl: "../../public/filedata/003_Report65.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 12,
@@ -121,6 +129,7 @@ const Filedata = [
         year: "2559",
         time: "17:50",
         FileUrl: "../../public/filedata/008_Acc59.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 13,
@@ -131,6 +140,7 @@ const Filedata = [
         year: "2561",
         time: "08:30",
         FileUrl: "../../public/filedata/013_Sumpati61.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 14,
@@ -141,6 +151,7 @@ const Filedata = [
         year: "2564",
         time: "14:40",
         FileUrl: "../../public/filedata/018_ReportYear64.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 15,
@@ -151,6 +162,7 @@ const Filedata = [
         year: "2567",
         time: "17:15",
         FileUrl: "../../public/filedata/023_ReportmanuAug67.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 16,
@@ -161,6 +173,7 @@ const Filedata = [
         year: "2564",
         time: "16:35",
         FileUrl: "../../public/filedata/004_Report64.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 17,
@@ -171,6 +184,7 @@ const Filedata = [
         year: "2565",
         time: "09:05",
         FileUrl: "../../public/filedata/009_Rateyour65.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 18,
@@ -181,6 +195,7 @@ const Filedata = [
         year: "2560",
         time: "13:20",
         FileUrl: "../../public/filedata/014_Sumpati60.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 19,
@@ -191,6 +206,7 @@ const Filedata = [
         year: "2563",
         time: "11:45",
         FileUrl: "../../public/filedata/019_ReportYear63.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 20,
@@ -201,6 +217,7 @@ const Filedata = [
         year: "2567",
         time: "16:10",
         FileUrl: "../../public/filedata/024_ReportsellSep67.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 21,
@@ -211,6 +228,7 @@ const Filedata = [
         year: "2563",
         time: "09:55",
         FileUrl: "../../public/filedata/005_Report63.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 22,
@@ -221,6 +239,7 @@ const Filedata = [
         year: "2564",
         time: "10:20",
         FileUrl: "../../public/filedata/010_Rateyour64.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 23,
@@ -231,6 +250,7 @@ const Filedata = [
         year: "2559",
         time: "13:45",
         FileUrl: "../../public/filedata/015_Sumpati59.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 24,
@@ -241,6 +261,7 @@ const Filedata = [
         year: "2562",
         time: "08:15",
         FileUrl: "../../public/filedata/020_ReportYear62.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 25,
@@ -251,6 +272,7 @@ const Filedata = [
         year: "2567",
         time: "14:23",
         FileUrl: "../../public/filedata/025_ReportsellAug67.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 26,
@@ -261,6 +283,7 @@ const Filedata = [
         year: "2567",
         time: "07:52",
         FileUrl: "../../public/filedata/026_ReportsellJuly67.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 27,
@@ -271,6 +294,7 @@ const Filedata = [
         year: "2567",
         time: "15:30",
         FileUrl: "../../public/filedata/031_Procure67.xlsx",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 28,
@@ -281,6 +305,7 @@ const Filedata = [
         year: "2565",
         time: "11:24",
         FileUrl: "../../public/filedata/036_Reserve65.xlsx",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 29,
@@ -291,6 +316,7 @@ const Filedata = [
         year: "2567",
         time: "11:40",
         FileUrl: "../../public/filedata/027_AlloMuPer4_67.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 30,
@@ -301,6 +327,7 @@ const Filedata = [
         year: "2566",
         time: "14:53",
         FileUrl: "../../public/filedata/032_Procure66.xlsx",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 31,
@@ -311,6 +338,7 @@ const Filedata = [
         year: "2564",
         time: "12:33",
         FileUrl: "../../public/filedata/037_Reserve64.xlsx",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 32,
@@ -321,6 +349,7 @@ const Filedata = [
         year: "2567",
         time: "10:52",
         FileUrl: "../../public/filedata/028_AlloMuPer3_67.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 33,
@@ -331,6 +360,7 @@ const Filedata = [
         year: "2565",
         time: "17:12",
         FileUrl: "../../public/filedata/033_Procure65.xlsx",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 34,
@@ -341,6 +371,7 @@ const Filedata = [
         year: "2567",
         time: "09:00",
         FileUrl: "../../public/filedata/038_Transport.xlsx",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 35,
@@ -351,6 +382,7 @@ const Filedata = [
         year: "2567",
         time: "13:28",
         FileUrl: "../../public/filedata/029_AlloSaoPer4_67.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 36,
@@ -361,6 +393,7 @@ const Filedata = [
         year: "2564",
         time: "10:52",
         FileUrl: "../../public/filedata/034_Procure64.xlsx",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 37,
@@ -371,6 +404,7 @@ const Filedata = [
         year: "2567",
         time: "15:11",
         FileUrl: "../../public/filedata/039_Namelist.xlsx",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 38,
@@ -381,6 +415,7 @@ const Filedata = [
         year: "2567",
         time: "17:38",
         FileUrl: "../../public/filedata/030_AlloSaoPer3_67.pdf",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
         id: 39,
@@ -391,7 +426,10 @@ const Filedata = [
         year: "2566",
         time: "18:04",
         FileUrl: "../../public/filedata/035_Reserve66.xlsx",
+        uploadedBy: "นายสมชาย ใจเด็ด"
     },
 ]
 
 export default Filedata;
+
+
