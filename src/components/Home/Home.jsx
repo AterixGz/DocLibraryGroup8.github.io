@@ -5,7 +5,7 @@ import FileData from "../../data/FileData"; // ใช้ไฟล์ข้อม
 import { motion as m } from "framer-motion";
 
 const Home = ({ role }) => {
-    const { uploadedFiles} = useContext(FileContext);  // ดึงข้อมูลจาก FileContext
+    const { uploadedFiles } = useContext(FileContext);  // ดึงข้อมูลจาก FileContext
     const [documents, setDocuments] = useState(FileData); // ใช้ FileData เป็นข้อมูลหลัก
 
     // const [documents, setDocuments] = useState([]);
@@ -60,11 +60,6 @@ const Home = ({ role }) => {
         setDocuments((prevDocuments) =>
             sortDocuments([...prevDocuments], option, order)
         );
-        setCurrentPage(1); // รีเซ็ตหน้าเป็นหน้าแรก
-    };
-
-    const handleSearch = (event) => {
-        setSearchTerm(event.target.value);
         setCurrentPage(1); // รีเซ็ตหน้าเป็นหน้าแรก
     };
 
@@ -180,17 +175,26 @@ const Home = ({ role }) => {
         setDownloadPopups((prev) => prev.filter((popup) => popup.id !== id));
     };
 
-
+    const handleSearch = (event) => {
+        setSearchTerm(event.target.value);
+        setCurrentPage(1); // รีเซ็ตหน้าเป็นหน้าแรกเมื่อค้นหาใหม่
+    };
 
     const filteredDocuments = documents
         .filter((doc) => {
             const search = searchTerm.trim().toLowerCase();
-            return (
-                doc.name.toLowerCase().includes(search) ||
-                doc.type.toLowerCase().includes(search) ||
-                doc.date.toLowerCase().includes(search) ||
-                doc.department.toLowerCase().includes(search)
-            );
+            // แยกคำค้นหาหลายคำด้วยช่องว่าง และกรองคำที่เป็นค่าว่าง
+            const searchTerms = search.split(" ").filter(term => term.length > 0);
+
+            // ตรวจสอบว่าเอกสารตรงกับทุกคำใน searchTerms
+            return searchTerms.every((term) => {
+                return (
+                    doc.name.toLowerCase().includes(term) ||
+                    doc.department.toLowerCase().includes(term) ||
+                    doc.date.toLowerCase().includes(term) ||
+                    doc.type.toLowerCase().includes(term)
+                );
+            });
         })
         .filter((doc) => {
             return (
@@ -200,9 +204,7 @@ const Home = ({ role }) => {
                 (!filters.category ||
                     doc.type.toLowerCase().includes(filters.category.toLowerCase())) &&
                 (!filters.department ||
-                    doc.department
-                        .toLowerCase()
-                        .includes(filters.department.toLowerCase()))
+                    doc.department.toLowerCase().includes(filters.department.toLowerCase()))
             );
         });
 
@@ -327,36 +329,44 @@ const Home = ({ role }) => {
                     </div>
                     <div className="multi-select-actions">
                         {role !== "guest" && (
-                            <th className={`checkbox-th ${isDownloading ? 'no-radius' : ''}`}>
-                                <button
-                                    onClick={toggleCheckbox}
-                                    className="toggle-checkbox-btn"
-                                >
-                                    {showCheckbox ? "ยกเลิกการเลือก" : "เลือกหลายรายการ"}
-                                </button>
-                                {showCheckbox && (
-                                    <>
-                                        <button
-                                            onClick={handleSelectAll}
-                                            className="toggle-select-all-btn"
-                                        >
-                                            {currentDocuments.every((doc) => selectedDocuments.includes(doc.id))
-                                                ? "ยกเลิกการเลือกทั้งหมด"
-                                                : "เลือกทั้งหมด"}
-                                        </button>
-
-                                        <button
-                                            onClick={handleDownloadSelected}
-                                            disabled={selectedDocuments.length === 0}
-                                            className="download-selected-btn"
-                                        >
-                                            ดาวน์โหลดเอกสารที่เลือก ({selectedDocuments.length})
-                                        </button>
-                                    </>
-                                )}
-                            </th>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th className={`checkbox-th ${isDownloading ? 'no-radius' : ''}`}>
+                                            <button
+                                                onClick={toggleCheckbox}
+                                                className="toggle-checkbox-btn"
+                                            >
+                                                {showCheckbox ? "ยกเลิกการเลือก" : "เลือกหลายรายการ"}
+                                            </button>
+                                        </th>
+                                        {showCheckbox && (
+                                            <th className="actions-th">
+                                                <div className="actions-group">
+                                                    <button
+                                                        onClick={handleSelectAll}
+                                                        className="toggle-select-all-btn"
+                                                    >
+                                                        {currentDocuments.every((doc) => selectedDocuments.includes(doc.id))
+                                                            ? "ยกเลิกการเลือกทั้งหมด"
+                                                            : "เลือกทั้งหมด"}
+                                                    </button>
+                                                    <button
+                                                        onClick={handleDownloadSelected}
+                                                        disabled={selectedDocuments.length === 0}
+                                                        className="download-selected-btn"
+                                                    >
+                                                        ดาวน์โหลดเอกสารที่เลือก ({selectedDocuments.length})
+                                                    </button>
+                                                </div>
+                                            </th>
+                                        )}
+                                    </tr>
+                                </thead>
+                            </table>
                         )}
                     </div>
+
                     <hr className="hr-top"></hr>
                     <table className="document-table">
                         <thead>
@@ -391,7 +401,7 @@ const Home = ({ role }) => {
                                             doc.name
                                         ) : (
                                             <a
-                                                a href="#" onClick={(e) => { e.stopPropagation(); handlePreview(doc.FileUrl); }} className="preview-link"
+                                                href="#" onClick={(e) => { e.stopPropagation(); handlePreview(doc.FileUrl); }} className="preview-link"
                                             >
                                                 {doc.name}
                                             </a>
