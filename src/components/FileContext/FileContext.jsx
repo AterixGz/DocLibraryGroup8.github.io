@@ -1,26 +1,21 @@
-// src/context/FileContext.jsx
-import React, { createContext, useState } from "react";
+import React, { createContext, useState } from 'react';
 
 export const FileContext = createContext();
 
-const FileProvider = ({ children }) => {
-  const [uploadedFiles, setUploadedFiles] = useState([]);
+export const FileProvider = ({ children }) => {
+    const [uploadedFiles, setUploadedFiles] = useState([]);
 
-  const addFiles = (newFiles) => {
-    setUploadedFiles((prevFiles) => [...prevFiles, ...newFiles]);
-  };
+    const addFiles = (file) => {
+        setUploadedFiles((prevFiles) => [...prevFiles, file]);
+    };
 
-  const removeFile = (fileToRemove) => {
-    setUploadedFiles((prevFiles) =>
-      prevFiles.filter((file) => file !== fileToRemove)
+    const removeFile = (fileId) => {
+        setUploadedFiles(uploadedFiles.filter(file => file.id !== fileId));
+    };
+
+    return (
+        <FileContext.Provider value={{ uploadedFiles, addFiles, removeFile }}>
+            {children}
+        </FileContext.Provider>
     );
-  };
-
-  return (
-    <FileContext.Provider value={{ uploadedFiles, addFiles, removeFile }}>
-      {children}
-    </FileContext.Provider>
-  );
 };
-
-export default FileProvider;
