@@ -165,6 +165,7 @@
   animation: zoomInButton 1s ease-out forwards;
   animation-delay: 1s;
   width: 100%;
+  margin-top: 16px;
 }
 
 /* Zoom-in animation for the button */
@@ -284,22 +285,7 @@
 }
 
 
-.error-message {
-  margin-top: 1rem;
-  margin-left: 9rem;
-  padding: 0.75rem;
-  color: #d32f2f; /* สีแดงสำหรับข้อความแจ้งเตือน */
-  background-color: #fdecea; /* สีพื้นหลังที่อ่อน */
-  border: 1px solid #d32f2f;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  animation: fadeIn 0.3s ease-in-out;
-}
+
 
 @keyframes fadeIn {
   from {
@@ -326,6 +312,17 @@
   box-shadow: 0 0 8px rgba(211, 47, 47, 0.5); /* เงาสีแดงเมื่อ focus */
 }
 
+/* ข้อความข้อผิดพลาดใต้กล่องรหัสผ่าน */
+.error-message-password {
+  color: #d32f2f; /* สีแดงสำหรับข้อความข้อผิดพลาด */
+  font-size: 0.85rem; /* ขนาดข้อความเล็กกว่าปกติ */
+  margin-top: 5px; /* ระยะห่างระหว่างข้อความกับ input */
+  display: flex; /* จัดไอคอนและข้อความในแนวเดียวกัน */
+  align-items: center; /* จัดให้ไอคอนและข้อความอยู่ในแนวเดียวกัน */
+  gap: 5px; /* ระยะห่างระหว่างไอคอนกับข้อความ */
+  animation: fadeInError 0.3s ease-in-out; /* แอนิเมชันสำหรับการปรากฏ */
+}
+
 /* Label color when there's an input error */
 .error-label {
   color: #d32f2f; /* สีแดง */
@@ -342,4 +339,24 @@
 .input-error:focus {
   outline: none;
   box-shadow: 0 0 8px rgba(211, 47, 47, 0.5);
+}
+
+
+
+/* เพิ่มแอนิเมชันสำหรับข้อความข้อผิดพลาด */
+@keyframes fadeInError {
+  from {
+    opacity: 0; /* เริ่มต้นแบบโปร่งใส */
+    transform: translateY(-5px); /* เริ่มต้นเลื่อนขึ้น */
+  }
+  to {
+    opacity: 1; /* แสดงข้อความชัดเจน */
+    transform: translateY(0); /* ตำแหน่งปกติ */
+  }
+}
+
+/* ไอคอนในข้อความข้อผิดพลาด */
+.error-message-password i {
+  font-size: 1rem; /* ขนาดไอคอน */
+  color: #d32f2f; /* สีเดียวกับข้อความข้อผิดพลาด */
 }

@@ -16,21 +16,28 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
     const username = usernameRef.current.value.trim();
     const password = passwordRef.current.value.trim();
 
+    // Reset input fields
     usernameRef.current.value = "";
     passwordRef.current.value = "";
 
+    // Verify user
     const userInfo = verifyUser(username, password);
-    if (userInfo === null) {
+    if (!userInfo) {
       setErrorMessage("ชื่อผู้ใช้หรือรหัสผ่านผิด");
-      setInputError(true); // Highlight the input fields
-      usernameRef.current.focus();
+      setInputError(true); // Highlight error
+      usernameRef.current.focus(); // Focus on username
     } else {
+      // Reset errors
       setErrorMessage("");
-      setInputError(false); // Reset input styles
+      setInputError(false);
+
+      // Save user information
       setToken(userInfo.token);
       setRole(userInfo.role);
       setUsername(username);
       setPassword(password);
+
+      // Redirect to the main page
       navigate("/");
     }
   };
@@ -49,7 +56,7 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
         <div className="login-form">
           <h2 className="login-form__title">ยินดีต้อนรับ</h2>
           <form onSubmit={handleLogin}>
-            {/* Username */}
+            {/* Username Field */}
             <label
               className={`login-form__label ${inputError ? "error-label" : ""}`}
             >
@@ -62,7 +69,8 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
               required
               className={`login-form__input ${inputError ? "input-error" : ""}`}
             />
-            {/* Password */}
+
+            {/* Password Field */}
             <label
               className={`login-form__label ${inputError ? "error-label" : ""}`}
             >
@@ -74,9 +82,10 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
                 placeholder="กรอกรหัสผ่าน"
                 ref={passwordRef}
                 required
-                className={`login-form__input password-input ${
-                  inputError ? "input-error" : ""
-                }`}
+                className={`login-form__input password-input ${inputError ? "input-error" : ""}`}
+                style={{
+                  marginBottom: "0px"
+                }}
               />
               <button
                 type="button"
@@ -90,19 +99,27 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
               </button>
             </div>
 
+            {/* Error Message */}
+            {inputError && (
+              <div className="error-message-password">
+                <i className="bi bi-exclamation-circle-fill"></i>{" "}
+                {errorMessage}
+              </div>
+            )}
+
             <button type="submit" className="login-button">
               เข้าสู่ระบบ
             </button>
           </form>
-          {errorMessage && (
-            <div className="error-message">
-              <i className="bi bi-exclamation-circle-fill"></i> {errorMessage}
-            </div>
-          )}
+
+          {/* Forgot Password Link */}
           <Link to="/forgot-password" className="forgot-password">
             ลืมรหัสผ่าน ?
           </Link>
+
           <div className="or">หรือ</div>
+
+          {/* Guest Login Button */}
           <button onClick={handleGuestLogin} className="guest-login">
             เข้าสู่ระบบโดยไม่ต้องลงชื่อเข้าใช้
           </button>
