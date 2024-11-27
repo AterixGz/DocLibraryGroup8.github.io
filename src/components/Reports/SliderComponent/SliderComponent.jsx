@@ -3,7 +3,7 @@ import './SliderComponent.css';
 
 
 import Image1 from '../ReportsImage/LaptopBG.jpg';
-import Image2 from '../ReportsImage/Postit.jpg';
+import Image2 from '../ReportsImage/PostIt.jpg';
 import Image3 from '../ReportsImage/SolarCell.jpg';
 
 const slides = [
@@ -53,7 +53,7 @@ const SliderComponent = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       nextSlide();
-    }, 3000);
+    }, 5000);
 
     return () => clearInterval(interval); // ล้าง interval เมื่อ component ถูก unmount
   }, [slides.length]);
@@ -105,7 +105,8 @@ const SliderComponent = () => {
                   </div>
                 ))}
               </div>
-              <p>วันที่ {currentTime.toLocaleTimeString("en-GB")} น.</p>
+              <p>วันที่ {new Date().toLocaleDateString("th-TH", { day: 'numeric', month: 'long', year: 'numeric' })} เวลา {new Date().toLocaleTimeString("en-GB")} น.</p>
+
             </div>
           </div>
         ))}

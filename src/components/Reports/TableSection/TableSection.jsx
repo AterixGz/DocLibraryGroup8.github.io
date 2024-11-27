@@ -13,13 +13,33 @@ function TableSection() {
           </tr>
         </thead>
         <tbody>
-          {[...Array(4)].map((_, index) => (
+          {/* {[...Array(4)].map((_, index) => (
             <tr className='border-bottom-document-report' key={index}>
               <td>หน่วยงานXXX</td>
               <td>357 ฉบับ</td>
               <td>19/10/2024</td>
             </tr>
-          ))}
+          ))} */}
+          <tr className='border-bottom-document-report'>
+            <td style={{ textAlign : 'left'}}>กองจัดการเชื้อเพลิงธรรมชาติ</td>
+            <td>67 ฉบับ</td>
+            <td>10/10/2024</td>
+          </tr>
+          <tr className='border-bottom-document-report'>
+            <td style={{ textAlign : 'left'}}>กองบริหารกิจการปิโตรเลียมระหว่างประเทศ</td>
+            <td>54 ฉบับ</td>
+            <td>19/11/2024</td>
+          </tr>
+          <tr className='border-bottom-document-report'>
+            <td style={{ textAlign : 'left'}}>กองบริหารสัญญาและสัมปทานปิโตรเลียม</td>
+            <td>37 ฉบับ</td>
+            <td>9/10/2024</td>
+          </tr>
+          <tr className='border-bottom-document-report'>
+            <td style={{ textAlign : 'left'}}>กองยุทธศาสตร์และแผนงาน</td>
+            <td>27 ฉบับ</td>
+            <td>16/10/2024</td>
+          </tr>
         </tbody>
       </table>
       <div className="pagination-report">
