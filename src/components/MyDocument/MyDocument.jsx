@@ -28,7 +28,17 @@ const MyDocument = ({ role }) => {
   const [isSingleDownload, setIsSingleDownload] = useState(false); // สำหรับดาวน์โหลดรายตัว
   const [downloadPopups, setDownloadPopups] = useState([]);
   const [toastMessage, setToastMessage] = useState(null);
+  const [showEditPopup, setShowEditPopup] = useState(false);
+  const [documentToEdit, setDocumentToEdit] = useState(null);
+  const openEditPopup = (doc) => {
+    setDocumentToEdit(doc);
+    setShowEditPopup(true);
+  };
 
+  const closeEditPopup = () => {
+    setShowEditPopup(false);
+    setDocumentToEdit(null);
+  };
 
 
   useEffect(() => {
@@ -437,7 +447,6 @@ const MyDocument = ({ role }) => {
                   {role !== "guest" && (
                     <td className="action-buttons">
                       <div className="button-container">
-                        <button><span><i className="bi bi-three-dots"></i></span></button>
                         <button
                           className="download-btn"
                           onClick={(e) => {
@@ -452,6 +461,11 @@ const MyDocument = ({ role }) => {
                           onClick={() => openDeletePopup(doc)}
                         >
                           ลบ
+                        </button>
+                        <button className="edit-btn" onClick={() => openEditPopup(doc)}>
+                          <span>
+                            <i className="bi bi-three-dots-vertical"></i>
+                          </span>
                         </button>
                       </div>
                     </td>
@@ -482,6 +496,105 @@ const MyDocument = ({ role }) => {
                       ยกเลิก
                     </button>
                   </div>
+                </m.div>
+              </div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {showEditPopup && (
+              <div className="popup-overlay-edit" onClick={closeEditPopup}>
+                <m.div
+                  className="popup-content-edit"
+                  onClick={(e) => e.stopPropagation()}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h2>แก้ไขเอกสาร</h2>
+                  <form className="edit-form"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const formData = new FormData(e.currentTarget);
+                      const name = formData.get("name");
+                      const type = formData.get("type");
+                      const date = formData.get("date");
+                      const department = formData.get("department");
+
+                      setDocuments((prevDocs) =>
+                        prevDocs.map((item) =>
+                          item.id === documentToEdit.id
+                            ? { ...item, name, type, date, department }
+                            : item
+                        )
+                      );
+                      closeEditPopup();
+                    }}
+                  >
+                    <div className="form-group">
+                      <label className="label-edit" htmlFor="name">ชื่อเอกสาร</label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        className="form-input"
+                        defaultValue={documentToEdit.name}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="label-edit" htmlFor="type">ประเภทเอกสาร</label>
+                      <select
+                        id="type"
+                        name="type"
+                        className="form-input"
+                        defaultValue={documentToEdit.type}
+                      >
+                        <option value="ผลการดำเนินงาน">ผลการดำเนินงาน</option>
+                        <option value="รายงานประจำปี">รายงานประจำปี</option>
+                        <option value="รายงานปริมาณการผลิตรายเดือน">
+                          รายงานปริมาณการผลิตรายเดือน
+                        </option>
+                        <option value="การขาย มูลค่า และค่าภาคหลวง">
+                          การขาย มูลค่า และค่าภาคหลวง
+                        </option>
+                        <option value="การจัดสรรค่าภาคหลวงให้ท้องถิ่น">
+                          การจัดสรรค่าภาคหลวงให้ท้องถิ่น
+                        </option>
+                        <option value="การจัดหาปิโตรเลียม">การจัดหาปิโตรเลียม</option>
+                        <option value="ปริมาณสำรองปิโตรเลียม">
+                          ปริมาณสำรองปิโตรเลียม
+                        </option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="label-edit" htmlFor="date">วันที่ลงเอกสาร</label>
+                      <input
+                        type="date"
+                        id="date"
+                        name="date"
+                        className="form-input"
+                        defaultValue={documentToEdit.date}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="label-edit" htmlFor="department">หน่วยงาน</label>
+                      <select
+                        id="department"
+                        name="department"
+                        className="form-input"
+                        defaultValue={documentToEdit.department}
+                      >
+                        <option value="กรมเชื้อเพลิงธรรมชาติ">กรมเชื้อเพลิงธรรมชาติ</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <button className="confirm-btn" type="submit">บันทึก</button>
+                      <button className="cancel-btn" type="button" onClick={closeEditPopup}>
+                        ยกเลิก
+                      </button>
+                    </div>
+                  </form>
                 </m.div>
               </div>
             )}

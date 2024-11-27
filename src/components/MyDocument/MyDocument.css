@@ -235,7 +235,7 @@
 }
 
 .download-btn:hover {
-  background-color: #F14D31; /* Darker green on hover */
+  background-color: #317433; /* Darker green on hover */
   transform: translateY(-2px); /* Slight lift effect */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
 }
@@ -364,4 +364,175 @@
 
 .cancel-btn:hover {
   background-color: #9b321f;
+}
+
+.edit-btn {
+  border: none;
+  background-color: transparent;
+}
+
+/* Popup Overlay */
+.popup-overlay-edit {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Popup Content */
+.popup-content-edit {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  width: 50rem;
+  max-width: 90%;
+  animation: scaleUp 0.3s ease-out;
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.9);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Header */
+.popup-content-edit h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Form Groups */
+.form-group {
+  display: flex; /* ใช้ flexbox เพื่อให้ label และ input อยู่ในบรรทัดเดียวกัน */
+  align-items: center; /* จัดแนวกลาง */
+  margin-bottom: 20px; /* ช่องว่างระหว่างฟอร์มกรุ๊ป */
+}
+
+.label-edit {
+  flex: 0 0 150px; /* กำหนดความกว้างของ label เป็น 150px */
+  font-weight: 500;
+  margin-bottom: 0; /* เอาช่องว่างระหว่าง label และ input */
+  color: #555;
+}
+
+.form-input {
+  flex: 1; /* ให้ input/select ขยายเต็มพื้นที่ที่เหลือ */
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #fafafa;
+  transition: border-color 0.3s;
+}
+
+.form-input:hover{
+  border-color: #F14D31 !important;
+  box-shadow: 0 0 5px rgba(241, 77, 49, 0.5); /* เพิ่มเงาเพื่อให้ชัดเจน */
+}
+
+.form-input:focus {
+  border-color: #F14D31 !important;
+  box-shadow: 0 0 5px rgba(241, 77, 49, 0.5); /* เพิ่มเงาเพื่อให้ชัดเจน */
+}
+
+.form-input:active {
+  border-color: #F14D31 !important;
+  box-shadow: 0 0 5px rgba(241, 77, 49, 0.5); /* เพิ่มเงาเพื่อให้ชัดเจน */
+}
+
+
+/* Adjust form button layout */
+.form-group {
+  display: flex;
+  justify-content: center;
+}
+
+/* Add spacing between inputs */
+.form-group input, .form-group select {
+  margin-bottom: 10px; /* ช่องว่างระหว่างช่องกรอก */
+}
+
+/* Popup Buttons */
+.popup-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Popup Content Padding */
+.popup-content-edit {
+  padding: 30px;
+}
+
+/* Additional Spacing */
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.confirm-btn {
+  background-color: #F14D31; /* Green background */
+  color: white; /* White text */
+  padding: 10px 20px; /* Padding */
+  border: none; /* Remove border */
+  border-radius: 25px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: all 0.3s ease; /* Smooth transition */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  font-weight: 600;
+  font-size: 1rem;
+  margin-right: 12px;
+  width: auto;
+  max-width: 160px;
+}
+
+.confirm-btn:hover {
+  background-color: #F14D31; /* Darker green on hover */
+  transform: translateY(-2px); /* Slight lift effect */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+}
+
+.cancel-btn {
+  background-color: #F14D31; /* Green background */
+  color: white; /* White text */
+  padding: 10px 20px; /* Padding */
+  border: none; /* Remove border */
+  border-radius: 25px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: all 0.3s ease; /* Smooth transition */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  font-weight: 600;
+  font-size: 1rem;
+  margin-right: 12px;
+  width: auto;
+  max-width: 160px;
+}
+
+.cancel-btn:hover {
+  background-color: #F14D31; /* Darker green on hover */
+  transform: translateY(-2px); /* Slight lift effect */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
 }
