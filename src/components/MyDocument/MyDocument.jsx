@@ -289,7 +289,7 @@ const MyDocument = ({ role }) => {
       <div className={`home-container ${role === "guest" ? "guest-home" : ""}`}>
         <div className={`main-content ${role === "guest" ? "guest-main" : ""}`}>
           <h1 className="title-doc">
-            ค้นหาเอกสารทั้งหมด
+            เอกสารของฉัน
             {role === "guest" && (
               <>
                 <a href="/">
