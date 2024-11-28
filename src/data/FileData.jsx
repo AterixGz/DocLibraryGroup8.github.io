@@ -330,7 +330,7 @@ const Filedata = [
         date: "2567-11-16",
         year: "2567",
         time: "11:40",
-        FileUrl: "../../public/filedata/027_AlloMuPer4_67.pdf",
+        FileUrl: "/DocLibraryGroup8/filedata/027_AlloMuPer4_67.pdf",
         uploadedBy: "นายสมชาย ใจเด็ด"
     },
     {
