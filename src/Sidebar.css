@@ -198,7 +198,7 @@
   padding: 20px 15px;
   background-color: #E97B68;
   margin-top: auto;
-  border-radius: 0 0 1rem 1rem;
+  border-radius: 0 0 1rem ;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
 }
 

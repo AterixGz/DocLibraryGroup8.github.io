@@ -59,6 +59,7 @@
   background-size: 300px 70px;  /* กำหนดขนาดของโลโก้ */
   background-position: top 2rem left 10rem;  /* ตำแหน่งของโลโก้ */
   animation: zoomInForm 1s ease-out forwards; /* Zoom-in effect for form */
+  margin-top: 3rem;
 }
 
 /* Zoom-in animation for the form */
@@ -74,7 +75,7 @@
 }
 
 .login-form__title {
-  margin-top: 100px;
+  /* margin-top: 100px; */
   animation: zoomInTitle 1s ease-out forwards; /* Zoom-in effect for title */
 }
 
