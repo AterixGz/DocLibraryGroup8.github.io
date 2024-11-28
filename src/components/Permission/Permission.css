@@ -3,9 +3,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  background: #f9f9f9;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .permission-management__header {
@@ -64,6 +62,8 @@
 .permission-management__table {
   width: 100%;
   border-collapse: collapse;
+  border-radius: 10px; /* เพิ่มมุมมนให้กับตาราง */
+  overflow: hidden; /* ทำให้มุมมนไม่ถูกตัด */
 }
 
 .permission-management__table th,
@@ -86,7 +86,7 @@
 
 .permission-management__delete-btn {
   padding: 5px 10px;
-  background-color: #d32f2f;
+  background-color: #53cd32;
   color: white;
   border: none;
   border-radius: 5px;
@@ -96,7 +96,7 @@
 }
 
 .permission-management__delete-btn:hover {
-  background-color: #c62828;
+  background-color: #53cd32;
 }
 
 .permission-management__confirm-btn {
@@ -116,27 +116,28 @@
   background-color: #388e3c;
 }
 
-/* Modal overlay */
+/* modal-overlay (ทำให้วางตรงกลาง) */
+/* modal-overlay (จัดตำแหน่งซ้าย) */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  justify-content: flex-start; /* จัดตำแหน่งไปทางซ้าย */
+  align-items: flex-start; /* จัดตำแหน่งในแนวตั้ง */
+  padding: 20px;
 }
 
-/* Modal content */
+/* modal-content (ตำแหน่งฟอร์มที่อยู่ในโมดัล) */
 .modal-content {
-  background-color: #fff;
-  border-radius: 8px;
+  background-color: white;
   padding: 20px;
-  width: 400px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  width: 300px; /* กำหนดความกว้างของฟอร์ม */
+  margin-top: 50px; /* ห่างจากด้านบน */
 }
 
 .modal-header {
@@ -183,6 +184,14 @@
   justify-content: space-between;
 }
 
+.modal-actions button {
+  padding: 10px 20px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: none;
+}
+
 .btn {
   padding: 10px 15px;
   font-size: 16px;
@@ -192,83 +201,76 @@
   transition: background-color 0.3s;
 }
 
-.btn-save {
-  background-color: #4f9aff;
+/* ปุ่ม Save (สีเขียว) */
+.btn-save { 
+  background-color: #53cd32;
   color: white;
 }
 
 .btn-save:hover {
-  background-color: #007bff;
+  background-color: #40aa22;
 }
 
-.btn-cancel {
-  background-color: #f2f2f2;
-  color: #333;
+/* ปุ่ม Cancel (สีส้ม) */
+.btn-cancel { 
+  background-color: #ff5722;
+  color: white;
 }
 
 .btn-cancel:hover {
-  background-color: #ddd;
+  background-color: #da3b0b;
 }
 
 
-.form-group {
-  margin-bottom: 15px;
-  text-align: left; /* จัดให้ทุกอย่างชิดซ้าย */
-  
+/* กำหนดระยะห่างระหว่างกลุ่มฟอร์ม */
+.form-group-group {
+  margin-bottom: 20px; /* เพิ่มระยะห่างระหว่างกลุ่มฟอร์ม */
 }
 
-.form-group label {
-  display: block; /* ทำให้ label อยู่ด้านบนของ input */
-  margin-bottom: 5px; /* ระยะห่างระหว่าง label และ input */
-  color: #555;
-  font-size: 14px;
+/* ป้าย (label) */
+.form-label {
+  display: block;
+  text-align: left; /* จัดข้อความของ label ให้อยู่ทางซ้าย */
+  margin-bottom: 8px; /* เพิ่มระยะห่างระหว่าง label และ input */
 }
 
+/* ช่องกรอกข้อมูล (input) */
 .form-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  text-align: left; /* จัดให้ข้อความใน input ชิดซ้าย */
-  
+  width: 100%; /* ทำให้ช่องกรอกข้อมูลขยายเต็มความกว้าง */
+  padding: 8px;
+  text-align: left; /* จัดข้อความภายใน input ให้ชิดซ้าย */
+  margin-bottom: 12px; /* เพิ่มระยะห่างระหว่างช่องกรอกข้อมูล */
 }
 
+
+/* modal-actions (จัดปุ่มตรงกลาง) */
 .modal-actions {
   display: flex;
-  justify-content: center; /* จัดให้อยู่ตรงกลาง */
-  gap: 15px; /* กำหนดระยะห่างระหว่างปุ่ม */
+  justify-content: center; /* จัดให้ปุ่มอยู่กลางแนวนอน */
+  align-items: center; /* จัดให้ปุ่มอยู่กลางแนวตั้ง */
+  gap: 15px; /* ระยะห่างระหว่างปุ่ม */
   margin-top: 20px; /* ระยะห่างจากส่วนอื่น ๆ ด้านบน */
 }
 
-.save-btn,
-.cancel-btn {
-  padding: 10px 20px; /* ขนาดปุ่ม */
-  font-size: 16px;
-  border: none;
-  border-radius: 25px; /* ทำให้ขอบปุ่มมน */
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease; /* การเปลี่ยนแปลงเมื่อ hover */
-}
-
-.save-btn {
-  background-color: #4CAF50; /* สีเขียวสำหรับบันทึก */
+/* ปุ่มบันทึก (สีเขียว) */
+.modal-actions .btn-save { 
+  background-color: #53cd32;
   color: white;
 }
 
-.save-btn:hover {
-  background-color: #45a049; /* สีเขียวเข้มขึ้นเมื่อ hover */
-  transform: scale(1.05); /* ขยายขนาดเล็กน้อยเมื่อ hover */
+.modal-actions .btn-save:hover {
+  background-color: #40aa22;
+  transform: scale(1.05);
 }
 
-.cancel-btn {
-  background-color: #f44336; /* สีแดงสำหรับยกเลิก */
+/* ปุ่มยกเลิก (สีส้ม) */
+.modal-actions.btn-cancel { 
+  background-color: #ff5722;
   color: white;
 }
 
-.cancel-btn:hover {
-  background-color: #e53935; /* สีแดงเข้มขึ้นเมื่อ hover */
-  transform: scale(1.05); /* ขยายขนาดเล็กน้อยเมื่อ hover */
+.btn-cancel:hover {
+  background-color: #da3b0b;
 }
 
 /* Popup Styling */
@@ -323,9 +325,9 @@
   background-color: #388e3c;
 }
 
-/* Style for the danger button */
+/* ปุ่ม ยืนยัน */
 .btn-danger {
-  background-color: #f44336; /* สีพื้นหลังแดง */
+  background-color: #4caf50; /* เปลี่ยนเป็นสีเขียวสำหรับปุ่มยืนยัน */
   color: white; /* สีตัวอักษรขาว */
   border: none; /* ไม่มีขอบ */
   padding: 10px 15px; /* ปรับระยะห่างภายในให้เหมาะสม */
@@ -339,18 +341,39 @@
 }
 
 .btn-danger:hover {
-  background-color: #e53935; /* สีพื้นหลังเมื่อเอาเมาส์ชี้ไป */
+  background-color: #388e3c; /* สีพื้นหลังเมื่อเอาเมาส์ชี้ไป */
   transform: scale(1.05); /* ขยายขนาดเล็กน้อย */
 }
 
-.btn-danger i {
-  font-size: 14px; /* ปรับขนาดไอคอน */
-}
-
-.btn-danger:focus {
+.modal-actions .btn-danger:active {
+  background-color: #388e3c; /* สีพื้นหลังเมื่อกดปุ่ม */
+  transform: scale(1.05); /* ขยายขนาดเล็กน้อยเมื่อกด */
   outline: none; /* ไม่มีเส้นกรอบเมื่อปุ่มถูกเลือก */
 }
 
+/* ปุ่ม ยกเลิก */
+.modal-actions .btn-cancel {
+  background-color: #ff5722; /* สีพื้นหลังส้ม */
+  color: white; /* สีตัวอักษรขาว */
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #da3b0b; /* สีส้มเข้มเมื่อ hover */
+  transform: scale(1.05); /* ขยายขนาดเล็กน้อย */
+}
+
+.btn-cancel:focus {
+  outline: none; /* ไม่มีเส้นกรอบเมื่อปุ่มถูกเลือก */
+}
 
 .permission-management__table td {
   text-align: center;
@@ -417,4 +440,18 @@
 
 .toggle-switch input:checked + label::before {
   transform: translateX(30px);
+}
+
+.loading-bar {
+  height: 5px;
+  background-color: #4caf50;
+  position: fixed;
+  top: 0;
+  left: 0
+}
+
+/* การหมุนของแถบโหลด */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

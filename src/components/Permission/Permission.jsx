@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion as m, AnimatePresence } from "framer-motion";
 import "./Permission.css";
 import users from "../../data/users";
@@ -16,6 +16,9 @@ function PermissionManagement() {
     username: "",
     employeeId: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const alertShown = useRef(false); // ใช้ useRef สำหรับเก็บสถานะ alert
 
   // Effect to initialize users
   useEffect(() => {
@@ -56,8 +59,22 @@ function PermissionManagement() {
 
   // Confirm update permissions
   const handleConfirmUpdate = () => {
-    alert("สิทธิ์การเข้าถึงได้รับการอัปเดตเรียบร้อยแล้ว!");
-    console.log("Updated User List:", userList);
+    setLoading(true);
+    let progressInterval = setInterval(() => {
+      setProgress((oldProgress) => {
+        if (oldProgress === 100) {
+          clearInterval(progressInterval);
+          setLoading(false);
+          // ตรวจสอบว่าตัวแปร alertShown ถูกตั้งค่าเป็น false แล้วหรือยัง
+          if (!alertShown.current) {
+            alert("สิทธิ์การเข้าถึงได้รับการอัปเดตเรียบร้อยแล้ว!");
+            alertShown.current = true; // ตั้งค่าเป็น true หลังจากแสดง alert
+          }
+          console.log("Updated User List:", userList);
+        }
+        return Math.min(oldProgress + 10, 100);
+      });
+    }, 200);
   };
 
   // Open add user modal
@@ -115,6 +132,20 @@ function PermissionManagement() {
         จัดการสิทธิ์ในการเข้าถึง
       </h2>
 
+      {/* Loading Bar with framer-motion */}
+      <AnimatePresence>
+        {loading && (
+          <m.div
+            className="loading-bar"
+            style={{ width: `${progress}%` }}
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -50, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 100, damping: 25 }}
+          />
+        )}
+      </AnimatePresence>
+
       <div className="permission-management__controls">
         <input
           type="text"
@@ -130,109 +161,101 @@ function PermissionManagement() {
           เพิ่มพนักงาน
         </button>
       </div>
+      {showAddUserModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3 className="modal-header">เพิ่มพนักงาน</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAddNewUser();
+              }}
+              className="modal-form"
+            >
+              <div className="form-group">
+                <label htmlFor="firstName" className="form-label">
+                  ชื่อ :
+                  <input
+                    type="text"
+                    id="firstName"
+                    value={newUser.firstName}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, firstName: e.target.value })
+                    }
+                    required
+                    className="form-input"
+                    placeholder="กรอกชื่อ"
+                  />
+                </label>
+              </div>
 
-      {/* Add User Modal */}
-{showAddUserModal && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <h3 className="modal-header">เพิ่มพนักงาน</h3>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleAddNewUser();
-        }}
-        className="modal-form"
-      >
-        <div className="form-group-group">
-          <div className="form-group">
-            <label htmlFor="firstName" className="form-label">
-              ชื่อ :
-              <input
-                type="text"
-                id="firstName"
-                value={newUser.firstName}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, firstName: e.target.value })
-                }
-                required
-                className="form-input"
-                placeholder="กรอกชื่อ"
-              />
-            </label>
-            
-            <label htmlFor="lastName" className="form-label">
-              นามสกุล :
-              <input
-                type="text"
-                id="lastName"
-                value={newUser.lastName}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, lastName: e.target.value })
-                }
-                required
-                className="form-input"
-                placeholder="กรอกนามสกุล"
-              />
-            </label>
-          </div>
-          <div className="form-group">
-           
+              <div className="form-group">
+                <label htmlFor="lastName" className="form-label">
+                  นามสกุล :
+                  <input
+                    type="text"
+                    id="lastName"
+                    value={newUser.lastName}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, lastName: e.target.value })
+                    }
+                    required
+                    className="form-input"
+                    placeholder="กรอกนามสกุล"
+                  />
+                </label>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="username" className="form-label">
+                  ชื่อผู้ใช้ :
+                  <input
+                    type="text"
+                    id="username"
+                    value={newUser.username}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, username: e.target.value })
+                    }
+                    required
+                    className="form-input"
+                    placeholder="กรอกชื่อผู้ใช้"
+                  />
+                </label>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="employeeId" className="form-label">
+                  รหัสพนักงาน :
+                  <input
+                    type="text"
+                    id="employeeId"
+                    value={newUser.employeeId}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, employeeId: e.target.value })
+                    }
+                    required
+                    className="form-input"
+                    placeholder="กรอกรหัสพนักงาน"
+                  />
+                </label>
+              </div>
+
+              <div className="modal-actions">
+                <button type="submit" className="btn btn-save">
+                  บันทึก
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="btn btn-cancel"
+                >
+                  ยกเลิก
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-
-        <div className="form-group-group">
-          <div className="form-group">
-            <label htmlFor="username" className="form-label">
-              ชื่อผู้ใช้ :
-              <input
-                type="text"
-                id="username"
-                value={newUser.username}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, username: e.target.value })
-                }
-                required
-                className="form-input"
-                placeholder="กรอกชื่อผู้ใช้"
-              />
-            </label>
-            <label htmlFor="employeeId" className="form-label">
-              รหัสพนักงาน :
-              <input
-                type="text"
-                id="employeeId"
-                value={newUser.employeeId}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, employeeId: e.target.value })
-                }
-                required
-                className="form-input"
-                placeholder="กรอกรหัสพนักงาน"
-              />
-            </label>
-          </div>
-          <div className="form-group">
-           
-          </div>
-        </div>
-
-        <div className="modal-actions">
-          <button type="submit" className="btn btn-save">
-            บันทึก
-          </button>
-          <button
-            type="button"
-            onClick={handleCloseModal}
-            className="btn btn-cancel"
-          >
-            ยกเลิก
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
-
+      )}
 
       {/* User Table */}
       <div className="permission-management__table-container">
@@ -244,7 +267,7 @@ function PermissionManagement() {
               <th>Document</th>
               <th>Permission</th>
               <th>Reports</th>
-              <th>Actions</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -309,8 +332,9 @@ function PermissionManagement() {
       <button
         onClick={handleConfirmUpdate}
         className="permission-management__confirm-btn"
+        disabled={loading}
       >
-        ยืนยัน
+        {loading ? "กำลังโหลด..." : "ยืนยัน"}
       </button>
 
       {/* Delete Popup */}
@@ -318,14 +342,14 @@ function PermissionManagement() {
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>ยืนยันการลบ</h3>
-            <p>คุณต้องการลบผู้ใช้นี้ใช่หรือไม่?</p>
+            <p>คุณต้องการลบผู้ใช้นี้ใช่ไหม?</p>
             <div className="modal-actions">
-              <button onClick={handleConfirmDelete} className="delete-btn">
+              <button onClick={handleConfirmDelete} className="btn btn-danger">
                 ยืนยัน
               </button>
               <button
                 onClick={() => setShowDeletePopup(false)}
-                className="cancel-btn"
+                className="btn btn-cancel"
               >
                 ยกเลิก
               </button>
