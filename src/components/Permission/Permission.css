@@ -90,6 +90,8 @@
     transition: background-color 0.3s;
 }
 
+
+
 .permission-container .add-btn {
     background-color: #FF4D02;
     color: #fff;
@@ -314,15 +316,57 @@
   
   .modal-btns {
     display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+    justify-content: space-between; /* แบ่งปุ่มให้เว้นระยะห่างเท่าๆ กัน */
+    gap: 15px; /* เพิ่มช่องว่างระหว่างปุ่ม */
+    margin-top: 20px; /* ระยะห่างจากเนื้อหาด้านบน */
+}
+
+.modal-btns .confirm-btn {
+    flex: 1; /* ทำให้ปุ่มใช้พื้นที่เท่าๆ กัน */
+    padding: 10px 20px;
+    border-radius: 7px;
+    border: none;
+    background-color: #28a745; /* สีเขียวสำหรับยืนยัน */
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* เพิ่มเอฟเฟกต์การเปลี่ยนสีและขยับ */
+}
+
+.modal-btns .confirm-btn:hover {
+    background-color: #218838;
+    transform: scale(1.05); 
+}
+
+.modal-btns .btn-danger {
+    width: 70px;
+    padding: 10px 20px;
+    border-radius: 7px;
+    border: none;
+    background-color: #FF4D02;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.modal-btns .btn-danger:hover {
+    background-color: #E64A00; /* สีแดงเข้มขึ้นเมื่อ hover */
+    transform: scale(1.05);
+}
+  
+  .modal-btns button:hover {
+    background-color: #FF4D02;
+    color: white;
   }
 
   .search-container {
     display: flex;
     align-items: center;
     gap: 10px;
-  } 
+  }
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {

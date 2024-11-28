@@ -1,12 +1,14 @@
-import "./Permission.css";
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import users from "../../data/users";
+import "./Permission.css";
 
 function Permission() {
   const [inputValue, setInputValue] = useState("");
   const [namesList, setNamesList] = useState([]);
   const [filteredNamesList, setFilteredNamesList] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
+  const [isDataChanged, setIsDataChanged] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [newUser, setNewUser] = useState({
     firstName: "",
     lastName: "",
@@ -16,16 +18,24 @@ function Permission() {
     report: false,
   });
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    const usersList = users.map((user) => ({
-      name: user.firstName + " " + user.lastName,
-      username: user.username,
-      documentAccess: false,
-      permission: false,
-      report: false,
-    }));
-    setNamesList(usersList);
-    setFilteredNamesList(usersList);
+    const storedData = localStorage.getItem("userData");
+    if (storedData) {
+      setNamesList(JSON.parse(storedData));
+      setFilteredNamesList(JSON.parse(storedData));
+    } else {
+      const usersList = users.map((user) => ({
+        name: user.firstName + " " + user.lastName,
+        username: user.username,
+        documentAccess: false,
+        permission: false,
+        report: false,
+      }));
+      setNamesList(usersList);
+      setFilteredNamesList(usersList);
+    }
   }, []);
 
   const handleSearch = (e) => {
@@ -39,19 +49,38 @@ function Permission() {
     setFilteredNamesList(filtered);
   };
 
+  const handleShowDetails = (person) => {
+    setSelectedPerson(person);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPerson(null);
+  };
+
   const handleDelete = (index) => {
     const updatedNamesList = filteredNamesList.filter((_, i) => i !== index);
     setFilteredNamesList(updatedNamesList);
+
+    const updatedOriginalList = namesList.filter((_, i) => i !== index);
+    setNamesList(updatedOriginalList);
+
+    localStorage.setItem("userData", JSON.stringify(updatedNamesList));
   };
 
   const toggleAccess = (index, field) => {
     const updatedNamesList = [...filteredNamesList];
     updatedNamesList[index][field] = !updatedNamesList[index][field];
     setFilteredNamesList(updatedNamesList);
+    setIsDataChanged(true);
+    localStorage.setItem("userData", JSON.stringify(updatedNamesList));
   };
 
   const handleConfirm = () => {
-    alert("ข้อมูลทั้งหมดได้รับการยืนยัน!");
+    localStorage.setItem("savedNamesList", JSON.stringify(namesList));
+    alert("ข้อมูลทั้งหมดได้รับการยืนยันและบันทึกเรียบร้อย!");
+    setIsDataChanged(false);
   };
 
   const handleModalOpen = () => {
@@ -92,6 +121,21 @@ function Permission() {
     }
   };
 
+  const handleNavigate = (path) => {
+    if (isDataChanged) {
+      const confirmLeave = window.confirm(
+        "คุณยังไม่ได้บันทึกข้อมูลการเปลี่ยนแปลง! คุณต้องการออกจากหน้านี้?"
+      );
+      if (confirmLeave) {
+        localStorage.setItem("userData", JSON.stringify(filteredNamesList));
+        setIsDataChanged(false);
+        navigate(path);
+      }
+    } else {
+      navigate(path);
+    }
+  };
+
   return (
     <div className="permission-container">
       <h3>จัดการสิทธิ์ในการเข้าถึง</h3>
@@ -112,7 +156,7 @@ function Permission() {
         <table>
           <thead>
             <tr>
-              <th className="align-left">บุคลากร</th>
+              <th className="align-center">บุคลากร</th>
               <th className="align-center"></th>
               <th className="align-center">การจัดการเอกสาร</th>
               <th className="align-center">การจัดการสิทธิ์เข้าถึง</th>
@@ -131,7 +175,14 @@ function Permission() {
               filteredNamesList.map((person, index) => (
                 <tr key={index}>
                   <td>{person.name}</td>
-                  <td></td>
+                  <td>
+                    <button
+                      className="btn btn-link"
+                      onClick={() => handleShowDetails(person)}
+                    >
+                      <i className="bi bi-three-dots-vertical"></i>
+                    </button>
+                  </td>
                   <td className="align-center">
                     <label className="switch">
                       <input
@@ -163,8 +214,11 @@ function Permission() {
                     </label>
                   </td>
                   <td>
-                    <button class="btn-danger" onclick="handleDelete(1)">
-                      <i class="bi bi-trash"></i>
+                    <button
+                      className="btn-danger"
+                      onClick={() => handleDelete(index)}
+                    >
+                      <i className="bi bi-trash"></i>
                     </button>
                   </td>
                 </tr>
@@ -222,4 +276,3 @@ function Permission() {
 }
 
 export default Permission;
-//ส่งไฟล์ใหม่
