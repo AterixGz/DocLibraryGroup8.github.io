@@ -42,6 +42,7 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
       localStorage.setItem("role", userInfo.role);
       localStorage.setItem("username", username);
       localStorage.setItem("password", password);
+      localStorage.setItem('userData', JSON.stringify(userInfo)); // Store the actual user data
 
       // Redirect to the main page
       navigate("/");
@@ -65,6 +66,15 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
     localStorage.setItem("role", guestRole);
     localStorage.setItem("username", guestUsername);
     localStorage.setItem("password", guestPassword);
+
+    // Store guest data in localStorage
+    localStorage.setItem("userData", JSON.stringify({
+      firstName: "Guest",
+      lastName: "User",
+      role: guestRole,
+      token: guestToken,
+      username: guestUsername,
+    }));
 
     // Redirect to the main page
     navigate("/");

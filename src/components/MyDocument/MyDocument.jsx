@@ -46,7 +46,7 @@ const MyDocument = ({ role }) => {
 
   useEffect(() => {
     // กรองเอกสารตาม Token ที่ตรงกับผู้ใช้ที่ล็อกอิน
-    const filteredDocuments = FileData.filter(doc => doc.token === token);
+    const filteredDocuments = [...FileData, ...uploadedFiles].filter(doc => doc.token === token);
     setDocuments(filteredDocuments); // ตั้งค่าเอกสารที่กรองแล้ว
   }, [token, uploadedFiles]); // รีเฟรชเมื่อ Token หรือ uploadedFiles เปลี่ยนแปลง
 
