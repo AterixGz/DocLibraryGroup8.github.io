@@ -1,16 +1,16 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { FileContext } from '../FileContext/FileContext';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
+import { useNavigate } from 'react-router-dom';
 import './Document.css';
 
 const Document = () => {
-  const { addFiles } = useContext(FileContext); // Add files function from context
+  const { addFiles } = useContext(FileContext);
   const [file, setFile] = useState(null);
   const [name, setName] = useState('');
   const [type, setType] = useState('');
   const [department, setDepartment] = useState('');
-  const [date, setDate] = useState(''); // Store date in this state
-  const [description, setDescription] = useState(''); // คำอธิบายเอกสาร
+  const [date, setDate] = useState('');
+  const [description, setDescription] = useState('');
   const [uploadedBy, setUploadedBy] = useState('');
   const [activeTab, setActiveTab] = useState('Upload');
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -18,27 +18,26 @@ const Document = () => {
   const navigate = useNavigate();
   const steps = ['Upload', 'Preview'];
 
-  // Retrieve user data from localStorage when the component mounts
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('userData')); // Fetch user data from localStorage
+    const userData = JSON.parse(localStorage.getItem('userData'));
     if (userData) {
-      setUploadedBy(`${userData.firstName} ${userData.lastName}`); // Set the uploadedBy to the logged-in user's full name
+      setUploadedBy(`${userData.firstName} ${userData.lastName}`);
     } else {
-      setUploadedBy('Unknown User'); // Default if no user data is found
+      setUploadedBy('Unknown User');
     }
   }, []);
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
   };
 
   const handleDateChange = (e) => {
     const inputDate = new Date(e.target.value);
     if (!isNaN(inputDate)) {
-      // Convert the year from Gregorian to Buddhist Era (BE)
       const thaiYear = inputDate.getFullYear() + 543;
-      const thaiDate = new Date(inputDate.setFullYear(thaiYear)); // Update the year to BE
-      setDate(thaiDate.toISOString().split('T')[0]); // Use ISO format to store in a consistent format
+      const thaiDate = new Date(inputDate.setFullYear(thaiYear));
+      setDate(thaiDate.toISOString().split('T')[0]);
     }
   };
 
@@ -56,11 +55,11 @@ const Document = () => {
       type,
       department,
       date,
-      description, // เพิ่มคำอธิบายในข้อมูล
+      description,
       time: new Date().toLocaleTimeString(),
       FileUrl: URL.createObjectURL(file),
       uploadedBy,
-      token: localStorage.getItem('token'), // Get token from localStorage
+      token: localStorage.getItem('token'),
     };
 
     setUploadedFile(newFile);
@@ -70,7 +69,6 @@ const Document = () => {
 
   return (
     <div className="step-tabs-container">
-      {/* Tabs */}
       <div className="tabs">
         {steps.map((step) => (
           <button
@@ -83,7 +81,6 @@ const Document = () => {
         ))}
       </div>
 
-      {/* Tab Content */}
       <div className="tab-content">
         {activeTab === 'Upload' && (
           <div>
@@ -91,7 +88,7 @@ const Document = () => {
             <form onSubmit={handleSubmit}>
               <div>
                 <label>ชื่อเอกสาร</label>
-                <input 
+                <input
                   type="text"
                   value={name}
                   placeholder="กรอกชื่อเอกสาร"
@@ -124,7 +121,7 @@ const Document = () => {
                   </option>
                 </select>
               </div>
-              
+
               <div className="form-group-horizontal">
                 <div className="form-item">
                   <label>หน่วยงาน</label>
@@ -148,6 +145,24 @@ const Document = () => {
                   />
                 </div>
               </div>
+
+
+              <div className="file-upload">
+
+                <label htmlFor="file-input" className="file-upload-button">เลือกไฟล์</label>
+                <input
+                  id="file-input" // ต้องการระบุ id เพื่อให้ label ทำงานได้
+                  type="file"
+                  onChange={handleFileChange}
+                  required
+                />
+                <input
+                  type="text"
+                  className="file-upload-name"
+                  value={file ? file.name : 'ยังไม่ได้เลือกไฟล์'} // แสดงชื่อไฟล์ที่อัปโหลด
+                  readOnly
+                />
+              </div>
               <div>
                 <label>คำอธิบาย</label>
                 <textarea
@@ -160,28 +175,25 @@ const Document = () => {
               <div>
                 <label>ชื่อผู้บันทึก</label>
                 <input
-                  className='readonly-input'
                   type="text"
                   value={uploadedBy}
-                  readOnly // Disable editing
+                  readOnly
                 />
               </div>
-              <div >
-                <label>File Upload</label>
-                <input type="file" onChange={handleFileChange} required />
-              </div>
+
+
               <button type="submit" className="continue-button">
                 {uploadedFile ? 'Continue to Preview' : 'Upload Document'}
               </button>
             </form>
           </div>
         )}
-{activeTab === 'Preview' && (
+
+        {activeTab === 'Preview' && (
           <div>
             <h3>ตรวจสอบข้อมูล</h3>
             {uploadedFile ? (
               <div>
-                {/* Show uploaded file preview */}
                 <div style={{ marginBottom: '1rem' }}>
                   <h4>ตัวอย่างไฟล์:</h4>
                   {uploadedFile.FileUrl && (
@@ -202,16 +214,11 @@ const Document = () => {
                     </div>
                   )}
                 </div>
-
-                {/* Show document details */}
                 <p><strong>ชื่อเอกสาร:</strong> {uploadedFile.name}</p>
                 <p><strong>ประเภทเอกสาร:</strong> {uploadedFile.type}</p>
                 <p><strong>หน่วยงาน:</strong> {uploadedFile.department}</p>
-                <p>
-                  <strong>วันที่:</strong>{' '}
-                  {uploadedFile.date} {/* Display date in BE format */}
-                </p>
-                <p><strong>คําอธิบาย:</strong> {uploadedFile.description}</p>
+                <p><strong>วันที่:</strong> {uploadedFile.date}</p>
+                <p><strong>คำอธิบาย:</strong> {uploadedFile.description}</p>
                 <p><strong>ผู้บันทึก:</strong> {uploadedFile.uploadedBy}</p>
                 <p><strong>เวลาการอัพโหลด:</strong> {uploadedFile.time}</p>
                 <button className='continue-button' onClick={() => navigate("/")}>

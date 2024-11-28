@@ -2,7 +2,7 @@
 .step-tabs-container {
   max-width: 700px;
 
-  margin: 20px auto;
+  margin: 5px auto;
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -15,7 +15,7 @@
 .tabs {
   display: flex;
   justify-content: space-around;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   gap: 15px;
 }
 
@@ -104,10 +104,6 @@
 }
 
 
-.tab-content input[type="file"] {
-  margin-bottom: 10px;
-}
-
 .tab-content input:focus,
 .tab-content select:focus,
 .tab-content textarea:focus {
@@ -120,7 +116,8 @@
 .continue-button {
   display: block;
   width: 100%;
-  padding: 12px;
+  margin-top: 10px;
+  padding: 10px;
   background-color: #f14D31; /* สีพื้นหลังส้ม */
   color: #ffffff;
   border: none;
@@ -148,11 +145,11 @@
   }
 
   .step-tabs-container {
-      padding: 15px;
+      padding: 10px;
   }
 
   .tab-content {
-      padding: 15px;
+      padding: 10px;
   }
 }
 
@@ -192,7 +189,7 @@ label {
   color: #333;
   border: 1px solid #ccc;
   border-radius: 4px;
-  margin-top: 5px;
+
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   resize: vertical; /* อนุญาตให้ปรับขนาดในแนวตั้ง */
@@ -206,3 +203,69 @@ label {
   outline: none;
 }
 
+/* Container สำหรับการอัปโหลดไฟล์ */
+.file-upload {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+/* ป้าย label ของการอัปโหลด */
+.file-upload label {
+  font-size: 1rem;
+  font-weight: 400px;
+  margin-bottom: 0.5rem;
+  color: #f8f8f8;
+}
+
+/* ปุ่มเลือกไฟล์ */
+.file-upload-button {
+  width: 25%;
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #a26a4a;
+  color: white;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  margin-bottom: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.file-upload-button:hover {
+  background-color: #bb8057;
+  
+}
+
+.file-upload-button:active {
+  background-color: hsl(21, 84%, 45%);
+}
+
+/* Input แบบ file (ซ่อนเพื่อให้ใช้ label แทน) */
+.file-upload input[type="file"] {
+  display: none;
+}
+
+/* Input สำหรับแสดงชื่อไฟล์ */
+.file-upload-name {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #f9f9f9;
+  color: #333;
+  margin-top: 8px;
+  cursor: not-allowed;
+}
+
+/* เมื่อ focus ที่ช่องชื่อไฟล์ */
+.file-upload-name:focus {
+  outline: none;
+  border-color: f14d31; /* สีเขียวเมื่อโฟกัส */
+}
+
+.file-upload .file-upload-name::placeholder {
+  color: #888;
+}
