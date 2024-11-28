@@ -327,7 +327,7 @@ function addFile({ role }) {
                                     className={`row-item ${selectedDocuments.includes(doc.id) ? "row-selected" : ""}`}
                                     onClick={() => handleSelectDocument(doc.id)}>
                                     {showCheckbox && (
-                                        <td>
+                                        <td className="td-addFile">
                                             <input
                                                 type="checkbox"
                                                 className="checkbox-round"
@@ -336,8 +336,8 @@ function addFile({ role }) {
                                             />
                                         </td>
                                     )}
-                                    <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                                    <td>
+                                    <td className="td-addFile">{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                                    <td className="td-addFile">
                                         {role === "guest" ? (
                                             doc.name
                                         ) : (
@@ -348,11 +348,11 @@ function addFile({ role }) {
                                             </a>
                                         )}
                                     </td>
-                                    <td>{doc.type}</td>
-                                    <td>{doc.date}</td>
-                                    <td>{doc.department}</td>
+                                    <td className="td-addFile">{doc.type}</td>
+                                    <td className="td-addFile">{doc.date}</td>
+                                    <td className="td-addFile">{doc.department}</td>
                                     {role !== "guest" && (
-                                        <td>
+                                        <td className="td-addFile">
                                             <a
                                                 className="download-link"
                                                 onClick={(e) => {

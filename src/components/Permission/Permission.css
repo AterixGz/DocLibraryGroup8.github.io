@@ -1,165 +1,113 @@
-.Toastify__toast-container {
-  position: fixed !important;
-  top: 20px !important; /* กำหนดให้อยู่ด้านบน */
-  left: 50% !important; /* กำหนดให้อยู่กลางแนวนอน */
-  transform: translateX(-50%) !important; /* เลื่อนให้อยู่ตรงกลางข้างบน */
-  z-index: 9999; /* ให้แน่ใจว่าแสดงอยู่บนสุด */
-}
-
-
 .permission-management__container {
-  display: flex;
-  flex-direction: column;
+  font-family: 'Arial', sans-serif;
   padding: 30px;
-  max-width: 200rem;
-  margin: 0 auto;
-  height: 100vh;
-  box-sizing: border-box;
-  background-color: #f4f7fc;
+  background-color: var(--background-color);
   border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .permission-management__header {
-  font-size: 1.75rem;
-  margin-bottom: 30px;
-margin-top: 3rem;
+  font-size: 28px;
+  color: var(--text-color);
+  margin-bottom: 20px;
   font-weight: bold;
-  color: #333;
+  text-align: center;
 }
 
 .permission-management__controls {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   margin-bottom: 20px;
 }
 
 .permission-management__search-input {
-  flex: 1;
-  padding: 12px 18px;
-  border: 1px solid #ddd;
-  border-radius: 30px;
-  font-size: 1.1rem;
-  margin-right: 15px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease-in-out;
-}
-
-.permission-management__search-input:hover {
-  box-shadow: 0 0 5px #ff5722;
+  width: 60%;
+  padding: 10px;
+  border: 2px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 16px;
+  transition: all 0.3s ease;
 }
 
 .permission-management__search-input:focus {
-  box-shadow: 0 0 5px #ff5722;
-  border: #ff5722 1px solid;
+  border-color: var(--primary-color);
   outline: none;
+  box-shadow: 0 0 10px rgba(241, 77, 49, 0.3);
 }
 
 .permission-management__add-user-btn {
-  padding: 12px 25px;
-  background-color: #ff5722;
-  color: #fff;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 20px;
   border: none;
-  border-radius: 30px;
+  border-radius: 5px;
+  font-size: 16px;
   cursor: pointer;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease-in-out;
 }
 
 .permission-management__add-user-btn:hover {
-  background-color: #eb3700;
-  transform: translateY(-2px);
+  background-color: var(--primary-color-dark);
+  transform: translateY(-3px);
+}
+
+.permission-management__add-user-btn:active {
+  transform: translateY(1px);
 }
 
 .permission-management__table-container {
-  flex: 1;
-  overflow-y: auto;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  background-color: #fff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: 45rem; /* กำหนดความสูงของ container */
+  overflow-y: auto; /* ทำให้สามารถเลื่อนตารางในแนวตั้งได้ */
 }
+
+.permission-management__table thead {
+  position: sticky; /* ทำให้ส่วนหัวติดกับตำแหน่ง */
+  top: 0; /* กำหนดให้ติดด้านบนของ container */
+  background-color: #ffffff; /* พื้นหลังส่วนหัว เพื่อป้องกันการซ้อน */
+  z-index: 1; /* ให้ส่วนหัวอยู่เหนือส่วนอื่น */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* เพิ่มเงาเพื่อให้เห็นชัด */
+}
+
 
 .permission-management__table {
   width: 100%;
+  min-width: 800px;
   border-collapse: collapse;
-  text-align: left;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.permission-management__table th,
-.permission-management__table td {
-  padding: 12px 15px;
-  border: 1px solid #ddd;
-  font-size: 1.05rem;
+.permission-management__table th, .permission-management__table td {
+  padding: 15px;
+  text-align: left;
+  font-size: 16px;
 }
 
 .permission-management__table th {
-  background-color: #f8f9fa;
+  background-color: var(--primary-color);
+  color: white;
   font-weight: bold;
-  color: #333;
 }
 
-.permission-management__table tr:nth-child(odd) {
-  background-color: #f9f9f9;
-}
-
-.permission-management__table tr:hover {
-  background-color: #f1f3f5;
-}
-
-.permission-management__confirm-btn {
-  margin-top: 30px;
-  padding: 12px 25px;
-  background-color: #ff5722;
-  color: #fff;
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  align-self: flex-end;
+.permission-management__table tbody tr {
   transition: background-color 0.3s ease;
 }
 
-.permission-management__confirm-btn:hover {
-  background-color: #eb3700;
-  transform: translateY(-2px);
+.permission-management__table tbody tr:hover {
+  background-color: #f1f1f1;
 }
 
-.btn-danger {
-  background-color: #ff5722; 
-  width: 40px; 
-  height: 40px;
-  display: flex; 
-  justify-content: center;
-  align-items: center; 
-  font-size: 18px; 
-  cursor: pointer; 
-  border-radius: 20%; 
-  transition: background-color 0.3s ease, transform 0.2s ease; /* เอฟเฟกต์ */
+.permission-management__table .align-center {
+  text-align: center;
 }
 
-.btn-danger:hover {
-  background-color: #eb3700; /* สีแดงเข้มเมื่อชี้เมาส์ */
-  transform: scale(1.1); /* ขยายปุ่มเล็กน้อย */
-}
-
-.btn-danger:active {
-  background-color: #cf3202; /* สีแดงเข้มเมื่อกด */
-  transform: scale(0.95); /* ลดขนาดเล็กลงเมื่อกด */
-}
-
-.btn-danger i {
-  margin: 0; /* ไม่มีระยะห่าง */
-}
-
-/* Switch Styles */
+/* Switch Styling */
 .switch {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 34px;
+  width: 40px;
+  height: 20px;
 }
 
 .switch input {
@@ -175,7 +123,7 @@ margin-top: 3rem;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: var(--border-color);
   transition: 0.4s;
   border-radius: 34px;
 }
@@ -183,8 +131,8 @@ margin-top: 3rem;
 .slider:before {
   position: absolute;
   content: "";
-  height: 26px;
-  width: 26px;
+  height: 12px;
+  width: 12px;
   border-radius: 50%;
   left: 4px;
   bottom: 4px;
@@ -192,14 +140,12 @@ margin-top: 3rem;
   transition: 0.4s;
 }
 
-/* When the checkbox is checked, change the slider's background color */
 input:checked + .slider {
-  background-color: #ff5722;
+  background-color: var(--primary-color);
 }
 
-/* Move the slider handle when the checkbox is checked */
 input:checked + .slider:before {
-  transform: translateX(26px);
+  transform: translateX(20px);
 }
 
 .switch:hover input:checked + .slider {
@@ -208,88 +154,6 @@ input:checked + .slider:before {
 
 .switch input:focus + .slider {
   box-shadow: 0 0 1px #cf3202;
-}
-
-.form-group {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.form-group label {
-  margin-right: 10px; /* เพิ่มระยะห่างระหว่าง label กับ input */
-  width: 150px; /* กำหนดความกว้างของ label */
-}
-
-.form-group input {
-  flex: 1; /* ทำให้ input ขยายตามขนาดของ container */
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end; /* จัดตำแหน่งปุ่มไปทางขวา */
-  gap: 10px; /* ระยะห่างระหว่างปุ่ม */
-  margin-top: 20px;
-}
-
-.save-btn, .cancel-btn {
-  padding: 12px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 25px; /* กำหนดมุมโค้งมนให้ทั้งสองปุ่ม */
-  cursor: pointer;
-  width: 45%;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  display: inline-block;
-  text-align: center;
-  font-weight: bold;
-}
-
-.save-btn {
-  background-color: #4CAF50; /* สีพื้นหลังปุ่มบันทึก */
-  color: white;
-}
-
-.save-btn:hover {
-  background-color: #45a049; /* สีพื้นหลังเมื่อ hover */
-  transform: translateY(-2px); /* ยกปุ่มขึ้นเล็กน้อย */
-}
-
-.cancel-btn {
-  background-color: #f44336; /* สีพื้นหลังปุ่มยกเลิก */
-  color: white;
-}
-
-.cancel-btn:hover {
-  background-color: #e53935; /* สีพื้นหลังเมื่อ hover */
-  transform: translateY(-2px); /* ยกปุ่มขึ้นเล็กน้อย */
-}
-
-.cancel-btn:active, .save-btn:active {
-  transform: scale(0.98); /* ลดขนาดเมื่อกด */
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-/* Modal Content */
-.modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 500px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Modal Overlay */
@@ -306,58 +170,72 @@ input:checked + .slider:before {
   z-index: 1000;
 }
 
-/* Modal Content */
+/* Confirmation Button */
+.permission-management__confirm-btn {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+}
+
+.permission-management__confirm-btn:hover {
+  background-color: var(--primary-color-dark);
+  transform: translateY(-3px);
+}
+
+.permission-management__confirm-btn:active {
+  transform: translateY(1px);
+}
+
+/* Modal Styling */
+.permission-management__add-user-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .modal-content {
   background-color: #fff;
-  padding: 20px;
+  padding: 30px;
   border-radius: 8px;
-  width: 100%;
-  max-width: 500px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 500px;
+  animation: modalAnimation 0.3s ease-in-out;
 }
 
-/* Modal Header */
-.modal-header {
-  font-size: 24px;
-  margin-bottom: 20px;
-  text-align: center;
-  font-weight: 600;
-}
-
-/* Form */
-.modal-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-/* Form Group */
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Horizontal layout for name fields */
-.name-group {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px; /* space between first name and last name */
-}
-
-/* Form Item (for each input field) */
-.form-item {
-  flex: 1;
-}
-
-/* Input Fields */
-.form-input {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-  margin-top: 5px;
+.modal-content input {
   width: 100%;
-  box-sizing: border-box;
+  padding: 12px;
+  margin: 10px 0;
+  border: 2px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.modal-content input:focus {
+  border-color: var(--primary-color);
+}
+
+/* Buttons */
+.save-btn,
+.cancel-btn {
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 45%;
 }
 
 .permission-container .add-btn i {
@@ -448,4 +326,3 @@ input:checked + .slider:before {
         width: 100%;
     }
 }
-/* ส่งไฟล์ใหม่ */

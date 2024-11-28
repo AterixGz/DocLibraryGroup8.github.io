@@ -67,7 +67,7 @@
 }
 
 .document-table th,
-.document-table td {
+.document-table .td-addFile {
   padding: 12px;
   border-bottom: 1px solid #ddd;
   text-align: left;

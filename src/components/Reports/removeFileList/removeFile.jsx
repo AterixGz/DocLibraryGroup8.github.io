@@ -328,7 +328,7 @@ function removeFile({ role }) {
                                     className={`row-item ${selectedDocuments.includes(doc.id) ? "row-selected" : ""}`}
                                     onClick={() => handleSelectDocument(doc.id)}>
                                     {showCheckbox && (
-                                        <td>
+                                        <td className="td-removeFile">
                                             <input
                                                 type="checkbox"
                                                 className="checkbox-round"
@@ -337,8 +337,8 @@ function removeFile({ role }) {
                                             />
                                         </td>
                                     )}
-                                    <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                                    <td>
+                                    <td className="td-removeFile">{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                                    <td className="td-removeFile">
                                         {role === "guest" ? (
                                             doc.name
                                         ) : (
@@ -349,11 +349,11 @@ function removeFile({ role }) {
                                             </a>
                                         )}
                                     </td>
-                                    <td>{doc.type}</td>
-                                    <td>{doc.date}</td>
-                                    <td>{doc.department}</td>
+                                    <td className="td-removeFile">{doc.type}</td>
+                                    <td className="td-removeFile">{doc.date}</td>
+                                    <td className="td-removeFile">{doc.department}</td>
                                     {role !== "guest" && (
-                                        <td>
+                                        <td className="td-removeFile">
                                             <a
                                                 className="download-link"
                                                 onClick={(e) => {
