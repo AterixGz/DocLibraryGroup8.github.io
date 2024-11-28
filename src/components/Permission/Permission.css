@@ -1,3 +1,12 @@
+.Toastify__toast-container {
+  position: fixed !important;
+  top: 20px !important; /* กำหนดให้อยู่ด้านบน */
+  left: 50% !important; /* กำหนดให้อยู่กลางแนวนอน */
+  transform: translateX(-50%) !important; /* เลื่อนให้อยู่ตรงกลางข้างบน */
+  z-index: 9999; /* ให้แน่ใจว่าแสดงอยู่บนสุด */
+}
+
+
 .permission-management__container {
   display: flex;
   flex-direction: column;
@@ -201,7 +210,65 @@ input:checked + .slider:before {
   box-shadow: 0 0 1px #cf3202;
 }
 
-/* Modal Overlay */
+.form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  margin-right: 10px; /* เพิ่มระยะห่างระหว่าง label กับ input */
+  width: 150px; /* กำหนดความกว้างของ label */
+}
+
+.form-group input {
+  flex: 1; /* ทำให้ input ขยายตามขนาดของ container */
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end; /* จัดตำแหน่งปุ่มไปทางขวา */
+  gap: 10px; /* ระยะห่างระหว่างปุ่ม */
+  margin-top: 20px;
+}
+
+.save-btn, .cancel-btn {
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 25px; /* กำหนดมุมโค้งมนให้ทั้งสองปุ่ม */
+  cursor: pointer;
+  width: 45%;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  display: inline-block;
+  text-align: center;
+  font-weight: bold;
+}
+
+.save-btn {
+  background-color: #4CAF50; /* สีพื้นหลังปุ่มบันทึก */
+  color: white;
+}
+
+.save-btn:hover {
+  background-color: #45a049; /* สีพื้นหลังเมื่อ hover */
+  transform: translateY(-2px); /* ยกปุ่มขึ้นเล็กน้อย */
+}
+
+.cancel-btn {
+  background-color: #f44336; /* สีพื้นหลังปุ่มยกเลิก */
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #e53935; /* สีพื้นหลังเมื่อ hover */
+  transform: translateY(-2px); /* ยกปุ่มขึ้นเล็กน้อย */
+}
+
+.cancel-btn:active, .save-btn:active {
+  transform: scale(0.98); /* ลดขนาดเมื่อกด */
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -291,17 +358,6 @@ input:checked + .slider:before {
   margin-top: 5px;
   width: 100%;
   box-sizing: border-box;
-}
-
-/* Buttons */
-.save-btn,
-.cancel-btn {
-  padding: 12px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 45%;
 }
 
 .permission-container .add-btn i {
