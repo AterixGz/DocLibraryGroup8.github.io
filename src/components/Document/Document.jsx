@@ -10,6 +10,7 @@ const Document = () => {
   const [type, setType] = useState('');
   const [department, setDepartment] = useState('');
   const [date, setDate] = useState(''); // Store date in this state
+  const [description, setDescription] = useState(''); // คำอธิบายเอกสาร
   const [uploadedBy, setUploadedBy] = useState('');
   const [activeTab, setActiveTab] = useState('Upload');
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -44,7 +45,7 @@ const Document = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!file || !name || !type || !department || !date || !uploadedBy) {
+    if (!file || !name || !type || !department || !date || !uploadedBy || !description) {
       alert('All fields are required!');
       return;
     }
@@ -55,6 +56,7 @@ const Document = () => {
       type,
       department,
       date,
+      description, // เพิ่มคำอธิบายในข้อมูล
       time: new Date().toLocaleTimeString(),
       FileUrl: URL.createObjectURL(file),
       uploadedBy,
@@ -89,9 +91,10 @@ const Document = () => {
             <form onSubmit={handleSubmit}>
               <div>
                 <label>ชื่อเอกสาร</label>
-                <input
+                <input 
                   type="text"
                   value={name}
+                  placeholder="กรอกชื่อเอกสาร"
                   onChange={(e) => setName(e.target.value)}
                   required
                 />
@@ -121,37 +124,49 @@ const Document = () => {
                   </option>
                 </select>
               </div>
-              <div className="form-item">
-                <label>หน่วยงาน</label>
-                <select
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  required
-                >
-                  <option value="">เลือกหน่วยงาน</option>
-                  <option value="กรมเชื้อเพลิงธรรมชาติ">กรมเชื้อเพลิงธรรมชาติ</option>
-                </select>
-              </div>
+              
+              <div className="form-group-horizontal">
+                <div className="form-item">
+                  <label>หน่วยงาน</label>
+                  <select
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    required
+                  >
+                    <option value="">เลือกหน่วยงาน</option>
+                    <option value="กรมเชื้อเพลิงธรรมชาติ">กรมเชื้อเพลิงธรรมชาติ</option>
+                  </select>
+                </div>
 
-              <div className="form-item">
-                <label className="date">วันที่</label>
-                <input
-                  type="date"
-                  value={date}
-                  onChange={handleDateChange}
-                  required
-                />
+                <div className="form-item">
+                  <label className="date">วันที่</label>
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={handleDateChange}
+                    required
+                  />
+                </div>
               </div>
-
+              <div>
+                <label>คำอธิบาย</label>
+                <textarea
+                  value={description}
+                  placeholder="กรอกคำอธิบายเพิ่มเติมเกี่ยวกับเอกสาร"
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                ></textarea>
+              </div>
               <div>
                 <label>ชื่อผู้บันทึก</label>
                 <input
+                  className='readonly-input'
                   type="text"
                   value={uploadedBy}
                   readOnly // Disable editing
                 />
               </div>
-              <div>
+              <div >
                 <label>File Upload</label>
                 <input type="file" onChange={handleFileChange} required />
               </div>
@@ -161,8 +176,7 @@ const Document = () => {
             </form>
           </div>
         )}
-
-        {activeTab === 'Preview' && (
+{activeTab === 'Preview' && (
           <div>
             <h3>ตรวจสอบข้อมูล</h3>
             {uploadedFile ? (
@@ -176,7 +190,7 @@ const Document = () => {
                         <img
                           src={uploadedFile.FileUrl}
                           alt={uploadedFile.name}
-                          style={{ maxWidth: '100%', maxHeight: '300px' }}
+                          style={{ maxWidth: '60%', maxHeight: '400px' }}
                         />
                       ) : (
                         <iframe
@@ -197,6 +211,7 @@ const Document = () => {
                   <strong>วันที่:</strong>{' '}
                   {uploadedFile.date} {/* Display date in BE format */}
                 </p>
+                <p><strong>คําอธิบาย:</strong> {uploadedFile.description}</p>
                 <p><strong>ผู้บันทึก:</strong> {uploadedFile.uploadedBy}</p>
                 <p><strong>เวลาการอัพโหลด:</strong> {uploadedFile.time}</p>
                 <button className='continue-button' onClick={() => navigate("/")}>
@@ -204,7 +219,7 @@ const Document = () => {
                 </button>
               </div>
             ) : (
-              <p>No document uploaded yet.</p>
+              <p>ยังไม่มีเอกสารที่อัปโหลด</p>
             )}
           </div>
         )}
