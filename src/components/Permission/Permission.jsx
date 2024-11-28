@@ -1,225 +1,325 @@
-import "./Permission.css";
 import React, { useState, useEffect } from "react";
+import Switch from "react-switch";
+import { motion as m, AnimatePresence } from "framer-motion";
+import { ToastContainer, toast } from "react-toastify"; // Import ToastContainer and toast
+import "react-toastify/dist/ReactToastify.css"; // Import CSS for toast notifications
+import "./Permission.css";
 import users from "../../data/users";
 
-function Permission() {
-  const [inputValue, setInputValue] = useState("");
-  const [namesList, setNamesList] = useState([]);
-  const [filteredNamesList, setFilteredNamesList] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
+function PermissionManagement() {
+  // State Management
+  const [userList, setUserList] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [newUser, setNewUser] = useState({
     firstName: "",
     lastName: "",
     username: "",
-    documentAccess: false,
-    permission: false,
-    report: false,
+    employeeId: "",
   });
 
+  // Fetch Initial User List
   useEffect(() => {
-    const usersList = users.map((user) => ({
-      name: user.firstName + " " + user.lastName,
-      username: user.username,
-      documentAccess: false,
-      permission: false,
-      report: false,
-    }));
-    setNamesList(usersList);
-    setFilteredNamesList(usersList);
+    setUserList(users);
+    setFilteredUsers(users);
   }, []);
 
+  // Event Handlers
   const handleSearch = (e) => {
-    setInputValue(e.target.value);
-    const searchTerm = e.target.value.toLowerCase();
-    const filtered = namesList.filter(
-      (person) =>
-        person.name.toLowerCase().includes(searchTerm) ||
-        person.username.toLowerCase().includes(searchTerm)
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+    setFilteredUsers(
+      userList.filter(
+        (user) =>
+          user.firstName.toLowerCase().includes(term) ||
+          user.lastName.toLowerCase().includes(term) ||
+          user.username.toLowerCase().includes(term)
+      )
     );
-    setFilteredNamesList(filtered);
   };
 
-  const handleDelete = (index) => {
-    const updatedNamesList = filteredNamesList.filter((_, i) => i !== index);
-    setFilteredNamesList(updatedNamesList);
+  const handleTogglePermission = (index, permission) => {
+    const updatedUsers = [...filteredUsers];
+    updatedUsers[index][permission] = !updatedUsers[index][permission];
+    setFilteredUsers(updatedUsers);
+
+    // Update main user list
+    const userIndex = userList.findIndex(
+      (user) => user.username === updatedUsers[index].username
+    );
+    if (userIndex !== -1) {
+      const updatedOriginalUsers = [...userList];
+      updatedOriginalUsers[userIndex][permission] =
+        updatedUsers[index][permission];
+      setUserList(updatedOriginalUsers);
+    }
   };
 
-  const toggleAccess = (index, field) => {
-    const updatedNamesList = [...filteredNamesList];
-    updatedNamesList[index][field] = !updatedNamesList[index][field];
-    setFilteredNamesList(updatedNamesList);
+  const handleConfirmUpdate = () => {
+    // Display a success toast notification
+    toast.success("สิทธิ์การเข้าถึงได้รับการอัปเดตเรียบร้อยแล้ว!", {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+    console.log("Updated User List:", userList);
   };
 
-  const handleConfirm = () => {
-    alert("ข้อมูลทั้งหมดได้รับการยืนยัน!");
+  const handleAddUser = () => {
+    setShowAddUserModal(true);
   };
 
-  const handleModalOpen = () => {
-    setIsModalOpen(true);
+  const handleDeleteUser = (user) => {
+    setSelectedUser(user);
+    setShowDeletePopup(true);
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
+  const handleConfirmDelete = () => {
+    setUserList(
+      userList.filter((user) => user.username !== selectedUser.username)
+    );
+    setFilteredUsers(
+      filteredUsers.filter((user) => user.username !== selectedUser.username)
+    );
+    setShowDeletePopup(false);
+  };
+
+  // Add User Modal Handlers
+  const handleAddNewUser = () => {
+    const newUserData = {
+      ...newUser,
+      documentAccess: true,
+      permissionAccess: false,
+      reportsAccess: false,
+    };
+    setUserList([...userList, newUserData]);
+    setFilteredUsers([...filteredUsers, newUserData]);
+    setShowAddUserModal(false);
     setNewUser({
       firstName: "",
       lastName: "",
       username: "",
-      documentAccess: false,
-      permission: false,
-      report: false,
+      employeeId: "",
     });
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewUser((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleAddUser = () => {
-    if (newUser.firstName && newUser.lastName && newUser.username) {
-      const newPerson = {
-        name: `${newUser.firstName} ${newUser.lastName}`,
-        username: newUser.username,
-        documentAccess: newUser.documentAccess,
-        permission: newUser.permission,
-        report: newUser.report,
-      };
-      setNamesList((prev) => [...prev, newPerson]);
-      setFilteredNamesList((prev) => [...prev, newPerson]);
-      handleModalClose();
-    } else {
-      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
-    }
-  };
-
   return (
-    <div className="permission-container">
-      <h3>จัดการสิทธิ์ในการเข้าถึง</h3>
+    <div className="permission-management__container">
+      <h2 className="permission-management__header">
+        จัดการสิทธิ์ในการเข้าถึง
+      </h2>
 
-      <div className="search-container">
+      {/* Search and Add User Section */}
+      <div className="permission-management__controls">
         <input
           type="text"
-          value={inputValue}
+          value={searchTerm}
           onChange={handleSearch}
-          placeholder="ค้นหาชื่อพนักงานหรือรหัสผู้ใช้งาน"
+          placeholder="ค้นหาผู้ใช้..."
+          className="permission-management__search-input"
         />
-        <button className="btn btn-primary add-btn" onClick={handleModalOpen}>
-          <i className="bi bi-plus"></i>
+
+        <button
+          onClick={handleAddUser}
+          className="permission-management__add-user-btn"
+        >
+          เพิ่มพนักงาน
         </button>
       </div>
 
-      <div className="names-list">
-        <table>
+      {/* User List Table */}
+      <div className="permission-management__table-container">
+        <table className="permission-management__table">
           <thead>
             <tr>
-              <th className="align-left">บุคลากร</th>
-              <th className="align-center"></th>
-              <th className="align-center">การจัดการเอกสาร</th>
-              <th className="align-center">การจัดการสิทธิ์เข้าถึง</th>
-              <th className="align-center">การจัดการรายงาน</th>
-              <th className="align-center"></th>
+              <th>ชื่อ</th>
+              <th>รหัสพนักงาน</th>
+              <th>Document</th>
+              <th>Permission</th>
+              <th>Reports</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredNamesList.length === 0 ? (
-              <tr>
-                <td colSpan="5" style={{ textAlign: "center" }}>
-                  ไม่มีข้อมูล
+            {filteredUsers.map((user, index) => (
+              <tr key={user.username}>
+                <td>{`${user.firstName} ${user.lastName}`}</td>
+                <td>{user.employeeId}</td>
+                <td>
+                  <Switch
+                    checked={user.documentAccess}
+                    onChange={() =>
+                      handleTogglePermission(index, "documentAccess")
+                    }
+                  />
+                </td>
+                <td>
+                  <Switch
+                    checked={user.permissionAccess}
+                    onChange={() =>
+                      handleTogglePermission(index, "permissionAccess")
+                    }
+                  />
+                </td>
+                <td>
+                  <Switch
+                    checked={user.reportsAccess}
+                    onChange={() =>
+                      handleTogglePermission(index, "reportsAccess")
+                    }
+                  />
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleDeleteUser(user)}
+                    className="permission-management__delete-btn"
+                  >
+                    ลบ
+                  </button>
                 </td>
               </tr>
-            ) : (
-              filteredNamesList.map((person, index) => (
-                <tr key={index}>
-                  <td>{person.name}</td>
-                  <td></td>
-                  <td className="align-center">
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={person.documentAccess}
-                        onChange={() => toggleAccess(index, "documentAccess")}
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </td>
-                  <td className="align-center">
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={person.permission}
-                        onChange={() => toggleAccess(index, "permission")}
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </td>
-                  <td className="align-center">
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={person.report}
-                        onChange={() => toggleAccess(index, "report")}
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </td>
-                  <td>
-                    <button class="btn-danger" onclick="handleDelete(1)">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
       </div>
 
-      <div className="confirm-btn-container">
-        <button className="confirm-btn" onClick={handleConfirm}>
-          ยืนยัน
-        </button>
-      </div>
+      {/* Confirm Update Button */}
+      <button
+        onClick={handleConfirmUpdate}
+        className="permission-management__confirm-btn"
+      >
+        ยืนยัน
+      </button>
 
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="modal">
+      {/* Add User Modal */}
+      {showAddUserModal && (
+        <div className="modal-overlay">
           <div className="modal-content">
-            <h3>เพิ่มบุคลากรใหม่</h3>
-            <input
-              type="text"
-              name="firstName"
-              placeholder="ชื่อ"
-              value={newUser.firstName}
-              onChange={handleInputChange}
-            />
-            <input
-              type="text"
-              name="lastName"
-              placeholder="นามสกุล"
-              value={newUser.lastName}
-              onChange={handleInputChange}
-            />
-            <input
-              type="text"
-              name="username"
-              placeholder="รหัสผู้ใช้"
-              value={newUser.username}
-              onChange={handleInputChange}
-            />
-            <div className="modal-btns">
-              <button className="confirm-btn" onClick={handleAddUser}>
-                เพิ่ม
-              </button>
-              <button className="btn-danger" onClick={handleModalClose}>
-                ยกเลิก
-              </button>
-            </div>
+            <h3 className="modal-header">เพิ่มพนักงาน</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAddNewUser();
+              }}
+              className="modal-form"
+            >
+              <div className="form-group name-group">
+                <div className="form-item">
+                  <label htmlFor="firstName">ชื่อ:</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    value={newUser.firstName}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, firstName: e.target.value })
+                    }
+                    required
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-item">
+                  <label htmlFor="lastName">นามสกุล:</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    value={newUser.lastName}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, lastName: e.target.value })
+                    }
+                    required
+                    className="form-input"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="username">ชื่อผู้ใช้:</label>
+                <input
+                  type="text"
+                  id="username"
+                  value={newUser.username}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, username: e.target.value })
+                  }
+                  required
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="employeeId">รหัสพนักงาน:</label>
+                <input
+                  type="text"
+                  id="employeeId"
+                  value={newUser.employeeId}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, employeeId: e.target.value })
+                  }
+                  required
+                  className="form-input"
+                />
+              </div>
+
+              <div className="modal-actions">
+                <button type="submit" className="save-btn">
+                  บันทึก
+                </button>
+                <button
+                  onClick={() => setShowAddUserModal(false)}
+                  className="cancel-btn"
+                >
+                  ยกเลิก
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Popup */}
+      <AnimatePresence>
+        {showDeletePopup && (
+          <div
+            className="popup-overlay"
+            onClick={() => setShowDeletePopup(false)}
+          >
+            <m.div
+              className="popup-content"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+            >
+              <h3>ยืนยันการลบ</h3>
+              <p>
+                คุณต้องการลบผู้ใช้งาน <strong>{selectedUser?.firstName}</strong>{" "}
+                ใช่หรือไม่?
+              </p>
+              <button onClick={handleConfirmDelete} className="confirm-btn">
+                ยืนยัน
+              </button>
+              <button
+                onClick={() => setShowDeletePopup(false)}
+                className="cancel-btn"
+              >
+                ยกเลิก
+              </button>
+            </m.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Toast Notification Container */}
+      <ToastContainer />
     </div>
   );
 }
 
-export default Permission;
-//ส่งไฟล์ใหม่
+export default PermissionManagement;

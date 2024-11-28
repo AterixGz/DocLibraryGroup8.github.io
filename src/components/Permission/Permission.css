@@ -1,347 +1,335 @@
-@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;700&display=swap');
-@import url('https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-straight/css/uicons-solid-straight.css');
-
-/* Reset styles */
-.permission-container * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    
+.permission-management__container {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  max-width: 200rem;
+  margin: 0 auto;
+  height: 100vh;
+  box-sizing: border-box;
+  background-color: #f4f7fc;
+  border-radius: 8px;
 }
 
-/* Main container */
-.permission-container {
-    font-family: 'Prompt', sans-serif;
-    background-color: #f9fafb;
-    color: #333;
-    padding: 20px;
-    min-height: 100vh;
-    width: 100%;
+.permission-management__header {
+  font-size: 1.75rem;
+  margin-bottom: 30px;
+margin-top: 3rem;
+  font-weight: bold;
+  color: #333;
 }
 
-/* Header */
-.permission-container h3 {
-    font-size: 28px;
-    font-weight: 500;
-    margin-bottom: 20px;
-    color: #444;
-    text-align: center;
-    border-bottom: 2px solid #FF4D02;
-    padding-bottom: 10px;
+.permission-management__controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-/* Search container */
-.permission-container .search-container {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
+.permission-management__search-input {
+  flex: 1;
+  padding: 12px 18px;
+  border: 1px solid #ddd;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  margin-right: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease-in-out;
 }
 
-.permission-container .search-container input {
-    padding: 10px 15px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 500px;
-    transition: border-color 0.3s;
+.permission-management__search-input:hover {
+  box-shadow: 0 0 5px #ff5722;
 }
 
-.permission-container .search-container input:focus {
-    border-color: #FF4D02;
-    outline: none;
-    box-shadow: 0 0 5px rgba(255, 77, 2, 0.3);
+.permission-management__search-input:focus {
+  box-shadow: 0 0 5px #ff5722;
+  border: #ff5722 1px solid;
+  outline: none;
 }
 
-/* Input container */
-.permission-container .input-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto; /* จัดให้อยู่ตรงกลาง */
+.permission-management__add-user-btn {
+  padding: 12px 25px;
+  background-color: #ff5722;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.permission-container .input-container input {
-    flex: 1;
-    padding: 10px 15px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    transition: border-color 0.3s;
+.permission-management__add-user-btn:hover {
+  background-color: #a53817;
+  transform: translateY(-2px);
 }
 
-.permission-container .input-container input:focus {
-    border-color: #FF4D02;
-    outline: none;
-    box-shadow: 0 0 5px rgba(255, 77, 2, 0.3);
+.permission-management__table-container {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Button styles */
-.permission-container .add-btn,
-.permission-container .confirm-btn,
-.permission-container .btn-danger {
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+.permission-management__table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
 }
 
-.permission-container .add-btn {
-    background-color: #FF4D02;
-    color: #fff;
-    border: none;
+.permission-management__table th,
+.permission-management__table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  font-size: 1.05rem;
 }
 
-.permission-container .add-btn:hover {
-    background-color: #E64A00;
+.permission-management__table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #333;
 }
 
-.permission-container .add-btn:active {
-    background-color: #B83D00;
+.permission-management__table tr:nth-child(odd) {
+  background-color: #f9f9f9;
 }
 
-.permission-container .confirm-btn {
-    background-color: #4CAF50;
-    color: white;
-    font-size: 18px;
-    border: none;
+.permission-management__table tr:hover {
+  background-color: #f1f3f5;
 }
 
-.permission-container .confirm-btn:hover {
-    background-color: #45a049;
+.permission-management__confirm-btn {
+  margin-top: 30px;
+  padding: 12px 25px;
+  background-color: #ff5722;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  align-self: flex-end;
+  transition: background-color 0.3s ease;
 }
 
-.permission-container .btn-danger {
-    background-color: #FF4D02;
-    color: white;
-    font-size: 14px;
-    border: none;
+.permission-management__confirm-btn:hover {
+  background-color: #b63d18;
+  transform: translateY(-2px);
 }
 
-.permission-container .btn-danger:hover {
-    background-color: #E64A00;
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-/* Table styles */
-.permission-container .names-list {
-    max-width: 1000px;
-    margin: 0 auto;
-    overflow-x: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background: #fff;
-    padding: 20px;
+/* Modal Content */
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.permission-container table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 16px;
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-.permission-container thead {
-    background-color: #FF4D02;
-    color: white;
-    text-align: center;
+/* Modal Content */
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.permission-container thead th {
-    padding: 12px 15px;
-    font-weight: bold;
-    word-wrap: break-word;
-    text-align: center;
+/* Modal Header */
+.modal-header {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
 }
 
-.permission-container tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+/* Form */
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.permission-container tbody tr:hover {
-    background-color: #f1f1f1;
+/* Form Group */
+.form-group {
+  display: flex;
+  flex-direction: column;
 }
 
-.permission-container tbody td {
-    padding: 12px 15px;
-    text-align: center;
+/* Horizontal layout for name fields */
+.name-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px; /* space between first name and last name */
 }
 
-.permission-container tbody tr td {
-    word-break: break-word;
+/* Form Item (for each input field) */
+.form-item {
+  flex: 1;
 }
 
-.permission-container tbody tr td:first-child {
-    text-align: left;
+/* Input Fields */
+.form-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  margin-top: 5px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Switch toggle */
-.permission-container .switch {
-    position: relative;
-    display: inline-block;
-    width: 60px; /* ขยายความกว้าง */
-    height: 34px; /* ขยายความสูง */
+/* Buttons */
+.save-btn,
+.cancel-btn {
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 45%;
 }
 
-.permission-container .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+.save-btn {
+  background-color: #4CAF50;
+  color: white;
 }
 
-.permission-container .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ddd;
-    border-radius: 40px; /* ทำมุมให้โค้งมากขึ้น */
-    transition: 0.4s;
+.cancel-btn {
+  background-color: #f44336;
+  color: white;
 }
 
-.permission-container .slider:before {
-    position: absolute;
-    content: "";
-    height: 27px; /* ขยายขนาดวงกลม */
-    width: 27px; /* ขยายขนาดวงกลม */
-    left: 4px; /* ปรับตำแหน่งวงกลม */
-    bottom: 4px; /* ปรับตำแหน่งวงกลม */
-    background-color: white;
-    border-radius: 50%;
-    transition: 0.4s;
-}
-
-.permission-container input:checked + .slider {
-    background-color: #FF4D02; /* สีเมื่อเปิด */
-}
-
-.permission-container input:checked + .slider:before {
-    transform: translateX(26px); /* ขยับวงกลมไปขวา */
+/* Modal Actions Container */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 
 
-/* Alignment helpers */
-.permission-container .align-right {
-    text-align: right;
+
+
+
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-.permission-container .align-center {
-    text-align: center;
+.popup-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 450px;
+  text-align: center;
+  transition: all 0.3s ease;
+  animation: zoomIn 0.3s ease;
+  margin-left: 250px;
 }
 
-/* Button container */
-.permission-container .confirm-btn-container {
-    text-align: center;
-    margin-top: 20px;
-    
+.confirm-btn {
+  padding: 12px 25px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease;
 }
 
-.permission-container .add-btn {
-    width: 42px; /* กำหนดความกว้าง */
-    height: 42px; /* กำหนดความสูง */
-    padding: 0; /* ไม่มีระยะห่างด้านใน */
-    border-radius: 8px; /* มุมโค้งเล็กน้อย */
-    display: flex;
-    justify-content: center; /* จัดให้อยู่กึ่งกลางแนวนอน */
-    align-items: center; /* จัดให้อยู่กึ่งกลางแนวตั้ง */
-    background-color: #FF4D02;
-    color: white;
-    border: none;
-    font-size: 20px; /* ขนาดไอคอน */
-    cursor: pointer;
-    transition: background-color 0.3s;
+.confirm-btn:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
 }
 
-.permission-container .add-btn i {
-    font-size: 20px; /* ลดขนาดไอคอน */
+.cancel-btn {
+  padding: 12px 25px;
+  background-color: #6c757d;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease;
 }
 
-.permission-container .btn-danger {
-    width: 42px; /* กำหนดความกว้าง */
-    height: 42px; /* กำหนดความสูง */
-    padding: 0; /* ไม่มีระยะห่างด้านใน */
-    border-radius: 8px; /* มุมโค้งเล็กน้อย */
-    display: flex;
-    justify-content: center; /* จัดให้อยู่กึ่งกลางแนวนอน */
-    align-items: center; /* จัดให้อยู่กึ่งกลางแนวตั้ง */
-    background-color: #FF4D02;
-    color: white;
-    border: none;
-    font-size: 20px; /* ขนาดไอคอน */
-    cursor: pointer;
-    transition: background-color 0.3s;
+.cancel-btn:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
 }
 
-.permission-container .btn-danger i {
-    font-size: 20px; /* ลดขนาดไอคอน */
+.permission-management__delete-btn {
+  padding: 5px 10px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Modal styles */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
-  }
-  
-  .modal-content input {
-    margin: 10px 0;
-    padding: 10px;
-    width: 100%;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  .modal-btns {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
-
-  .search-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  } 
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    .permission-container .input-container {
-        flex-direction: column;
-    }
-
-    .permission-container .names-list {
-        padding: 10px;
-    }
-
-    .permission-container table {
-        width: 100%;
-        table-layout: fixed;
-    }
-
-    .permission-container .add-btn,
-    .permission-container .confirm-btn {
-        width: 100%;
-    }
+.permission-management__delete-btn:hover {
+  background-color: #c82333;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
 }
-/* ส่งไฟล์ใหม่ */
+
+.permission-management__delete-btn:active {
+  background-color: #bd2130;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.permission-management__delete-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.4);
+}
