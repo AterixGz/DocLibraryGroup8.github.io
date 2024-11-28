@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
+import Switch from "react-switch";
 import { motion as m, AnimatePresence } from "framer-motion";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import "./Permission.css";
 import users from "../../data/users";
 
@@ -62,10 +61,6 @@ function PermissionManagement() {
     setShowAddUserModal(true);
   };
 
-  const handleCloseModal = () => {
-    setShowAddUserModal(false);
-  };
-
   const handleDeleteUser = (user) => {
     setSelectedUser(user);
     setShowDeletePopup(true);
@@ -120,87 +115,6 @@ function PermissionManagement() {
           เพิ่มพนักงาน
         </button>
       </div>
-
-      {/* Modal สำหรับเพิ่มพนักงาน */}
-      {showAddUserModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3 className="modal-header">เพิ่มพนักงาน</h3>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleAddNewUser();
-              }}
-              className="modal-form"
-            >
-              <div className="form-group">
-                <label htmlFor="firstName">ชื่อ:</label>
-                <input
-                  type="text"
-                  id="firstName"
-                  value={newUser.firstName}
-                  onChange={(e) =>
-                    setNewUser({ ...newUser, firstName: e.target.value })
-                  }
-                  required
-                  className="form-input"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="lastName">นามสกุล:</label>
-                <input
-                  type="text"
-                  id="lastName"
-                  value={newUser.lastName}
-                  onChange={(e) =>
-                    setNewUser({ ...newUser, lastName: e.target.value })
-                  }
-                  required
-                  className="form-input"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="username">ชื่อผู้ใช้:</label>
-                <input
-                  type="text"
-                  id="username"
-                  value={newUser.username}
-                  onChange={(e) =>
-                    setNewUser({ ...newUser, username: e.target.value })
-                  }
-                  required
-                  className="form-input"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="employeeId">รหัสพนักงาน:</label>
-                <input
-                  type="text"
-                  id="employeeId"
-                  value={newUser.employeeId}
-                  onChange={(e) =>
-                    setNewUser({ ...newUser, employeeId: e.target.value })
-                  }
-                  required
-                  className="form-input"
-                />
-              </div>
-              <div className="modal-actions">
-                <button type="submit" className="save-btn">
-                  บันทึก
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="cancel-btn"
-                >
-                  ยกเลิก
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       <div className="permission-management__table-container">
         <table className="permission-management__table">
