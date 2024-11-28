@@ -85,6 +85,7 @@ function Profile({ username, password }) {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
       >
+        {/* ข้อมูลส่วนตัว */}
         <div className="profile__form-group--name">
           <motion.div
             className="profile__form-group"
@@ -111,21 +112,41 @@ function Profile({ username, password }) {
           <label>E-mail</label>
           <input type="text" value={userData.email} readOnly />
         </motion.div>
+        {/* ข้อมูลแผนกและตำแหน่ง */}
+        <div className="profile__form-group--name">
+          <motion.div
+            className="profile__form-group"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <label>แผนก</label>
+            <input type="text" value={userData.department} readOnly />
+          </motion.div>
+          <motion.div
+            className="profile__form-group"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <label>ตำแหน่ง</label>
+            <input type="text" value={userData.position} readOnly />
+          </motion.div>
+        </div>
+        {/* ข้อมูลรหัสพนักงาน */}
         <motion.div
           className="profile__form-group"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <label>แผนก</label>
-          <input type="text" value={userData.department} readOnly />
+          <label>รหัสพนักงาน</label>
+          <input type="text" value={userData.employeeId} readOnly />
         </motion.div>
+        {/* ข้อมูลบทบาท */}
         <motion.div
           className="profile__form-group"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <label>ตำแหน่ง</label>
-          <input type="text" value={userData.position} readOnly />
+        
         </motion.div>
       </motion.div>
     </motion.div>
