@@ -8,8 +8,7 @@ const Document = () => {
   const [file, setFile] = useState(null);
   const [name, setName] = useState('');
   const [type, setType] = useState('');
-  const [department, setDepartment] = useState('');
-  const [year, setYear] = useState('');
+  const [department, setDepartment] = useState(''); // ตั้งค่าเริ่มต้นให้เป็นค่าแรกใน dropdown
   const [date, setDate] = useState('');
   const [uploadedBy, setUploadedBy] = useState('');
   const [activeTab, setActiveTab] = useState('Upload'); // Active tab state
@@ -23,12 +22,21 @@ const Document = () => {
     setFile(e.target.files[0]);
   };
 
+  const handleDateChange = (e) => {
+    const inputDate = new Date(e.target.value);
+    if (!isNaN(inputDate)) {
+      setDate(e.target.value); // เก็บค่า ISO format สำหรับการจัดการในแอป
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!file || !name || !type || !department || !year || !date || !uploadedBy) {
+
+    if (!file || !name || !type || !department || !date || !uploadedBy) {
       alert('All fields are required!');
       return;
+
     }
 
     const newFile = {
@@ -37,7 +45,6 @@ const Document = () => {
       type,
       department,
       date,
-      year,
       time: new Date().toLocaleTimeString(),
       FileUrl: URL.createObjectURL(file),
       uploadedBy,
@@ -45,10 +52,7 @@ const Document = () => {
 
     setUploadedFile(newFile); // Store file details for preview
     addFiles(newFile); // Add file to context
-    // alert('File uploaded successfully!');
-
-    // Automatically switch to Preview tab
-    setActiveTab('Preview');
+    setActiveTab('Preview'); // Automatically switch to Preview tab
   };
 
   return (
@@ -73,7 +77,7 @@ const Document = () => {
             <h3>Upload Document</h3>
             <form onSubmit={handleSubmit}>
               <div>
-                <label>Document Name</label>
+                <label>ชื่อเอกสาร</label>
                 <input
                   type="text"
                   value={name}
@@ -82,43 +86,56 @@ const Document = () => {
                 />
               </div>
               <div>
-                <label>Document Type</label>
-                <input
-                  type="text"
+                <label>ประเภทเอกสาร</label>
+                <select
                   value={type}
                   onChange={(e) => setType(e.target.value)}
                   required
-                />
+                >
+                  <option value="">เลือกประเภทเอกสาร</option>
+                  <option value="ผลการดำเนินงาน">ผลการดำเนินงาน</option>
+                  <option value="รายงานประจำปี">รายงานประจำปี</option>
+                  <option value="รายงานปริมาณการผลิตรายเดือน">
+                    รายงานปริมาณการผลิตรายเดือน
+                  </option>
+                  <option value="การขาย มูลค่า และค่าภาคหลวง">
+                    การขาย มูลค่า และค่าภาคหลวง
+                  </option>
+                  <option value="การจัดสรรค่าภาคหลวงให้ท้องถิ่น">
+                    การจัดสรรค่าภาคหลวงให้ท้องถิ่น
+                  </option>
+                  <option value="การจัดหาปิโตรเลียม">การจัดหาปิโตรเลียม</option>
+                  <option value="ปริมาณสำรองปิโตรเลียม">
+                    ปริมาณสำรองปิโตรเลียม
+                  </option>
+                </select>
               </div>
+              <span className="form-group-horizontal">
+                <div className="form-item">
+                  <label>หน่วยงาน</label>
+                  <select
+                    id="department"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    required
+                  >
+                    <option value="">เลือกหน่วยงาน</option>
+                    <option value="กรมเชื้อเพลิงธรรมชาติ">กรมเชื้อเพลิงธรรมชาติ</option>
+                  </select>
+                </div>
+
+                <div className="form-item">
+                  <label className="date">Date</label>
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={handleDateChange}
+                    required
+                  />
+                </div>
+              </span>
               <div>
-                <label>Department</label>
-                <input
-                  type="text"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label>Year</label>
-                <input
-                  type="text"
-                  value={year}
-                  onChange={(e) => setYear(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label>Date</label>
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label>Uploaded By</label>
+                <label>ชื่อผู้บันทึก</label>
                 <input
                   type="text"
                   value={uploadedBy}
@@ -168,8 +185,15 @@ const Document = () => {
                 <p><strong>Document Name:</strong> {uploadedFile.name}</p>
                 <p><strong>Document Type:</strong> {uploadedFile.type}</p>
                 <p><strong>Department:</strong> {uploadedFile.department}</p>
-                <p><strong>Year:</strong> {uploadedFile.year}</p>
-                <p><strong>Date:</strong> {uploadedFile.date}</p>
+
+                <p>
+                  <strong>Date:</strong>{' '}
+                  {new Date(uploadedFile.date).toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </p>
                 <p><strong>Uploaded By:</strong> {uploadedFile.uploadedBy}</p>
                 <p><strong>Uploaded Time:</strong> {uploadedFile.time}</p>
                 <button className='continue-button' onClick={() => navigate("/")}>
