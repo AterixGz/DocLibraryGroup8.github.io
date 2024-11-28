@@ -39,8 +39,9 @@
   flex-direction: column;
   gap: 2rem;
   margin: 0 20px;  /* Adjusted margins to ensure consistency */
-  margin-left: 21.875rem;
-  margin-right: 21.875rem;
+  margin-left: 15rem;
+  margin-right: 15rem;
+  padding-left: 1rem;
 }
 
 /* Form Group */
@@ -161,7 +162,7 @@
 
 /* Divider */
 .dividermain {
-  border: #f39c12 2px solid;
+  border: #F14D31 2px solid;
   width: 20%;
   margin: 0 auto;
   margin-bottom: 20px;

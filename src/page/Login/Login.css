@@ -75,7 +75,7 @@
 }
 
 .login-form__title {
-  /* margin-top: 100px; */
+  margin-top: 100px;
   animation: zoomInTitle 1s ease-out forwards; /* Zoom-in effect for title */
 }
 
@@ -108,7 +108,7 @@
   font-size: 0.9rem;
   color: #333;
   margin-top: 1rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: rem;
 }
 
 /* Styling for input fields */
