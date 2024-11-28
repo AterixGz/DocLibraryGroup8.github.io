@@ -5,7 +5,6 @@ import "./Permission.css";
 import users from "../../data/users";
 
 function PermissionManagement() {
-  // State Management
   const [userList, setUserList] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,13 +18,11 @@ function PermissionManagement() {
     employeeId: "",
   });
 
-  // Fetch Initial User List
   useEffect(() => {
     setUserList(users);
     setFilteredUsers(users);
   }, []);
 
-  // Event Handlers
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
@@ -44,7 +41,6 @@ function PermissionManagement() {
     updatedUsers[index][permission] = !updatedUsers[index][permission];
     setFilteredUsers(updatedUsers);
 
-    // Update main user list
     const userIndex = userList.findIndex(
       (user) => user.username === updatedUsers[index].username
     );
@@ -80,7 +76,6 @@ function PermissionManagement() {
     setShowDeletePopup(false);
   };
 
-  // Add User Modal Handlers
   const handleAddNewUser = () => {
     const newUserData = {
       ...newUser,
@@ -105,7 +100,6 @@ function PermissionManagement() {
         จัดการสิทธิ์ในการเข้าถึง
       </h2>
 
-      {/* Search and Add User Section */}
       <div className="permission-management__controls">
         <input
           type="text"
@@ -114,7 +108,6 @@ function PermissionManagement() {
           placeholder="ค้นหาผู้ใช้..."
           className="permission-management__search-input"
         />
-
         <button
           onClick={handleAddUser}
           className="permission-management__add-user-btn"
@@ -123,7 +116,6 @@ function PermissionManagement() {
         </button>
       </div>
 
-      {/* User List Table */}
       <div className="permission-management__table-container">
         <table className="permission-management__table">
           <thead>
@@ -147,6 +139,13 @@ function PermissionManagement() {
                     onChange={() =>
                       handleTogglePermission(index, "documentAccess")
                     }
+                    onColor="#FF5722"
+                    offColor="#aba4a3"
+                    uncheckedIcon={false}
+                    checkedIcon={false}
+                    handleDiameter={20}
+                    height={24}
+                    width={48}
                   />
                 </td>
                 <td>
@@ -155,6 +154,13 @@ function PermissionManagement() {
                     onChange={() =>
                       handleTogglePermission(index, "permissionAccess")
                     }
+                    onColor="#FF5722"
+                    offColor="#aba4a3"
+                    uncheckedIcon={false}
+                    checkedIcon={false}
+                    handleDiameter={20}
+                    height={24}
+                    width={48}
                   />
                 </td>
                 <td>
@@ -163,6 +169,13 @@ function PermissionManagement() {
                     onChange={() =>
                       handleTogglePermission(index, "reportsAccess")
                     }
+                    onColor="#FF5722"
+                    offColor="#aba4a3"
+                    uncheckedIcon={false}
+                    checkedIcon={false}
+                    handleDiameter={20}
+                    height={24}
+                    width={48}
                   />
                 </td>
                 <td>
@@ -179,7 +192,6 @@ function PermissionManagement() {
         </table>
       </div>
 
-      {/* Confirm Update Button */}
       <button
         onClick={handleConfirmUpdate}
         className="permission-management__confirm-btn"
@@ -187,81 +199,80 @@ function PermissionManagement() {
         ยืนยัน
       </button>
 
-      {/* Add User Modal */}
-{showAddUserModal && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <h3>เพิ่มพนักงาน</h3>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleAddNewUser();
-        }}
-      >
-        <div className="form-group">
-          <label>ชื่อ:</label>
-          <input
-            type="text"
-            value={newUser.firstName}
-            onChange={(e) =>
-              setNewUser({ ...newUser, firstName: e.target.value })
-            }
-            required
-            className="form-input"
-          />
+      {showAddUserModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>เพิ่มพนักงาน</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAddNewUser();
+              }}
+            >
+              <div className="form-group">
+                <label>ชื่อ:</label>
+                <input
+                  type="text"
+                  value={newUser.firstName}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, firstName: e.target.value })
+                  }
+                  required
+                  className="form-input"
+                />
+              </div>
+              <div className="form-group">
+                <label>นามสกุล:</label>
+                <input
+                  type="text"
+                  value={newUser.lastName}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, lastName: e.target.value })
+                  }
+                  required
+                  className="form-input"
+                />
+              </div>
+              <div className="form-group">
+                <label>ชื่อผู้ใช้:</label>
+                <input
+                  type="text"
+                  value={newUser.username}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, username: e.target.value })
+                  }
+                  required
+                  className="form-input"
+                />
+              </div>
+              <div className="form-group">
+                <label>รหัสพนักงาน:</label>
+                <input
+                  type="text"
+                  value={newUser.employeeId}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, employeeId: e.target.value })
+                  }
+                  required
+                  className="form-input"
+                />
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="save-btn">
+                  บันทึก
+                </button>
+                <button
+                  onClick={() => setShowAddUserModal(false)}
+                  className="cancel-btn"
+                >
+                  ยกเลิก
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-        <div className="form-group">
-          <label>นามสกุล:</label>
-          <input
-            type="text"
-            value={newUser.lastName}
-            onChange={(e) =>
-              setNewUser({ ...newUser, lastName: e.target.value })
-            }
-            required
-            className="form-input"
-          />
-        </div>
-        <div className="form-group">
-          <label>ชื่อผู้ใช้:</label>
-          <input
-            type="text"
-            value={newUser.username}
-            onChange={(e) =>
-              setNewUser({ ...newUser, username: e.target.value })
-            }
-            required
-            className="form-input"
-          />
-        </div>
-        <div className="form-group">
-          <label>รหัสพนักงาน:</label>
-          <input
-            type="text"
-            value={newUser.employeeId}
-            onChange={(e) =>
-              setNewUser({ ...newUser, employeeId: e.target.value })
-            }
-            required
-            className="form-input"
-          />
-        </div>
-        <div className="modal-actions">
-          <button type="submit" className="save-btn">บันทึก</button>
-          <button
-            onClick={() => setShowAddUserModal(false)}
-            className="cancel-btn"
-          >
-            ยกเลิก
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
 
-
-      {/* Delete Confirmation Popup */}
       <AnimatePresence>
         {showDeletePopup && (
           <div
@@ -276,8 +287,8 @@ function PermissionManagement() {
             >
               <h3>ยืนยันการลบ</h3>
               <p>
-                คุณต้องการลบผู้ใช้งาน <strong>{selectedUser?.firstName}</strong>{" "}
-                ใช่หรือไม่?
+                คุณต้องการลบผู้ใช้งาน{" "}
+                <strong>{selectedUser?.firstName}</strong> ใช่หรือไม่?
               </p>
               <button onClick={handleConfirmDelete} className="confirm-btn">
                 ยืนยัน
