@@ -55,22 +55,6 @@ function addFile({ role }) {
         });
     };
 
-    const handleSortChange = (event) => {
-        const [option, order] = event.target.value.split("-");
-        setSortOption(event.target.value);
-        setDocuments((prevDocuments) =>
-            sortDocuments([...prevDocuments], option, order)
-        );
-        setCurrentPage(1); // รีเซ็ตหน้าเป็นหน้าแรก
-    };
-
-    const handleFilterChange = (e) => {
-        const { name, value } = e.target;
-        const cleanedValue = value.trim().toLowerCase().replace(/&/g, "และ");
-        setFilters((prevFilters) => ({ ...prevFilters, [name]: cleanedValue }));
-        setCurrentPage(1); // รีเซ็ตหน้าเป็นหน้าแรก
-    };
-
     const handlePreview = (fileUrl) => {
         if (fileUrl.endsWith(".xlsx")) {
             setAlertMessage("ไม่สามารถแสดงตัวอย่างไฟล์ Excel ได้ในขณะนี้");
@@ -87,36 +71,11 @@ function addFile({ role }) {
         setPreviewFile(null);
     };
 
-    const toggleCheckbox = () => {
-        setShowCheckbox((prev) => !prev);
-        setSelectedDocuments([]); // Reset การเลือกเมื่อ toggle
-        setIsDownloading(false); // Reset การดาวน์โหลด
-        setIsDownloadComplete(false); // ซ่อน popup
-    };
-
     const handleSelectDocument = (id) => {
         setSelectedDocuments((prev) =>
             prev.includes(id) ? prev.filter((docId) => docId !== id) : [...prev, id]
         );
     };
-
-    const handleSelectAll = () => {
-        const currentDocumentIds = currentDocuments.map((doc) => doc.id);
-
-        if (currentDocumentIds.every((id) => selectedDocuments.includes(id))) {
-            // ยกเลิกการเลือกทั้งหมดในหน้านั้น
-            setSelectedDocuments((prev) =>
-                prev.filter((id) => !currentDocumentIds.includes(id))
-            );
-        } else {
-            // เลือกทั้งหมดในหน้านั้น
-            setSelectedDocuments((prev) => [
-                ...prev,
-                ...currentDocumentIds.filter((id) => !prev.includes(id)),
-            ]);
-        }
-    };
-
 
     const handleSingleDownload = (fileUrl, fileName) => {
         setIsSingleDownload(true);
@@ -142,43 +101,9 @@ function addFile({ role }) {
     };
 
 
-
-    const handleDownloadSelected = () => {
-        setIsSingleDownload(false);
-
-        const filesToDownload = documents.filter((doc) =>
-            selectedDocuments.includes(doc.id)
-        );
-
-        const newPopup = {
-            id: Date.now(),
-            message: `ดาวน์โหลดเอกสารทั้งหมด ${selectedDocuments.length} รายการเสร็จสิ้น`,
-            isSingle: false,
-        };
-
-        setDownloadPopups((prev) => [...prev, newPopup]);
-
-        // ตั้งเวลาให้ popup หายไปหลัง 5 วินาที
-        setTimeout(() => {
-            setDownloadPopups((prev) => prev.filter((popup) => popup.id !== newPopup.id));
-        }, 5000);
-
-        filesToDownload.forEach((file) => {
-            const link = document.createElement("a");
-            link.href = file.FileUrl;
-            link.download = file.name;
-            link.click();
-        });
-    };
-
     // Function to close popup by ID
     const closeDownloadPopup = (id) => {
         setDownloadPopups((prev) => prev.filter((popup) => popup.id !== id));
-    };
-
-    const handleSearch = (event) => {
-        setSearchTerm(event.target.value);
-        setCurrentPage(1); // รีเซ็ตหน้าเป็นหน้าแรกเมื่อค้นหาใหม่
     };
 
     const filteredDocuments = documents
@@ -255,60 +180,14 @@ function addFile({ role }) {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
         >
-            <div className={`home-container ${role === "guest" ? "guest-home" : ""}`}>
+            <div className={`home-container ${role === "guest" ? "guest-home" : ""}`} style={{height:"600px"}}>
                 <div className={`main-content ${role === "guest" ? "guest-main" : ""}`}>
                     <h5 style={{textAlign: 'center'}}>
                         เอกสารที่เพิ่มล่าสุด
                     </h5>
 
-                    <div className="dropdown">
-                        <label className="filter-label">จัดเรียงตาม: </label>
-                        <select
-                            onChange={handleSortChange}
-                            value={sortOption}
-                            className="sort-dropdown"
-                        >
-                            <option value="date-desc">ล่าสุด</option>
-                            <option value="date-asc">เก่าที่สุด</option>
-                            <option value="name-asc">ชื่อ (ก-ฮ)</option>
-                            <option value="name-desc">ชื่อ (ฮ-ก)</option>
-                        </select>
-                        <label className="filter-labels">ประเภทเอกสาร:</label>
-                        <select
-                            onChange={handleFilterChange}
-                            value={filters.category}
-                            name="category"
-                            className="sort-dropdown"
-                        >
-                            <option value="">เลือกประเภทเอกสาร</option>
-                            <option value="ผลการดำเนินงาน">ผลการดำเนินงาน</option>
-                            <option value="รายงานประจำปี">รายงานประจำปี</option>
-                            <option value="รายงานปริมาณการผลิตรายเดือน">
-                                รายงานปริมาณการผลิตรายเดือน
-                            </option>
-                            <option value="การขาย มูลค่า และค่าภาคหลวง">
-                                การขาย มูลค่า และค่าภาคหลวง
-                            </option>
-                            <option value="การจัดสรรค่าภาคหลวงให้ท้องถิ่น">
-                                การจัดสรรค่าภาคหลวงให้ท้องถิ่น
-                            </option>
-                            <option value="การจัดหาปิโตรเลียม">การจัดหาปิโตรเลียม</option>
-                            <option value="ปริมาณสำรองปิโตรเลียม">
-                                ปริมาณสำรองปิโตรเลียม
-                            </option>
-                        </select>
-                        {/* <span className='items-per-page'>
-                        <label className='filter-label'>แสดงข้อมูล:</label>
-                        <select onChange={(e) => setItemsPerPage(Number(e.target.value))} value={itemsPerPage} className="sort-dropdown">
-                            <option value={5}>5 ข้อมูล</option>
-                            <option value={10}>10 ข้อมูล</option>
-                            <option value={15}>15 ข้อมูล</option>
-                            <option value={30}>30 ข้อมูล</option>
-                        </select>
-                    </span> */}
-                    </div>
+                   
                     
-                    <hr className="hr-top"></hr>
                     <table className="document-table">
                         <thead>
                             <tr>
@@ -318,7 +197,6 @@ function addFile({ role }) {
                                 <th>ประเภทเอกสาร</th>
                                 <th>วันที่ลง</th>
                                 <th>หน่วยงาน</th>
-                                {role !== "guest" && <th className="th-to">เครื่องมือ</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -351,19 +229,7 @@ function addFile({ role }) {
                                     <td className="td-addFile">{doc.type}</td>
                                     <td className="td-addFile">{doc.date}</td>
                                     <td className="td-addFile">{doc.department}</td>
-                                    {role !== "guest" && (
-                                        <td className="td-addFile">
-                                            <a
-                                                className="download-link"
-                                                onClick={(e) => {
-                                                    e.stopPropagation(); // ป้องกันการ trigger การเลือกแถว
-                                                    handleSingleDownload(doc.FileUrl, doc.name); // เรียกฟังก์ชัน handleSingleDownload
-                                                }}
-                                            >
-                                                ดาวน์โหลด
-                                            </a>
-                                        </td>
-                                    )}
+                                    
                                 </tr>
                             ))}
                         </tbody>
@@ -374,6 +240,7 @@ function addFile({ role }) {
                             className="bp bp-outline-og page-space"
                             onClick={handleFirstPage}
                             disabled={currentPage === 1}
+                            
                         >
                             หน้าแรก
                         </button>

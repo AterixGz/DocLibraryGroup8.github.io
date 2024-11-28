@@ -260,56 +260,6 @@ function removeFile({ role }) {
                     <h5 style={{textAlign: 'center'}}>
                         เอกสารที่ลบล่าสุด
                     </h5>
-
-
-                    <div className="dropdown">
-                        <label className="filter-label">จัดเรียงตาม: </label>
-                        <select
-                            onChange={handleSortChange}
-                            value={sortOption}
-                            className="sort-dropdown"
-                        >
-                            <option value="date-desc">ล่าสุด</option>
-                            <option value="date-asc">เก่าที่สุด</option>
-                            <option value="name-asc">ชื่อ (ก-ฮ)</option>
-                            <option value="name-desc">ชื่อ (ฮ-ก)</option>
-                        </select>
-                        <label className="filter-labels">ประเภทเอกสาร:</label>
-                        <select
-                            onChange={handleFilterChange}
-                            value={filters.category}
-                            name="category"
-                            className="sort-dropdown"
-                        >
-                            <option value="">เลือกประเภทเอกสาร</option>
-                            <option value="ผลการดำเนินงาน">ผลการดำเนินงาน</option>
-                            <option value="รายงานประจำปี">รายงานประจำปี</option>
-                            <option value="รายงานปริมาณการผลิตรายเดือน">
-                                รายงานปริมาณการผลิตรายเดือน
-                            </option>
-                            <option value="การขาย มูลค่า และค่าภาคหลวง">
-                                การขาย มูลค่า และค่าภาคหลวง
-                            </option>
-                            <option value="การจัดสรรค่าภาคหลวงให้ท้องถิ่น">
-                                การจัดสรรค่าภาคหลวงให้ท้องถิ่น
-                            </option>
-                            <option value="การจัดหาปิโตรเลียม">การจัดหาปิโตรเลียม</option>
-                            <option value="ปริมาณสำรองปิโตรเลียม">
-                                ปริมาณสำรองปิโตรเลียม
-                            </option>
-                        </select>
-                        {/* <span className='items-per-page'>
-                        <label className='filter-label'>แสดงข้อมูล:</label>
-                        <select onChange={(e) => setItemsPerPage(Number(e.target.value))} value={itemsPerPage} className="sort-dropdown">
-                            <option value={5}>5 ข้อมูล</option>
-                            <option value={10}>10 ข้อมูล</option>
-                            <option value={15}>15 ข้อมูล</option>
-                            <option value={30}>30 ข้อมูล</option>
-                        </select>
-                    </span> */}
-                    </div>
-                
-                    <hr className="hr-top"></hr>
                     <table className="document-table">
                         <thead>
                             <tr>
@@ -361,7 +311,7 @@ function removeFile({ role }) {
                                                     handleSingleDownload(doc.FileUrl, doc.name); // เรียกฟังก์ชัน handleSingleDownload
                                                 }}
                                             >
-                                                ดาวน์โหลด
+                                                กู้คืน
                                             </a>
                                         </td>
                                     )}
