@@ -188,7 +188,8 @@ const Filedata = [
         year: "2564",
         time: "16:35",
         FileUrl: "../../public/filedata/004_Report64.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token2",
     },
     {
         id: 17,
@@ -199,7 +200,8 @@ const Filedata = [
         year: "2565",
         time: "09:05",
         FileUrl: "../../public/filedata/009_Rateyour65.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token2",
     },
     {
         id: 18,
@@ -210,7 +212,8 @@ const Filedata = [
         year: "2560",
         time: "13:20",
         FileUrl: "../../public/filedata/014_Sumpati60.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token2",
     },
     {
         id: 19,
@@ -221,7 +224,8 @@ const Filedata = [
         year: "2563",
         time: "11:45",
         FileUrl: "../../public/filedata/019_ReportYear63.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token2",
     },
     {
         id: 20,
@@ -232,7 +236,8 @@ const Filedata = [
         year: "2567",
         time: "16:10",
         FileUrl: "../../public/filedata/024_ReportsellSep67.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token2",
     },
     {
         id: 21,
