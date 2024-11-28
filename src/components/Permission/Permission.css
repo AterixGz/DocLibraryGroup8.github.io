@@ -46,8 +46,6 @@ margin-top: 3rem;
   outline: none;
 }
 
-
-
 .permission-management__add-user-btn {
   padding: 12px 25px;
   background-color: #ff5722;
@@ -61,7 +59,7 @@ margin-top: 3rem;
 }
 
 .permission-management__add-user-btn:hover {
-  background-color: #a53817;
+  background-color: #eb3700;
   transform: translateY(-2px);
 }
 
@@ -116,8 +114,91 @@ margin-top: 3rem;
 }
 
 .permission-management__confirm-btn:hover {
-  background-color: #b63d18;
+  background-color: #eb3700;
   transform: translateY(-2px);
+}
+
+.btn-danger {
+  background-color: #ff5722; 
+  width: 40px; 
+  height: 40px;
+  display: flex; 
+  justify-content: center;
+  align-items: center; 
+  font-size: 18px; 
+  cursor: pointer; 
+  border-radius: 20%; 
+  transition: background-color 0.3s ease, transform 0.2s ease; /* เอฟเฟกต์ */
+}
+
+.btn-danger:hover {
+  background-color: #eb3700; /* สีแดงเข้มเมื่อชี้เมาส์ */
+  transform: scale(1.1); /* ขยายปุ่มเล็กน้อย */
+}
+
+.btn-danger:active {
+  background-color: #cf3202; /* สีแดงเข้มเมื่อกด */
+  transform: scale(0.95); /* ลดขนาดเล็กลงเมื่อกด */
+}
+
+.btn-danger i {
+  margin: 0; /* ไม่มีระยะห่าง */
+}
+
+/* Switch Styles */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  border-radius: 50%;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+}
+
+/* When the checkbox is checked, change the slider's background color */
+input:checked + .slider {
+  background-color: #ff5722;
+}
+
+/* Move the slider handle when the checkbox is checked */
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.switch:hover input:checked + .slider {
+  background-color: #eb3700;
+}
+
+.switch input:focus + .slider {
+  box-shadow: 0 0 1px #cf3202;
 }
 
 /* Modal Overlay */

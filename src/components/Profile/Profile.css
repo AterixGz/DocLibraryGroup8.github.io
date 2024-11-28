@@ -37,7 +37,7 @@
 .profile__info {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
   margin: 0 20px;  /* Adjusted margins to ensure consistency */
   margin-left: 21.875rem;
   margin-right: 21.875rem;
@@ -79,7 +79,7 @@
 /* New Style for First and Last Name (Same Line) */
 .profile__form-group--name {
   display: flex;
-  gap: 20px;  /* Adjust the space between the inputs */
+  gap: 3rem;  /* Adjust the space between the inputs */
 }
 
 .profile__form-group--name .profile__form-group {
