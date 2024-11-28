@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Switch from "react-switch";
 import { motion as m, AnimatePresence } from "framer-motion";
 import "./Permission.css";
 import users from "../../data/users";
@@ -18,11 +17,13 @@ function PermissionManagement() {
     employeeId: "",
   });
 
+  // Effect to initialize users
   useEffect(() => {
     setUserList(users);
     setFilteredUsers(users);
   }, []);
 
+  // Handle search
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
@@ -36,6 +37,7 @@ function PermissionManagement() {
     );
   };
 
+  // Handle permission toggle (Document, Permission, Reports)
   const handleTogglePermission = (index, permission) => {
     const updatedUsers = [...filteredUsers];
     updatedUsers[index][permission] = !updatedUsers[index][permission];
@@ -52,30 +54,38 @@ function PermissionManagement() {
     }
   };
 
+  // Confirm update permissions
   const handleConfirmUpdate = () => {
     alert("สิทธิ์การเข้าถึงได้รับการอัปเดตเรียบร้อยแล้ว!");
     console.log("Updated User List:", userList);
   };
 
+  // Open add user modal
   const handleAddUser = () => {
     setShowAddUserModal(true);
   };
 
-  const handleDeleteUser = (user) => {
+  // Handle delete user
+  const handleDelete = (user) => {
     setSelectedUser(user);
     setShowDeletePopup(true);
   };
 
+  // Confirm delete user
   const handleConfirmDelete = () => {
-    setUserList(
-      userList.filter((user) => user.username !== selectedUser.username)
+    const updatedUserList = userList.filter(
+      (user) => user.username !== selectedUser.username
     );
-    setFilteredUsers(
-      filteredUsers.filter((user) => user.username !== selectedUser.username)
+    const updatedFilteredUsers = filteredUsers.filter(
+      (user) => user.username !== selectedUser.username
     );
+
+    setUserList(updatedUserList);
+    setFilteredUsers(updatedFilteredUsers);
     setShowDeletePopup(false);
   };
 
+  // Handle add new user
   const handleAddNewUser = () => {
     const newUserData = {
       ...newUser,
@@ -92,6 +102,11 @@ function PermissionManagement() {
       username: "",
       employeeId: "",
     });
+  };
+
+  // Close modal
+  const handleCloseModal = () => {
+    setShowAddUserModal(false);
   };
 
   return (
@@ -116,103 +131,23 @@ function PermissionManagement() {
         </button>
       </div>
 
-      <div className="permission-management__table-container">
-        <table className="permission-management__table">
-          <thead>
-            <tr>
-              <th>ชื่อ</th>
-              <th>รหัสพนักงาน</th>
-              <th>Document</th>
-              <th>Permission</th>
-              <th>Reports</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map((user, index) => (
-              <tr key={user.username}>
-                <td>{`${user.firstName} ${user.lastName}`}</td>
-                <td>{user.employeeId}</td>
-                <td>
-                  <Switch
-                    checked={user.documentAccess}
-                    onChange={() =>
-                      handleTogglePermission(index, "documentAccess")
-                    }
-                    onColor="#FF5722"
-                    offColor="#aba4a3"
-                    uncheckedIcon={false}
-                    checkedIcon={false}
-                    handleDiameter={20}
-                    height={24}
-                    width={48}
-                  />
-                </td>
-                <td>
-                  <Switch
-                    checked={user.permissionAccess}
-                    onChange={() =>
-                      handleTogglePermission(index, "permissionAccess")
-                    }
-                    onColor="#FF5722"
-                    offColor="#aba4a3"
-                    uncheckedIcon={false}
-                    checkedIcon={false}
-                    handleDiameter={20}
-                    height={24}
-                    width={48}
-                  />
-                </td>
-                <td>
-                  <Switch
-                    checked={user.reportsAccess}
-                    onChange={() =>
-                      handleTogglePermission(index, "reportsAccess")
-                    }
-                    onColor="#FF5722"
-                    offColor="#aba4a3"
-                    uncheckedIcon={false}
-                    checkedIcon={false}
-                    handleDiameter={20}
-                    height={24}
-                    width={48}
-                  />
-                </td>
-                <td>
-                  <button
-                    onClick={() => handleDeleteUser(user)}
-                    className="permission-management__delete-btn"
-                  >
-                    ลบ
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <button
-        onClick={handleConfirmUpdate}
-        className="permission-management__confirm-btn"
-      >
-        ยืนยัน
-      </button>
-
+      {/* Add User Modal */}
       {showAddUserModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>เพิ่มพนักงาน</h3>
+            <h3 className="modal-header">เพิ่มพนักงาน</h3>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 handleAddNewUser();
               }}
+              className="modal-form"
             >
               <div className="form-group">
-                <label>ชื่อ:</label>
+                <label htmlFor="firstName">ชื่อ : </label>
                 <input
                   type="text"
+                  id="firstName"
                   value={newUser.firstName}
                   onChange={(e) =>
                     setNewUser({ ...newUser, firstName: e.target.value })
@@ -222,9 +157,10 @@ function PermissionManagement() {
                 />
               </div>
               <div className="form-group">
-                <label>นามสกุล:</label>
+                <label htmlFor="lastName">นามสกุล : </label>
                 <input
                   type="text"
+                  id="lastName"
                   value={newUser.lastName}
                   onChange={(e) =>
                     setNewUser({ ...newUser, lastName: e.target.value })
@@ -234,9 +170,10 @@ function PermissionManagement() {
                 />
               </div>
               <div className="form-group">
-                <label>ชื่อผู้ใช้:</label>
+                <label htmlFor="username">ชื่อผู้ใช้ : </label>
                 <input
                   type="text"
+                  id="username"
                   value={newUser.username}
                   onChange={(e) =>
                     setNewUser({ ...newUser, username: e.target.value })
@@ -246,9 +183,10 @@ function PermissionManagement() {
                 />
               </div>
               <div className="form-group">
-                <label>รหัสพนักงาน:</label>
+                <label htmlFor="employeeId">รหัสพนักงาน : </label>
                 <input
                   type="text"
+                  id="employeeId"
                   value={newUser.employeeId}
                   onChange={(e) =>
                     setNewUser({ ...newUser, employeeId: e.target.value })
@@ -262,7 +200,8 @@ function PermissionManagement() {
                   บันทึก
                 </button>
                 <button
-                  onClick={() => setShowAddUserModal(false)}
+                  type="button"
+                  onClick={handleCloseModal}
                   className="cancel-btn"
                 >
                   ยกเลิก
@@ -273,24 +212,93 @@ function PermissionManagement() {
         </div>
       )}
 
-      <AnimatePresence>
-        {showDeletePopup && (
-          <div
-            className="popup-overlay"
-            onClick={() => setShowDeletePopup(false)}
-          >
-            <m.div
-              className="popup-content"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-            >
-              <h3>ยืนยันการลบ</h3>
-              <p>
-                คุณต้องการลบผู้ใช้งาน{" "}
-                <strong>{selectedUser?.firstName}</strong> ใช่หรือไม่?
-              </p>
-              <button onClick={handleConfirmDelete} className="confirm-btn">
+      {/* User Table */}
+      <div className="permission-management__table-container">
+        <table className="permission-management__table">
+          <thead>
+            <tr>
+              <th>บุคลากร</th>
+              <th>รหัสพนักงาน</th>
+              <th>Document</th>
+              <th>Permission</th>
+              <th>Reports</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredUsers.map((user, index) => (
+              <tr key={user.username}>
+                <td>{`${user.firstName} ${user.lastName}`}</td>
+                <td>{user.employeeId}</td>
+                <td>
+                  <div className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      id={`documentAccess-${index}`}
+                      checked={user.documentAccess}
+                      onChange={() =>
+                        handleTogglePermission(index, "documentAccess")
+                      }
+                    />
+                    <label htmlFor={`documentAccess-${index}`}></label>
+                  </div>
+                </td>
+                <td>
+                  <div className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      id={`permissionAccess-${index}`}
+                      checked={user.permissionAccess}
+                      onChange={() =>
+                        handleTogglePermission(index, "permissionAccess")
+                      }
+                    />
+                    <label htmlFor={`permissionAccess-${index}`}></label>
+                  </div>
+                </td>
+                <td>
+                  <div className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      id={`reportsAccess-${index}`}
+                      checked={user.reportsAccess}
+                      onChange={() =>
+                        handleTogglePermission(index, "reportsAccess")
+                      }
+                    />
+                    <label htmlFor={`reportsAccess-${index}`}></label>
+                  </div>
+                </td>
+                <td>
+                  <button
+                    className="btn-danger"
+                    onClick={() => handleDelete(user)}
+                  >
+                    <i className="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Confirm Update Button */}
+      <button
+        onClick={handleConfirmUpdate}
+        className="permission-management__confirm-btn"
+      >
+        ยืนยัน
+      </button>
+
+      {/* Delete Popup */}
+      {showDeletePopup && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>ยืนยันการลบ</h3>
+            <p>คุณต้องการลบผู้ใช้นี้ใช่หรือไม่?</p>
+            <div className="modal-actions">
+              <button onClick={handleConfirmDelete} className="delete-btn">
                 ยืนยัน
               </button>
               <button
@@ -299,10 +307,10 @@ function PermissionManagement() {
               >
                 ยกเลิก
               </button>
-            </m.div>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 }

@@ -18,17 +18,28 @@
 
 .permission-management__controls {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 20px;
+  gap: 0;
 }
 
 .permission-management__search-input {
   width: 60%;
+  margin-right: 8px;
   padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 10px;
   font-size: 16px;
+  box-sizing: border-box; /* รวม border และ padding เข้ากับขนาดกล่อง */
 }
+
+.permission-management__search-input:hover {
+  border: 2px solid #ff5722; /* เพิ่มกรอบสีส้ม */
+  border-radius: 10px; /* เพิ่มมุมมนให้กรอบ */
+  transition: border 0.3s ease; /* เพิ่มการเคลื่อนไหวแบบนุ่มนวล */
+}
+
 
 .permission-management__add-user-btn {
   padding: 10px 20px;
@@ -114,8 +125,9 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
+  justify-content: flex-start; /* ชิดซ้าย */
   align-items: center;
-  justify-content: center;
+  padding-left: 20px; /* เพิ่มระยะห่างจากขอบซ้าย */
   z-index: 1000;
 }
 
@@ -124,7 +136,9 @@
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 400px;
+  width: 400px; /* กำหนดขนาดความกว้างของ modal */
+  max-height: 90vh;
+  overflow-y: auto; /* ทำให้ scroll ได้ถ้าคอนเทนต์ยาวเกิน */
 }
 
 .modal-content h3 {
@@ -135,11 +149,12 @@
 
 .form-group {
   margin-bottom: 15px;
+  text-align: left; /* จัดให้ทุกอย่างชิดซ้าย */
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 5px;
+  display: block; /* ทำให้ label อยู่ด้านบนของ input */
+  margin-bottom: 5px; /* ระยะห่างระหว่าง label และ input */
   color: #555;
   font-size: 14px;
 }
@@ -150,42 +165,44 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 14px;
+  text-align: left; /* จัดให้ข้อความใน input ชิดซ้าย */
 }
 
 .modal-actions {
   display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+  justify-content: center; /* จัดให้อยู่ตรงกลาง */
+  gap: 15px; /* กำหนดระยะห่างระหว่างปุ่ม */
+  margin-top: 20px; /* ระยะห่างจากส่วนอื่น ๆ ด้านบน */
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 10px 20px; /* ขนาดปุ่ม */
+  font-size: 16px;
+  border: none;
+  border-radius: 25px; /* ทำให้ขอบปุ่มมน */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease; /* การเปลี่ยนแปลงเมื่อ hover */
 }
 
 .save-btn {
-  padding: 8px 16px;
-  background-color: #4caf50;
+  background-color: #4CAF50; /* สีเขียวสำหรับบันทึก */
   color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
 }
 
 .save-btn:hover {
-  background-color: #388e3c;
+  background-color: #45a049; /* สีเขียวเข้มขึ้นเมื่อ hover */
+  transform: scale(1.05); /* ขยายขนาดเล็กน้อยเมื่อ hover */
 }
 
 .cancel-btn {
-  padding: 8px 16px;
-  background-color: #d32f2f;
+  background-color: #f44336; /* สีแดงสำหรับยกเลิก */
   color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
 }
 
 .cancel-btn:hover {
-  background-color: #c62828;
+  background-color: #e53935; /* สีแดงเข้มขึ้นเมื่อ hover */
+  transform: scale(1.05); /* ขยายขนาดเล็กน้อยเมื่อ hover */
 }
 
 /* Popup Styling */
@@ -200,6 +217,10 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+}
+
+.popup-container {
+  margin-left: 250px;
 }
 
 .popup-content {
@@ -234,4 +255,100 @@
 
 .confirm-btn:hover {
   background-color: #388e3c;
+}
+
+/* Style for the danger button */
+.btn-danger {
+  background-color: #f44336; /* สีพื้นหลังแดง */
+  color: white; /* สีตัวอักษรขาว */
+  border: none; /* ไม่มีขอบ */
+  padding: 10px 15px; /* ปรับระยะห่างภายในให้เหมาะสม */
+  font-size: 16px; /* ขนาดฟอนต์ */
+  border-radius: 5px; /* มุมมน */
+  cursor: pointer; /* แสดงเคอร์เซอร์เมื่อชี้ที่ปุ่ม */
+  display: flex; /* ใช้ flexbox สำหรับจัดการตำแหน่ง */
+  align-items: center; /* จัดแนวไอคอนแนวตั้ง */
+  justify-content: center; /* จัดแนวไอคอนแนวนอน */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* การเปลี่ยนแปลงเมื่อเลื่อน */
+}
+
+.btn-danger:hover {
+  background-color: #e53935; /* สีพื้นหลังเมื่อเอาเมาส์ชี้ไป */
+  transform: scale(1.05); /* ขยายขนาดเล็กน้อย */
+}
+
+.btn-danger i {
+  font-size: 14px; /* ปรับขนาดไอคอน */
+}
+
+.btn-danger:focus {
+  outline: none; /* ไม่มีเส้นกรอบเมื่อปุ่มถูกเลือก */
+}
+
+
+.permission-management__table td {
+  text-align: center;
+  vertical-align: middle; 
+  padding: 20px; 
+}
+
+.permission-management__table .btn-danger {
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  text-align: center;
+  width: 40px; 
+  height: 40px;
+  background-color: #FF5722; 
+  border-radius: 20%; 
+  border: none; 
+  color: white; 
+  font-size: 20px; 
+  padding: 0; 
+}
+
+.permission-management__table .btn-danger i {
+  font-size: 16px; 
+}
+
+
+.toggle-switch {
+  position: relative;
+  width: 60px;
+  height: 30px;
+}
+
+.toggle-switch input {
+  display: none;
+}
+
+.toggle-switch label {
+  background-color: #aba4a3;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 30px;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.toggle-switch label::before {
+  content: "";
+  width: 26px;
+  height: 26px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s;
+}
+
+.toggle-switch input:checked + label {
+  background-color: #ff5722;
+}
+
+.toggle-switch input:checked + label::before {
+  transform: translateX(30px);
 }
