@@ -8,7 +8,8 @@ const Filedata = [
         year: "2566",
         time: "16:47",
         FileUrl: '../../public/filedata/001_Report66.pdf',
-        uploadedBy: "นายสมชาย ใจดี"  // Added uploader
+        uploadedBy: "นายสมชาย ใจดี",
+        token: "token1",
     },
     {
         id: 2,
@@ -19,7 +20,8 @@ const Filedata = [
         year: "2563",
         time: "12:34",
         FileUrl: "../../public/filedata/006_Sum63.pdf",
-        uploadedBy: "นางสาวสมชาย ใจดี"
+        uploadedBy: "นางสาวสมชาย ใจดี",
+        token: "token1",
     },
     {
         id: 3,
@@ -30,7 +32,8 @@ const Filedata = [
         year: "2563",
         time: "17:22",
         FileUrl: "../../public/filedata/011_Rateyour63.pdf",
-        uploadedBy: "นายสมชาย ใจดี"
+        uploadedBy: "นายสมชาย ใจดี",
+        token: "token1",
     },
     {
         id: 4,
@@ -41,7 +44,8 @@ const Filedata = [
         year: "2566",
         time: "10:33",
         FileUrl: "../../public/filedata/016_ReportYear66.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token1",
     },
     {
         id: 5,
@@ -52,7 +56,8 @@ const Filedata = [
         year: "2567",
         time: "11:40",
         FileUrl: "../../public/filedata/021_ReportmanuOct67.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token1",
     },
     {
         id: 6,
@@ -63,7 +68,8 @@ const Filedata = [
         year: "2565",
         time: "15:30",
         FileUrl: "../../public/filedata/002_Sum65.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token1",
     },
     {
         id: 7,
@@ -74,7 +80,8 @@ const Filedata = [
         year: "2560",
         time: "09:25",
         FileUrl: "../../public/filedata/007_Acc60.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token1",
     },
     {
         id: 8,
@@ -85,7 +92,8 @@ const Filedata = [
         year: "2562",
         time: "13:50",
         FileUrl: "../../public/filedata/012_Rateyour62.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token1",
     },
     {
         id: 9,
@@ -96,7 +104,8 @@ const Filedata = [
         year: "2565",
         time: "14:10",
         FileUrl: "../../public/filedata/017_ReportYear65.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token1",
     },
     {
         id: 10,
@@ -107,7 +116,8 @@ const Filedata = [
         year: "2567",
         time: "10:55",
         FileUrl: "../../public/filedata/022_ReportmanuSep67.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token1",
     },
     {
         id: 11,
@@ -118,7 +128,8 @@ const Filedata = [
         year: "2565",
         time: "12:05",
         FileUrl: "../../public/filedata/003_Report65.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token4",
     },
     {
         id: 12,
@@ -129,7 +140,8 @@ const Filedata = [
         year: "2559",
         time: "17:50",
         FileUrl: "../../public/filedata/008_Acc59.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token4",
     },
     {
         id: 13,
@@ -140,7 +152,8 @@ const Filedata = [
         year: "2561",
         time: "08:30",
         FileUrl: "../../public/filedata/013_Sumpati61.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token4",
     },
     {
         id: 14,
@@ -151,7 +164,8 @@ const Filedata = [
         year: "2564",
         time: "14:40",
         FileUrl: "../../public/filedata/018_ReportYear64.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token4",
     },
     {
         id: 15,
@@ -162,7 +176,8 @@ const Filedata = [
         year: "2567",
         time: "17:15",
         FileUrl: "../../public/filedata/023_ReportmanuAug67.pdf",
-        uploadedBy: "นายสมชาย ใจเด็ด"
+        uploadedBy: "นายสมชาย ใจเด็ด",
+        token: "token4",
     },
     {
         id: 16,

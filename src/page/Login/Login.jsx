@@ -31,11 +31,17 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
       setErrorMessage("");
       setInputError(false);
 
-      // Save user information
+      // Save user information in state
       setToken(userInfo.token);
       setRole(userInfo.role);
       setUsername(username);
       setPassword(password);
+
+      // Save user information to localStorage
+      localStorage.setItem("token", userInfo.token);
+      localStorage.setItem("role", userInfo.role);
+      localStorage.setItem("username", username);
+      localStorage.setItem("password", password);
 
       // Redirect to the main page
       navigate("/");
@@ -43,10 +49,24 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
   };
 
   const handleGuestLogin = () => {
-    setToken("guest_token");
-    setRole("guest");
-    setUsername("guest");
-    setPassword("");
+    const guestToken = "guest_token";
+    const guestRole = "guest";
+    const guestUsername = "guest";
+    const guestPassword = "";
+
+    // Save guest information in state
+    setToken(guestToken);
+    setRole(guestRole);
+    setUsername(guestUsername);
+    setPassword(guestPassword);
+
+    // Save guest information to localStorage
+    localStorage.setItem("token", guestToken);
+    localStorage.setItem("role", guestRole);
+    localStorage.setItem("username", guestUsername);
+    localStorage.setItem("password", guestPassword);
+
+    // Redirect to the main page
     navigate("/");
   };
 

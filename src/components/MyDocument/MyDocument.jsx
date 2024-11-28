@@ -8,6 +8,9 @@ const MyDocument = ({ role }) => {
   const { uploadedFiles } = useContext(FileContext);  // ดึงข้อมูลจาก FileContext
   const [documents, setDocuments] = useState(FileData); // ใช้ FileData เป็นข้อมูลหลัก
 
+  // ดึง Token จาก localStorage
+  const token = localStorage.getItem("token");
+
   // const [documents, setDocuments] = useState([]);
   const [previewFile, setPreviewFile] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,8 +45,10 @@ const MyDocument = ({ role }) => {
 
 
   useEffect(() => {
-    setDocuments([...FileData, ...uploadedFiles]);  // รวมไฟล์ที่อัปโหลดเข้ามาใน FileContext
-  }, [uploadedFiles]);  // รีเฟรชเอกสารเมื่อมีการอัปโหลดไฟล์ใหม่
+    // กรองเอกสารตาม Token ที่ตรงกับผู้ใช้ที่ล็อกอิน
+    const filteredDocuments = FileData.filter(doc => doc.token === token);
+    setDocuments(filteredDocuments); // ตั้งค่าเอกสารที่กรองแล้ว
+  }, [token, uploadedFiles]); // รีเฟรชเมื่อ Token หรือ uploadedFiles เปลี่ยนแปลง
 
   const sortDocuments = (documents, option, order) => {
     return documents.sort((a, b) => {
