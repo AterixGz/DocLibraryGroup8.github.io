@@ -326,7 +326,7 @@
 }
 
 /* ปุ่ม ยืนยัน */
-.btn-danger {
+.custom-btn-danger {
   background-color: #4caf50; /* เปลี่ยนเป็นสีเขียวสำหรับปุ่มยืนยัน */
   color: white; /* สีตัวอักษรขาว */
   border: none; /* ไม่มีขอบ */
@@ -340,10 +340,11 @@
   transition: background-color 0.3s ease, transform 0.2s ease; /* การเปลี่ยนแปลงเมื่อเลื่อน */
 }
 
-.btn-danger:hover {
+.custom-btn-danger:hover {
   background-color: #388e3c; /* สีพื้นหลังเมื่อเอาเมาส์ชี้ไป */
   transform: scale(1.05); /* ขยายขนาดเล็กน้อย */
 }
+
 
 .modal-actions .btn-danger:active {
   background-color: #388e3c; /* สีพื้นหลังเมื่อกดปุ่ม */

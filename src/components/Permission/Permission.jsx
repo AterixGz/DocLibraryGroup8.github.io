@@ -316,7 +316,7 @@ function PermissionManagement() {
                 </td>
                 <td>
                   <button
-                    className="btn-danger"
+                    className="custom-btn-danger"
                     onClick={() => handleDelete(user)}
                   >
                     <i className="bi bi-trash"></i>
@@ -344,7 +344,7 @@ function PermissionManagement() {
             <h3>ยืนยันการลบ</h3>
             <p>คุณต้องการลบผู้ใช้นี้ใช่ไหม?</p>
             <div className="modal-actions">
-              <button onClick={handleConfirmDelete} className="btn btn-danger">
+              <button onClick={handleConfirmDelete} className="btn custom-btn-danger">
                 ยืนยัน
               </button>
               <button

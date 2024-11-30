@@ -17,6 +17,7 @@ import Login from "./page/Login/Login";
 import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
 import MyDocument from "./components/MyDocument/MyDocument";
 import Popup from "./styles/Popup"; // Import Popup
+import AboutMe from "./components/Aboutme/Aboutme";
 import { PermissionProvider, usePermission } from "./contexts/PermissionContext"; // Import Context
 import { verifyUser } from "./data/users";
 
@@ -78,6 +79,8 @@ function App() {
       </BrowserRouter>
     );
   }
+
+  
 
   return (
     <PermissionProvider>
@@ -148,9 +151,10 @@ function App() {
                     />
                     <Route path="/help" element={<Help />} />
                     <Route path="/profile" element={<Profile username={username} password={password} />} />
+                    <Route path="/about-me" element={<AboutMe />} />
                   </>
                 )}
-                <Route path="*" element={<Home role={role} />} />
+                <Route path="/aboutme" element={<AboutMe role={role} />} />
               </Routes>
             </div>
           </div>

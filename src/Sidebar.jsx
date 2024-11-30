@@ -1,23 +1,22 @@
 import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom"; // Import useNavigate for programmatic navigation
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./Sidebar.css";
 
 function Sidebar({ user, onLogout }) {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const location = useLocation(); // Use location to track the current path
-  const navigate = useNavigate(); // Hook to navigate programmatically
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const isActive = (path) => location.pathname === path; // Check if current path matches the link
+  const isActive = (path) => location.pathname === path;
 
   const toggleDropdown = () => {
-    setDropdownOpen(!isDropdownOpen); // Toggle the dropdown's open/close state
+    setDropdownOpen(!isDropdownOpen);
   };
 
   const handleLogout = () => {
-    // Call the onLogout function passed as prop to clear token/role/user data
     onLogout();
-    navigate("/login"); // Redirect to login page after logging out
+    navigate("/login");
   };
 
   return (
@@ -45,6 +44,18 @@ function Sidebar({ user, onLogout }) {
             className={`nav-link sidebar-item ${isActive("/") ? "active" : ""}`}
           >
             <i className="bi bi-house me-2"></i> Home
+          </Link>
+        </li>
+
+         {/* About Me */}
+        <li className="nav-item p-1">
+          <Link
+            to="/about-me"
+            className={`nav-link sidebar-item ${
+              isActive("/about-me") ? "active" : ""
+            }`}
+          >
+            <i className="bi bi-person me-2"></i> About Me
           </Link>
         </li>
 
@@ -103,6 +114,8 @@ function Sidebar({ user, onLogout }) {
           )}
         </li>
 
+       
+
         {/* Help */}
         <li className="nav-item p-1">
           <Link
@@ -138,7 +151,7 @@ function Sidebar({ user, onLogout }) {
         {/* Log out Button */}
         <button
           className="btn btn-danger sidebar-item mt-3 w-100"
-          onClick={handleLogout} // Trigger handleLogout when clicked
+          onClick={handleLogout}
         >
           <i className="bi bi-box-arrow-right me-2"></i> Log Out
         </button>
