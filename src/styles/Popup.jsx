@@ -5,7 +5,7 @@ const Popup = ({ message }) => {
   return (
     <div className="popup-overlay">
       <div className="popup-content">
-        <h2>Access Denied</h2>
+        <h2>แจ้งให้ทราบ</h2>
         <p>{message}</p>
       </div>
     </div>
