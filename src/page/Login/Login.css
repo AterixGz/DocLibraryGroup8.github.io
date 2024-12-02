@@ -52,16 +52,12 @@
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
-  background-position: top 50px left 30px;
   justify-content: center;
-  align-items: left;  /* จัดให้อยู่กลาง */
-  background: url("./NewLogo.png") no-repeat;
-  background-size: 300px 70px;  /* กำหนดขนาดของโลโก้ */
-  background-position: top 2rem left 10rem;  /* ตำแหน่งของโลโก้ */
-  animation: zoomInForm 1s ease-out forwards; /* Zoom-in effect for form */
+  align-items: left;
+  animation: zoomInForm 1s ease-out forwards;
   margin-top: 3rem;
 }
-
+  
 /* Zoom-in animation for the form */
 @keyframes zoomInForm {
   from {
@@ -75,7 +71,7 @@
 }
 
 .login-form__title {
-  margin-top: 100px;
+  margin-top: 5rem;
   animation: zoomInTitle 1s ease-out forwards; /* Zoom-in effect for title */
 }
 
@@ -228,6 +224,7 @@
   transition: background-color 0.3s ease, transform 0.2s ease;
   width: 40%;
   margin: 0 auto; /* ทำให้อยู่ตรงกลาง */
+  margin-bottom: 5rem;
 }
 
 .guest-login:hover {

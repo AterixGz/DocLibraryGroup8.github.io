@@ -269,3 +269,83 @@ label {
 .file-upload .file-upload-name::placeholder {
   color: #888;
 }
+
+/* Fade In with Slide Up */
+@keyframes fadeInSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-tabs-container {
+  animation: fadeInSlideUp 0.6s ease-out;
+}
+
+/* Tab Animation */
+@keyframes fadeInTabs {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tab-button {
+  animation: fadeInTabs 0.4s ease-out;
+}
+
+.tab-button:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.tab-button:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.tab-button:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+
+
+/* Pulse Button Hover */
+.file-upload-button:hover {
+  animation: pulse 0.3s infinite alternate;
+}
+
+@keyframes pulse {
+  from {
+    transform: scale(1);
+    background-color: #a26a4a;
+  }
+  to {
+    transform: scale(1.05);
+    background-color: #bb8057;
+  }
+}
+
+/* Zoom In Form Elements */
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tab-content input,
+.tab-content select,
+.tab-content textarea {
+  animation: zoomIn 0.4s ease-out;
+}

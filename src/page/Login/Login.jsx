@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
+import logo from "./logo.png";
 import { verifyUser } from "../../data/users";
 
 function Login({ setToken, setRole, setUsername, setPassword }) {
@@ -84,6 +85,7 @@ function Login({ setToken, setRole, setUsername, setPassword }) {
     <div className="login-page">
       <div className="login-container">
         <div className="login-form">
+        <img src="../img/NewLogo.png" alt="Logo" width="300" height="300" style={{display: 'block', margin: 'auto'}} />
           <h2 className="login-form__title">ยินดีต้อนรับ</h2>
           <form onSubmit={handleLogin}>
             {/* Username Field */}
