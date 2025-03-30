@@ -1,19 +1,4 @@
-/* Sidebar general styles */
-.sidebar-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 250px;
-  min-width: 250px;
-  max-width: 250px;
-  background-color: #F14D31;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border-radius: 0 1rem 1rem 0;
-}
+
 
 .sidebar {
   height: 100%;
@@ -296,7 +281,7 @@
 }
 
 /* Sidebar general styles */
-.sidebar-container {
+.sidebar-container1 {
   position: fixed;
   top: 0;
   left: -250px;  /* Start off-screen */

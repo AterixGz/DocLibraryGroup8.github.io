@@ -37,11 +37,12 @@ function ProtectedRoute({ children, accessKey }) {
 }
 
 function App() {
-  const [token, setToken] = useState("");
-  const [role, setRole] = useState("guest");
+  const [token, setToken] = useState(localStorage.getItem("currentUser") ? JSON.parse(localStorage.getItem("currentUser")).token : "");
+  const [role, setRole] = useState(localStorage.getItem("currentUser") ? JSON.parse(localStorage.getItem("currentUser")).role : "guest");
+  const [userData, setUserData] = useState(localStorage.getItem("currentUser") ? JSON.parse(localStorage.getItem("currentUser")) : null);
+  
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     if (username && password) {
@@ -49,6 +50,7 @@ function App() {
       if (user) {
         setRole(user.role);
         setUserData(user);
+        setToken(user.token);
         localStorage.setItem("currentUser", JSON.stringify(user)); // บันทึกผู้ใช้ใน localStorage
       } else {
         console.error("Invalid credentials");
@@ -79,8 +81,6 @@ function App() {
       </BrowserRouter>
     );
   }
-
-  
 
   return (
     <PermissionProvider>

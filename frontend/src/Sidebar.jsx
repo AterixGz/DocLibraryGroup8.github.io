@@ -20,7 +20,7 @@ function Sidebar({ user, onLogout }) {
   };
 
   return (
-    <div className="sidebar-container d-flex flex-column justify-content-between vh-100">
+    <div className="sidebar-container1  d-flex flex-column justify-content-between vh-100">
       {/* Logo Section */}
       <div className="logo-section mb-4">
         <Link

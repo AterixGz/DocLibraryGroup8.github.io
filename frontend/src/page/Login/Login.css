@@ -231,7 +231,6 @@
   color: #9b321f;
   transform: scale(1.05); /* Slightly enlarge button */
   width: 40%;
-  margin: 0 auto; /* ทำให้อยู่ตรงกลาง */
 }
 
 /* Background styling */
