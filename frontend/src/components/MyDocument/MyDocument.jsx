@@ -1,17 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import "./MyDocument.css";
-import { FileContext } from "../FileContext/FileContext"; // Import FileContext
-import FileData from "../../data/FileData"; // ใช้ไฟล์ข้อมูลเอกสารเดิม
+import { FileContext } from "../FileContext/FileContext";
+import FileData from "../../data/FileData";
 import { AnimatePresence, motion as m } from "framer-motion";
 
-const MyDocument = ({ role }) => {
-  const { uploadedFiles } = useContext(FileContext);  // ดึงข้อมูลจาก FileContext
-  const [documents, setDocuments] = useState(FileData); // ใช้ FileData เป็นข้อมูลหลัก
-
-  // ดึง Token จาก localStorage
-  const token = localStorage.getItem("token");
-
-  // const [documents, setDocuments] = useState([]);
+const MyDocument = () => {
+  const { uploadedFiles } = useContext(FileContext); // ดึงข้อมูลจาก FileContext
+  const [documents, setDocuments] = useState([]); // ใช้ FileData เป็นข้อมูลหลัก
   const [previewFile, setPreviewFile] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
@@ -33,6 +28,16 @@ const MyDocument = ({ role }) => {
   const [toastMessage, setToastMessage] = useState(null);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [documentToEdit, setDocumentToEdit] = useState(null);
+
+  const userId = localStorage.getItem("userData")
+    ? JSON.parse(localStorage.getItem("userData")).id
+    : null;
+
+  // เพิ่มการดึง token จาก localStorage
+  const token = localStorage.getItem("userData")
+    ? JSON.parse(localStorage.getItem("userData")).token
+    : null;
+
   const openEditPopup = (doc) => {
     setDocumentToEdit(doc);
     setShowEditPopup(true);
@@ -43,10 +48,26 @@ const MyDocument = ({ role }) => {
     setDocumentToEdit(null);
   };
 
+  useEffect(() => {
+    const fetchUserFiles = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/files/user/${userId}`
+        );
+        const data = await res.json();
+        setDocuments(data);
+      } catch (err) {
+        console.error("Failed to fetch user files", err);
+      }
+    };
+    if (userId) fetchUserFiles();
+  }, []);
 
   useEffect(() => {
     // กรองเอกสารตาม Token ที่ตรงกับผู้ใช้ที่ล็อกอิน
-    const filteredDocuments = [...FileData, ...uploadedFiles].filter(doc => doc.token === token);
+    const filteredDocuments = [...FileData, ...uploadedFiles].filter(
+      (doc) => doc.token === token
+    );
     setDocuments(filteredDocuments); // ตั้งค่าเอกสารที่กรองแล้ว
   }, [token, uploadedFiles]); // รีเฟรชเมื่อ Token หรือ uploadedFiles เปลี่ยนแปลง
 
@@ -131,7 +152,6 @@ const MyDocument = ({ role }) => {
     }
   };
 
-
   const handleSingleDownload = (fileUrl, fileName) => {
     setIsSingleDownload(true);
 
@@ -145,7 +165,9 @@ const MyDocument = ({ role }) => {
 
     // ตั้งเวลาให้ popup หายไปหลัง 5 วินาที
     setTimeout(() => {
-      setDownloadPopups((prev) => prev.filter((popup) => popup.id !== newPopup.id));
+      setDownloadPopups((prev) =>
+        prev.filter((popup) => popup.id !== newPopup.id)
+      );
     }, 5000);
 
     // Trigger download
@@ -154,8 +176,6 @@ const MyDocument = ({ role }) => {
     link.download = fileName;
     link.click();
   };
-
-
 
   const handleDownloadSelected = () => {
     setIsSingleDownload(false);
@@ -174,7 +194,9 @@ const MyDocument = ({ role }) => {
 
     // ตั้งเวลาให้ popup หายไปหลัง 5 วินาที
     setTimeout(() => {
-      setDownloadPopups((prev) => prev.filter((popup) => popup.id !== newPopup.id));
+      setDownloadPopups((prev) =>
+        prev.filter((popup) => popup.id !== newPopup.id)
+      );
     }, 5000);
 
     filesToDownload.forEach((file) => {
@@ -199,7 +221,7 @@ const MyDocument = ({ role }) => {
     .filter((doc) => {
       const search = searchTerm.trim().toLowerCase();
       // แยกคำค้นหาหลายคำด้วยช่องว่าง และกรองคำที่เป็นค่าว่าง
-      const searchTerms = search.split(" ").filter(term => term.length > 0);
+      const searchTerms = search.split(" ").filter((term) => term.length > 0);
 
       // ตรวจสอบว่าเอกสารตรงกับทุกคำใน searchTerms
       return searchTerms.every((term) => {
@@ -219,7 +241,9 @@ const MyDocument = ({ role }) => {
         (!filters.category ||
           doc.type.toLowerCase().includes(filters.category.toLowerCase())) &&
         (!filters.department ||
-          doc.department.toLowerCase().includes(filters.department.toLowerCase()))
+          doc.department
+            .toLowerCase()
+            .includes(filters.department.toLowerCase()))
       );
     });
 
@@ -269,15 +293,29 @@ const MyDocument = ({ role }) => {
     setShowPopup(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (documentToDelete) {
-      setDocuments((prevDocs) =>
-        prevDocs.filter((item) => item.id !== documentToDelete.id)
-      );
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/files/${documentToDelete.id}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (res.ok) {
+          setDocuments((prevDocs) =>
+            prevDocs.filter((item) => item.id !== documentToDelete.id)
+          );
+          setToastMessage(`ลบเอกสาร "${documentToDelete.name}" สำเร็จ!`);
+          setTimeout(() => setToastMessage(null), 3000);
+          closePopup();
+        } else {
+          console.error("Failed to delete from backend");
+        }
+      } catch (err) {
+        console.error("Error deleting file:", err);
+      }
     }
-    setToastMessage(`ลบเอกสาร "${documentToDelete.name}" สำเร็จ!`);
-    setTimeout(() => setToastMessage(null), 3000);
-    closePopup();
   };
 
   const closePopup = () => {
@@ -291,24 +329,9 @@ const MyDocument = ({ role }) => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <div className={`home-container ${role === "guest" ? "guest-home" : ""}`}>
-        <div className={`main-content ${role === "guest" ? "guest-main" : ""}`}>
-          <h1 className="title-doc">
-            เอกสารของฉัน
-            {role === "guest" && (
-              <>
-                <a href="/">
-                  <img src="./img/Logo2.png" alt="Logo" className="logo" />
-                </a>
-                <button
-                  className="back-to-login-btn"
-                  onClick={() => (window.location.href = "/login")}
-                >
-                  กลับไปหน้า Login
-                </button>
-              </>
-            )}
-          </h1>
+      <div className="home-container">
+        <div className="main-content">
+          <h1 className="title-doc">เอกสารของฉัน</h1>
 
           <div className="search-bar">
             <input
@@ -367,11 +390,14 @@ const MyDocument = ({ role }) => {
                     </span> */}
           </div>
           <div className="multi-select-actions">
-            {role !== "guest" && (
               <table>
                 <thead>
                   <tr>
-                    <th className={`checkbox-th ${isDownloading ? 'no-radius' : ''}`}>
+                    <th
+                      className={`checkbox-th ${
+                        isDownloading ? "no-radius" : ""
+                      }`}
+                    >
                       <button
                         onClick={toggleCheckbox}
                         className="toggle-checkbox-btn"
@@ -386,7 +412,9 @@ const MyDocument = ({ role }) => {
                             onClick={handleSelectAll}
                             className="toggle-select-all-btn"
                           >
-                            {currentDocuments.every((doc) => selectedDocuments.includes(doc.id))
+                            {currentDocuments.every((doc) =>
+                              selectedDocuments.includes(doc.id)
+                            )
                               ? "ยกเลิกการเลือกทั้งหมด"
                               : "เลือกทั้งหมด"}
                           </button>
@@ -403,7 +431,7 @@ const MyDocument = ({ role }) => {
                   </tr>
                 </thead>
               </table>
-            )}
+          
           </div>
 
           <hr className="hr-top"></hr>
@@ -416,14 +444,18 @@ const MyDocument = ({ role }) => {
                 <th>ประเภทเอกสาร</th>
                 <th>วันที่ลง</th>
                 <th>หน่วยงาน</th>
-                {role !== "guest" && <th className="th-to">เครื่องมือ</th>}
+                <th className="th-to">เครื่องมือ</th>
               </tr>
             </thead>
             <tbody>
               {currentDocuments.map((doc, index) => (
-                <tr key={doc.id}
-                  className={`row-item ${selectedDocuments.includes(doc.id) ? "row-selected" : ""}`}
-                  onClick={() => handleSelectDocument(doc.id)}>
+                <tr
+                  key={doc.id}
+                  className={`row-item ${
+                    selectedDocuments.includes(doc.id) ? "row-selected" : ""
+                  }`}
+                  onClick={() => handleSelectDocument(doc.id)}
+                >
                   {showCheckbox && (
                     <td>
                       <input
@@ -436,20 +468,23 @@ const MyDocument = ({ role }) => {
                   )}
                   <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
                   <td>
-                    {role === "guest" ? (
-                      doc.name
-                    ) : (
+                    
                       <a
-                        href="#" onClick={(e) => { e.stopPropagation(); handlePreview(doc.FileUrl); }} className="preview-link"
+                        href="#"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePreview(doc.FileUrl);
+                        }}
+                        className="preview-link"
                       >
                         {doc.name}
                       </a>
-                    )}
+                    
                   </td>
                   <td>{doc.type}</td>
                   <td>{doc.date}</td>
                   <td>{doc.department}</td>
-                  {role !== "guest" && (
+                 
                     <td className="action-buttons">
                       <div className="button-container">
                         <button
@@ -467,14 +502,17 @@ const MyDocument = ({ role }) => {
                         >
                           ลบ
                         </button>
-                        <button className="edit-btn" onClick={() => openEditPopup(doc)}>
+                        <button
+                          className="edit-btn"
+                          onClick={() => openEditPopup(doc)}
+                        >
                           <span>
                             <i className="bi bi-three-dots-vertical"></i>
                           </span>
                         </button>
                       </div>
                     </td>
-                  )}
+                  
                 </tr>
               ))}
             </tbody>
@@ -518,7 +556,8 @@ const MyDocument = ({ role }) => {
                   transition={{ duration: 0.3 }}
                 >
                   <h2>แก้ไขเอกสาร</h2>
-                  <form className="edit-form"
+                  <form
+                    className="edit-form"
                     onSubmit={(e) => {
                       e.preventDefault();
                       const formData = new FormData(e.currentTarget);
@@ -538,7 +577,9 @@ const MyDocument = ({ role }) => {
                     }}
                   >
                     <div className="form-group">
-                      <label className="label-edit" htmlFor="name">ชื่อเอกสาร</label>
+                      <label className="label-edit" htmlFor="name">
+                        ชื่อเอกสาร
+                      </label>
                       <input
                         type="text"
                         id="name"
@@ -548,7 +589,9 @@ const MyDocument = ({ role }) => {
                       />
                     </div>
                     <div className="form-group">
-                      <label className="label-edit" htmlFor="type">ประเภทเอกสาร</label>
+                      <label className="label-edit" htmlFor="type">
+                        ประเภทเอกสาร
+                      </label>
                       <select
                         id="type"
                         name="type"
@@ -566,14 +609,18 @@ const MyDocument = ({ role }) => {
                         <option value="การจัดสรรค่าภาคหลวงให้ท้องถิ่น">
                           การจัดสรรค่าภาคหลวงให้ท้องถิ่น
                         </option>
-                        <option value="การจัดหาปิโตรเลียม">การจัดหาปิโตรเลียม</option>
+                        <option value="การจัดหาปิโตรเลียม">
+                          การจัดหาปิโตรเลียม
+                        </option>
                         <option value="ปริมาณสำรองปิโตรเลียม">
                           ปริมาณสำรองปิโตรเลียม
                         </option>
                       </select>
                     </div>
                     <div className="form-group">
-                      <label className="label-edit" htmlFor="date">วันที่ลงเอกสาร</label>
+                      <label className="label-edit" htmlFor="date">
+                        วันที่ลงเอกสาร
+                      </label>
                       <input
                         type="date"
                         id="date"
@@ -583,19 +630,29 @@ const MyDocument = ({ role }) => {
                       />
                     </div>
                     <div className="form-group">
-                      <label className="label-edit" htmlFor="department">หน่วยงาน</label>
+                      <label className="label-edit" htmlFor="department">
+                        หน่วยงาน
+                      </label>
                       <select
                         id="department"
                         name="department"
                         className="form-input"
                         defaultValue={documentToEdit.department}
                       >
-                        <option value="กรมเชื้อเพลิงธรรมชาติ">กรมเชื้อเพลิงธรรมชาติ</option>
+                        <option value="กรมเชื้อเพลิงธรรมชาติ">
+                          กรมเชื้อเพลิงธรรมชาติ
+                        </option>
                       </select>
                     </div>
                     <div className="form-group">
-                      <button className="confirm-btn" type="submit">บันทึก</button>
-                      <button className="cancel-btn" type="button" onClick={closeEditPopup}>
+                      <button className="confirm-btn" type="submit">
+                        บันทึก
+                      </button>
+                      <button
+                        className="cancel-btn"
+                        type="button"
+                        onClick={closeEditPopup}
+                      >
                         ยกเลิก
                       </button>
                     </div>
@@ -641,7 +698,10 @@ const MyDocument = ({ role }) => {
           {/* Preview Modal */}
           {previewFile && (
             <div className="preview-modal" onClick={closePreview}>
-              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div
+                className="modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <button onClick={closePreview} className="close-button">
                   ปิด
                 </button>
@@ -656,7 +716,10 @@ const MyDocument = ({ role }) => {
           {/* Alert Modal */}
           {alertMessage && (
             <div className="alert-modal" onClick={closeAlert}>
-              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div
+                className="modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <button onClick={closeAlert} className="close-button">
                   ปิด
                 </button>
@@ -671,10 +734,12 @@ const MyDocument = ({ role }) => {
               </span>{" "}
               &nbsp;
               {isSingleDownload ? (
-                <span><b>ดาวน์โหลดเอกสารเสร็จสิ้น</b></span>
+                <span>
+                  <b>ดาวน์โหลดเอกสารเสร็จสิ้น</b>
+                </span>
               ) : (
                 <span>
-                  <b>ดาวน์โหลดเอกสารเสร็จสิ้นทั้งหมด{" "}</b>
+                  <b>ดาวน์โหลดเอกสารเสร็จสิ้นทั้งหมด </b>
                   <strong>{selectedDocuments.length}</strong> <b>รายการ</b>
                 </span>
               )}
@@ -700,7 +765,9 @@ const MyDocument = ({ role }) => {
                 <i className="bi bi-check-circle"></i>
               </span>
               &nbsp;
-              <span><b>{popup.message}</b></span>
+              <span>
+                <b>{popup.message}</b>
+              </span>
               <span
                 onClick={() => closeDownloadPopup(popup.id)}
                 style={{ cursor: "pointer" }}

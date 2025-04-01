@@ -29,18 +29,16 @@ function Login({ setToken, setRole, setUsername }) {
 
     try {
       // ตรวจสอบก่อนทำการ login
-      const response = await axios.post(`${API_URL}/users/login`, { username, password });
+      const response = await axios.post(`${API_URL}/api/login`, { username, password });
       
       // Success - store user data
-      const userData = response.data;
+      const userData = response.data.user;
       setToken(userData.token);
       setRole(userData.role);
       setUsername(username);
 
       // Save user data to localStorage
-      localStorage.setItem("token", userData.token);
-      localStorage.setItem("role", userData.role);
-      localStorage.setItem("username", username);
+      localStorage.setItem("userData", JSON.stringify(userData));
       localStorage.setItem('userData', JSON.stringify(userData));
 
       // Reset input fields
@@ -48,7 +46,7 @@ function Login({ setToken, setRole, setUsername }) {
       passwordRef.current.value = "";
 
       // Redirect to the main page
-      navigate("/");
+      navigate("/home");
 
     } catch (error) {
       console.error("Login error:", error);
@@ -88,7 +86,7 @@ function Login({ setToken, setRole, setUsername }) {
     localStorage.setItem("username", guestUsername);
     localStorage.setItem("userData", JSON.stringify({ firstName: "Guest", lastName: "User", role: guestRole, token: guestToken, username: guestUsername }));
 
-    navigate("/");
+    navigate("/home");
   };
 
   return (
