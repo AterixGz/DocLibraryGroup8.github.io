@@ -14,6 +14,8 @@ const Document = () => {
   const [uploadedBy, setUploadedBy] = useState("");
   const [activeTab, setActiveTab] = useState("Upload");
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
   const steps = ["Upload", "Preview"];
@@ -21,11 +23,17 @@ const Document = () => {
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("userData"));
     if (userData) {
-      setUploadedBy(`${userData.firstName} ${userData.lastName}`);
+      // ตรวจสอบว่าควรใช้ first_name หรือ firstName ตามโครงสร้างข้อมูลที่บันทึกใน localStorage
+      const firstName = userData.first_name || userData.firstName;
+      const lastName = userData.last_name || userData.lastName;
+      const userId = userData.id;
+      
+      setUploadedBy(userId); // ส่ง user ID แทนชื่อ
     } else {
-      setUploadedBy("Unknown User");
+      // ถ้าไม่มีข้อมูลผู้ใช้ ให้ redirect ไปหน้า login
+      navigate('/login');
     }
-  }, []);
+  }, [navigate]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -33,22 +41,19 @@ const Document = () => {
   };
 
   const handleDateChange = (e) => {
-    const inputDate = new Date(e.target.value);
-    if (!isNaN(inputDate)) {
-      const thaiYear = inputDate.getFullYear() + 543;
-      const thaiDate = new Date(inputDate.setFullYear(thaiYear));
-      setDate(thaiDate.toISOString().split("T")[0]);
-    }
+    setDate(e.target.value); // เก็บค่าวันที่ในรูปแบบ YYYY-MM-DD
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setError("");
+    
     if (!file || !name || !type || !department || !date || !uploadedBy || !description) {
-      alert("All fields are required!");
+      setError("กรุณากรอกข้อมูลให้ครบทุกช่อง");
       return;
     }
-
+  
+    setLoading(true);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("name", name);
@@ -56,43 +61,39 @@ const Document = () => {
     formData.append("department", department);
     formData.append("date", date);
     formData.append("description", description);
-    formData.append("uploadedBy", uploadedBy);
-
+    formData.append("uploadedBy", uploadedBy); // ส่ง user ID
+  
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/upload", {
+      const response = await fetch("http://localhost:3000/api/files/upload", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: formData
+        body: formData,
       });
-
+  
       const result = await response.json();
-
+  
       if (response.ok) {
         const newFile = {
-          id: result.id || Date.now(),
-          name,
-          type,
-          department,
-          date,
-          description,
-          time: new Date().toLocaleTimeString(),
-          FileUrl: result.fileUrl || URL.createObjectURL(file),
-          uploadedBy,
-          token
+          id: result.id,
+          name: result.filename,
+          type: result.file_type,
+          department: result.department,
+          date: result.document_date,
+          description: result.description,
+          FileUrl: result.url,
+          uploadedBy: result.uploaded_by,
         };
-
+  
         setUploadedFile(newFile);
         addFiles(newFile);
         setActiveTab("Preview");
       } else {
-        alert("Upload failed: " + result.message);
+        setError("การอัปโหลดล้มเหลว: " + result.message);
       }
     } catch (error) {
       console.error("Error uploading file:", error);
-      alert("Error uploading file");
+      setError("เกิดข้อผิดพลาดในการอัปโหลดไฟล์");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -104,6 +105,7 @@ const Document = () => {
             key={step}
             className={`tab-button ${activeTab === step ? 'active' : ''}`}
             onClick={() => setActiveTab(step)}
+            disabled={step === 'Preview' && !uploadedFile}
           >
             {step}
           </button>
@@ -114,6 +116,7 @@ const Document = () => {
         {activeTab === 'Upload' && (
           <div>
             <h3>อัพโหลดเอกสาร</h3>
+            {error && <div className="error-message">{error}</div>}
             <form onSubmit={handleSubmit}>
               <div>
                 <label>ชื่อเอกสาร</label>
@@ -136,50 +139,99 @@ const Document = () => {
               </div>
               <div>
                 <label>แผนก</label>
-                <input
-                  type="text"
+                <select
                   value={department}
-                  placeholder="กรอกชื่อแผนก"
                   onChange={(e) => setDepartment(e.target.value)}
                   required
-                />
+                >
+                  <option value="">เลือกแผนก</option>
+                  <option value="การเงิน">การเงิน</option>
+                  <option value="ทรัพยากรบุคคล">ทรัพยากรบุคคล</option>
+                  <option value="ไอที">ไอที</option>
+                  <option value="การตลาด">การตลาด</option>
+                  <option value="อื่นๆ">อื่นๆ</option>
+                </select>
               </div>
               <div>
                 <label>วันที่</label>
-                <input type="date" onChange={handleDateChange} required />
+                <input 
+                  type="date" 
+                  value={date}
+                  onChange={handleDateChange} 
+                  required 
+                />
               </div>
               <div>
                 <label>คำอธิบาย</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                  placeholder="กรอกคำอธิบายเอกสาร"
                   required
                 />
               </div>
               <div>
                 <label>เลือกไฟล์</label>
-                <input type="file" onChange={handleFileChange} accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpg" required />
+                <input 
+                  type="file" 
+                  onChange={handleFileChange} 
+                  accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpg" 
+                  required 
+                />
               </div>
-              <button type="submit">อัปโหลด</button>
+              <button type="submit" disabled={loading}>
+                {loading ? 'กำลังอัปโหลด...' : 'อัปโหลด'}
+              </button>
             </form>
           </div>
         )}
 
-        {activeTab === 'Preview' && uploadedFile && (
-          <div>
-            <h3>แสดงตัวอย่างเอกสาร</h3>
-            <p><strong>ชื่อ:</strong> {uploadedFile.name}</p>
-            <p><strong>ประเภท:</strong> {uploadedFile.type}</p>
-            <p><strong>แผนก:</strong> {uploadedFile.department}</p>
-            <p><strong>วันที่:</strong> {uploadedFile.date}</p>
-            <p><strong>คำอธิบาย:</strong> {uploadedFile.description}</p>
-            <p><strong>อัปโหลดโดย:</strong> {uploadedFile.uploadedBy}</p>
-            <a href={uploadedFile.FileUrl} target="_blank" rel="noopener noreferrer">เปิดไฟล์</a>
-          </div>
-        )}
+{activeTab === 'Preview' && uploadedFile && (
+  <div className="file-preview-container">
+    <h3>แสดงตัวอย่างเอกสาร</h3>
+    <div className="file-details">
+      <p><strong>ชื่อ:</strong> {uploadedFile?.name}</p>
+      <p><strong>ประเภท:</strong> {uploadedFile?.type}</p>
+      <p><strong>แผนก:</strong> {uploadedFile?.department}</p>
+      <p><strong>วันที่:</strong> {uploadedFile?.date}</p>
+      <p><strong>คำอธิบาย:</strong> {uploadedFile?.description}</p>
+      <p><strong>อัปโหลดโดย:</strong> {uploadedFile?.uploadedBy}</p>
+    </div>
+    
+    {/* แสดงตัวอย่างไฟล์ทุกประเภททันที */}
+    <div className="file-preview">
+      {uploadedFile?.type?.includes('image') ? (
+        <img 
+          src={uploadedFile?.url} 
+          alt={uploadedFile.name} 
+          className="preview-image" 
+          style={{ maxWidth: '80%', maxHeight: '400px' }}
+        />
+      ) : uploadedFile?.type?.includes('pdf') ? (
+        <iframe 
+          src={uploadedFile?.FileUrl} 
+          title={uploadedFile.name} 
+          width="100%" 
+          height="500px" 
+          className="preview-pdf"
+        ></iframe>
+      ) : (
+        <p>ไม่สามารถแสดงตัวอย่างไฟล์นี้ได้</p>
+      )}
+    </div>
+    <div className="file-actions">
+      <button 
+        onClick={() => navigate('/my-document')} 
+        className="done-button"
+      >
+        เสร็จสิ้น
+      </button>
+    </div>
+  </div>
+)}
+
       </div>
     </div>
   );
 };
-
 export default Document;

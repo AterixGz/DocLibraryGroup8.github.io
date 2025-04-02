@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -23,11 +23,6 @@ import { FileProvider } from "./components/FileContext/FileContext";
 import "./App.css";
 
 function App() {
-  const [token, setToken] = useState(
-    localStorage.getItem("userData")
-      ? JSON.parse(localStorage.getItem("userData")).token
-      : ""
-  );
   const [role, setRole] = useState(
     localStorage.getItem("userData")
       ? JSON.parse(localStorage.getItem("userData")).role
@@ -43,44 +38,12 @@ function App() {
   const [password, setPassword] = useState("");
 
   const handleLogout = () => {
-    setToken("");
     setRole("guest");
     setUserData(null);
     setUsername("");
     setPassword("");
-    localStorage.removeItem("userData"); // ลบข้อมูลผู้ใช้จาก localStorage
+    localStorage.removeItem("userData"); // Remove user data from localStorage
   };
-
-  if (!token) {
-    return (
-      <Routes>
-        <Route path="/home" element={<Home />} />
-        <Route
-          path="/login"
-          element={
-            <Login
-              setToken={setToken}
-              setRole={setRole}
-              setUsername={setUsername}
-              setPassword={setPassword}
-            />
-          }
-        />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route
-          path="*"
-          element={
-            <Login
-              setToken={setToken}
-              setRole={setRole}
-              setUsername={setUsername}
-              setPassword={setPassword}
-            />
-          }
-        />
-      </Routes>
-    );
-  }
 
   return (
     <FileProvider>
@@ -90,6 +53,8 @@ function App() {
           <Routes>
             <Route path="/home" element={<Home />} />
             <Route path="/" element={<Home role={role} />} />
+            <Route path="/login" element={<Login setRole={setRole} setUsername={setUsername} setPassword={setPassword} />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             {role !== "guest" && (
               <>
                 <Route path="/administrator" element={<Administrator />} />
@@ -98,15 +63,9 @@ function App() {
                 <Route path="/permission" element={<Permission />} />
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/reports/addfilelist" element={<AddFileReport />} />
-                <Route
-                  path="/reports/removefilelist"
-                  element={<RemoveFileReport />}
-                />
+                <Route path="/reports/removefilelist" element={<RemoveFileReport />} />
                 <Route path="/help" element={<Help />} />
-                <Route
-                  path="/profile"
-                  element={<Profile username={username} password={password} />}
-                />
+                <Route path="/profile" element={<Profile username={username} password={password} />} />
                 <Route path="/about-me" element={<AboutMe />} />
               </>
             )}

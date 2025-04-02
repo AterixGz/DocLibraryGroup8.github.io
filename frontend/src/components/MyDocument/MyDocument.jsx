@@ -47,21 +47,18 @@ const MyDocument = () => {
     setShowEditPopup(false);
     setDocumentToEdit(null);
   };
-
   useEffect(() => {
     const fetchUserFiles = async () => {
       try {
-        const res = await fetch(
-          `http://localhost:3000/api/files/user/${userId}`
-        );
+        const res = await fetch(`http://localhost:3000/api/files/user/${userId}`);
         const data = await res.json();
         setDocuments(data);
       } catch (err) {
-        console.error("Failed to fetch user files", err);
+        console.error("Failed to fetch user files:", err);
       }
     };
     if (userId) fetchUserFiles();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     // กรองเอกสารตาม Token ที่ตรงกับผู้ใช้ที่ล็อกอิน

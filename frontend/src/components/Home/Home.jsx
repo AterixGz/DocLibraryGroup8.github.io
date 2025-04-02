@@ -29,21 +29,17 @@ const Home = ({ role }) => {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const userData = JSON.parse(localStorage.getItem("userData"));
-    const res = await fetch("http://localhost:3000/api/files", {
-      headers: {
-        Authorization: `Bearer ${userData.token}`
-      }
-    });
+        const res = await fetch("http://localhost:3000/api/files");
         const data = await res.json();
-        setDocuments([...data, ...uploadedFiles]); // รวมกับไฟล์ใหม่จาก context
+        setDocuments([...data, ...uploadedFiles]); // Combine with files from context
       } catch (err) {
-        console.error("Failed to fetch files", err);
+        console.error("Failed to fetch files:", err);
       }
     };
     fetchFiles();
   }, [uploadedFiles]);
 
+  // 🔄 โหลดไฟล์ทั้งหมดจาก backend
   const sortDocuments = (docs, option, order) => {
     return docs.sort((a, b) => {
       if (option === "date") {
@@ -142,10 +138,12 @@ const Home = ({ role }) => {
     }, 5000);
 
     // Trigger download
-    const link = document.createElement("a");
-    link.href = fileUrl;
-    link.download = fileName;
-    link.click();
+    filesToDownload.forEach((file) => {
+      const link = document.createElement("a");
+      link.href = file.FileUrl;
+      link.download = file.name;
+      link.click();
+    });
   };
 
   const handleDownloadSelected = () => {
@@ -154,6 +152,7 @@ const Home = ({ role }) => {
     const filesToDownload = documents.filter((doc) =>
       selectedDocuments.includes(doc.id)
     );
+    
 
     const newPopup = {
       id: Date.now(),

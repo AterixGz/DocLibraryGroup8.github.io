@@ -1,4 +1,3 @@
-// backend/server.js
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -6,7 +5,6 @@ const { Pool } = require('pg');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,34 +36,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Authorization middleware
-const authorize = (allowedRoles) => async (req, res, next) => {
-  const token = req.headers.authorization?.replace("Bearer ", "");
-  if (!token) return res.status(401).send("Missing token");
-
-  try {
-    const result = await pool.query(
-      `SELECT u.*, r.name AS role_name FROM users u
-       JOIN roles r ON u.role_id = r.id
-       WHERE u.token = $1`,
-      [token]
-    );
-
-    if (result.rows.length === 0) return res.status(403).send("Invalid token");
-
-    const userRole = result.rows[0].role_name;
-    if (!allowedRoles.includes(userRole)) {
-      return res.status(403).send("Access denied");
-    }
-
-    req.user = result.rows[0];
-    next();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Authorization error");
-  }
-};
-
 // Test DB route
 app.get('/api/test-db', async (req, res) => {
   try {
@@ -77,65 +47,74 @@ app.get('/api/test-db', async (req, res) => {
   }
 });
 
+// Get all users
 app.get("/api/users", async (req, res) => {
-    try {
-      const result = await pool.query("SELECT id, username, first_name, last_name, role_id, email, department, position, employee_id FROM users");
-      res.json(result.rows);
-    } catch (err) {
-      console.error("Error fetching users:", err);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  });
-  
-
-// Get all files (accessible by all roles)
-app.get('/api/files', authorize(['admin', 'manager', 'worker']), async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM files ORDER BY uploaded_at DESC');
+    const result = await pool.query("SELECT id, username, first_name, last_name, role_id, email, department, position, employee_id FROM users");
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching users:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Get all files
+app.get('/api/files', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, filename AS name, url AS FileUrl, file_type AS type, department, document_date AS date, description, uploaded_by, uploaded_at FROM files ORDER BY uploaded_at DESC'
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Failed to fetch files:', err);
     res.status(500).send('Failed to fetch files');
   }
 });
 
-// Get files uploaded by specific user (self only unless admin)
-app.get('/api/files/user/:userId', authorize(['admin', 'manager', 'worker']), async (req, res) => {
+// Get files uploaded by specific user
+app.get('/api/files/user/:userId', async (req, res) => {
   const userId = parseInt(req.params.userId);
-  if (req.user.id !== userId && req.user.role_name !== 'admin') {
-    return res.status(403).send("You can only view your own documents");
-  }
 
   try {
-    const result = await pool.query('SELECT * FROM files WHERE uploaded_by = $1 ORDER BY uploaded_at DESC', [userId]);
+    const result = await pool.query(
+      'SELECT id, filename AS name, url AS FileUrl, file_type AS type, department, document_date AS date, description, uploaded_by, uploaded_at FROM files WHERE uploaded_by = $1 ORDER BY uploaded_at DESC',
+      [userId]
+    );
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('Failed to fetch user files:', err);
     res.status(500).send('Failed to fetch user files');
   }
 });
 
-// Upload file (admin, manager, worker)
-app.post('/api/files   ', authorize(['admin', 'manager', 'worker']), upload.single('file'), async (req, res) => {
+// อัปเดต route การอัปโหลดไฟล์
+app.post('/api/files/upload', upload.single('file'), async (req, res) => {
   const file = req.file;
-  const userId = req.user.id;
-  if (!file || !userId) return res.status(400).send('File and userId are required');
+  const { name, type, department, date, description, uploadedBy } = req.body;
+
+  // Debugging logs
+  console.log("File:", file);
+  console.log("Body:", req.body);
+
+  if (!file || !uploadedBy) {
+    return res.status(400).json({ message: 'File and uploadedBy are required' });
+  }
 
   try {
     const url = `/uploads/${file.filename}`;
     const result = await pool.query(
-      'INSERT INTO files (filename, url, uploaded_by) VALUES ($1, $2, $3) RETURNING *',
-      [file.originalname, url, userId]
+      'INSERT INTO files (filename, url, file_type, department, document_date, description, uploaded_by, uploaded_at) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING *',
+      [name || file.originalname, url, type, department, date, description, uploadedBy]
     );
+    console.log("Database Insert Result:", result.rows[0]); // Log the database result
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Failed to upload file');
+    console.error("Error uploading file:", err); // Log the error
+    res.status(500).json({ message: 'Failed to upload file' });
   }
 });
-
-// Delete file (admin only)
-app.delete('/api/files/:id', authorize(['admin']), async (req, res) => {
+// Delete file
+app.delete('/api/files/:id', async (req, res) => {
   const fileId = req.params.id;
   try {
     const result = await pool.query('DELETE FROM files WHERE id = $1 RETURNING *', [fileId]);
@@ -151,7 +130,7 @@ app.delete('/api/files/:id', authorize(['admin']), async (req, res) => {
   }
 });
 
-// Enhanced login route with JOIN roles table
+// Login route
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -164,15 +143,11 @@ app.post('/api/login', async (req, res) => {
 
     if (result.rows.length > 0) {
       const user = result.rows[0];
-      const token = crypto.randomBytes(16).toString("hex");
-      await pool.query('UPDATE users SET token = $1 WHERE id = $2', [token, user.id]);
-
       res.json({
         message: 'Login successful',
         user: {
           id: user.id,
           username: user.username,
-          token,
           role: user.role_name,
           first_name: user.first_name,
           last_name: user.last_name,
@@ -192,7 +167,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Get roles (for permission check)
+// Get roles
 app.get('/api/roles', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM roles');
@@ -203,21 +178,42 @@ app.get('/api/roles', async (req, res) => {
   }
 });
 
-// Get current user profile from token
-app.get('/api/profile', authorize(['admin', 'manager', 'worker']), async (req, res) => {
-  const user = req.user;
-  res.json({
-    id: user.id,
-    username: user.username,
-    role: user.role_name,
-    first_name: user.first_name,
-    last_name: user.last_name,
-    email: user.email,
-    department: user.department,
-    position: user.position,
-    avatar: user.avatar,
-    employee_id: user.employee_id
-  });
+
+
+app.get('/api/profile', async (req, res) => {
+  const userId = req.query.userId; // Pass userId from the frontend as a query parameter
+  if (!userId) {
+    return res.status(400).json({ message: 'User ID is required' });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT id, username, first_name, last_name, role_id, email, department, position, avatar, employee_id
+       FROM users WHERE id = $1`,
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const user = result.rows[0];
+    res.json({
+      id: user.id,
+      username: user.username,
+      role: user.role_id, // Assuming role_id is used instead of role_name
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      department: user.department,
+      position: user.position,
+      avatar: user.avatar,
+      employee_id: user.employee_id,
+    });
+  } catch (err) {
+    console.error('Error fetching user profile:', err);
+    res.status(500).json({ message: 'Failed to fetch user profile' });
+  }
 });
 
 // Start server
