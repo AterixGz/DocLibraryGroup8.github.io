@@ -101,17 +101,51 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
   }
 
   try {
-    const url = `/uploads/${file.filename}`;
+    // แก้ตรงนี้ - เพิ่ม domain และ port
+    const url = `http://localhost:3000/uploads/${file.filename}`;
     const result = await pool.query(
       'INSERT INTO files (filename, url, file_type, department, document_date, description, uploaded_by, uploaded_at) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING *',
       [name || file.originalname, url, type, department, date, description, uploadedBy]
     );
-    console.log("Database Insert Result:", result.rows[0]); // Log the database result
+    console.log("Database Insert Result:", result.rows[0]);
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    console.error("Error uploading file:", err); // Log the error
+    console.error("Error uploading file:", err);
     res.status(500).json({ message: 'Failed to upload file' });
   }
+});
+
+// เพิ่ม route สำหรับการดาวน์โหลดไฟล์ที่จะตั้งค่า Content-Disposition
+app.get('/api/files/download/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, 'uploads', filename);
+  
+  // ตรวจสอบว่าไฟล์มีอยู่จริง
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send('File not found');
+  }
+  
+  // อ่านไฟล์
+  const file = fs.readFileSync(filePath);
+  
+  // กำหนดชนิดของไฟล์ (MIME type)
+  const mimeType = path.extname(filename).toLowerCase();
+  let contentType = 'application/octet-stream'; // ค่าเริ่มต้น
+  
+  // กำหนด content type ตามนามสกุลไฟล์
+  if (mimeType === '.pdf') contentType = 'application/pdf';
+  else if (mimeType === '.doc' || mimeType === '.docx') contentType = 'application/msword';
+  else if (mimeType === '.xls' || mimeType === '.xlsx') contentType = 'application/vnd.ms-excel';
+  else if (mimeType === '.png') contentType = 'image/png';
+  else if (mimeType === '.jpg' || mimeType === '.jpeg') contentType = 'image/jpeg';
+  
+  // ตั้งค่าส่วนหัวสำหรับการดาวน์โหลด
+  res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+  res.setHeader('Content-Type', contentType);
+  res.setHeader('Content-Length', file.length);
+  
+  // ส่งไฟล์
+  res.send(file);
 });
 // Delete file
 app.delete('/api/files/:id', async (req, res) => {

@@ -6,16 +6,20 @@ import "./Document.css";
 const Document = () => {
   const { addFiles } = useContext(FileContext);
   const [file, setFile] = useState(null);
+  const [fileMimeType, setFileMimeType] = useState(""); // เพิ่ม state สำหรับเก็บ MIME type
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [department, setDepartment] = useState("");
   const [date, setDate] = useState("");
   const [description, setDescription] = useState("");
   const [uploadedBy, setUploadedBy] = useState("");
+  const [uploadedByName, setUploadedByName] = useState(""); // เพิ่ม state สำหรับเก็บชื่อผู้อัปโหลด
   const [activeTab, setActiveTab] = useState("Upload");
   const [uploadedFile, setUploadedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  // แก้ตรงนี้ในฟังก์ชัน upload file
+
 
   const navigate = useNavigate();
   const steps = ["Upload", "Preview"];
@@ -27,8 +31,12 @@ const Document = () => {
       const firstName = userData.first_name || userData.firstName;
       const lastName = userData.last_name || userData.lastName;
       const userId = userData.id;
-      
+
       setUploadedBy(userId); // ส่ง user ID แทนชื่อ
+
+      // คำนวณชื่อเต็มและเก็บใน state
+      const fullName = `${firstName} ${lastName}`;
+      setUploadedByName(fullName);
     } else {
       // ถ้าไม่มีข้อมูลผู้ใช้ ให้ redirect ไปหน้า login
       navigate('/login');
@@ -38,6 +46,8 @@ const Document = () => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
+    // เพิ่มการเก็บ MIME type
+    setFileMimeType(selectedFile?.type || '');
   };
 
   const handleDateChange = (e) => {
@@ -47,12 +57,20 @@ const Document = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    
+
     if (!file || !name || !type || !department || !date || !uploadedBy || !description) {
       setError("กรุณากรอกข้อมูลให้ครบทุกช่อง");
       return;
     }
-  
+
+    // ตรวจสอบประเภทไฟล์
+    const allowedTypes = ['.pdf', '.doc', '.docx', '.xlsx', '.xls', '.png', '.jpg'];
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (!allowedTypes.includes(fileExtension)) {
+      setError("ประเภทไฟล์ไม่ถูกต้อง กรุณาเลือกไฟล์ที่เป็น PDF, DOC, DOCX, XLS, XLSX, PNG หรือ JPG");
+      return;
+    }
+
     setLoading(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -62,15 +80,16 @@ const Document = () => {
     formData.append("date", date);
     formData.append("description", description);
     formData.append("uploadedBy", uploadedBy); // ส่ง user ID
-  
+    formData.append("mimeType", fileMimeType); // ส่ง MIME type ไปด้วย
+
     try {
       const response = await fetch("http://localhost:3000/api/files/upload", {
         method: "POST",
         body: formData,
       });
-  
+
       const result = await response.json();
-  
+
       if (response.ok) {
         const newFile = {
           id: result.id,
@@ -81,8 +100,12 @@ const Document = () => {
           description: result.description,
           FileUrl: result.url,
           uploadedBy: result.uploaded_by,
+          mimeType: fileMimeType
         };
-  
+
+        console.log("ข้อมูลไฟล์ที่อัปโหลด:", newFile);
+        console.log("URL ของไฟล์:", result.url);
+
         setUploadedFile(newFile);
         addFiles(newFile);
         setActiveTab("Preview");
@@ -154,11 +177,11 @@ const Document = () => {
               </div>
               <div>
                 <label>วันที่</label>
-                <input 
-                  type="date" 
+                <input
+                  type="date"
                   value={date}
-                  onChange={handleDateChange} 
-                  required 
+                  onChange={handleDateChange}
+                  required
                 />
               </div>
               <div>
@@ -172,11 +195,11 @@ const Document = () => {
               </div>
               <div>
                 <label>เลือกไฟล์</label>
-                <input 
-                  type="file" 
-                  onChange={handleFileChange} 
-                  accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpg" 
-                  required 
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpg"
+                  required
                 />
               </div>
               <button type="submit" disabled={loading}>
@@ -186,52 +209,59 @@ const Document = () => {
           </div>
         )}
 
-{activeTab === 'Preview' && uploadedFile && (
-  <div className="file-preview-container">
-    <h3>แสดงตัวอย่างเอกสาร</h3>
-    <div className="file-details">
-      <p><strong>ชื่อ:</strong> {uploadedFile?.name}</p>
-      <p><strong>ประเภท:</strong> {uploadedFile?.type}</p>
-      <p><strong>แผนก:</strong> {uploadedFile?.department}</p>
-      <p><strong>วันที่:</strong> {uploadedFile?.date}</p>
-      <p><strong>คำอธิบาย:</strong> {uploadedFile?.description}</p>
-      <p><strong>อัปโหลดโดย:</strong> {uploadedFile?.uploadedBy}</p>
-    </div>
-    
-    {/* แสดงตัวอย่างไฟล์ทุกประเภททันที */}
-    <div className="file-preview">
-      {uploadedFile?.type?.includes('image') ? (
-        <img 
-          src={uploadedFile?.url} 
-          alt={uploadedFile.name} 
-          className="preview-image" 
-          style={{ maxWidth: '80%', maxHeight: '400px' }}
-        />
-      ) : uploadedFile?.type?.includes('pdf') ? (
-        <iframe 
-          src={uploadedFile?.FileUrl} 
-          title={uploadedFile.name} 
-          width="100%" 
-          height="500px" 
-          className="preview-pdf"
-        ></iframe>
-      ) : (
-        <p>ไม่สามารถแสดงตัวอย่างไฟล์นี้ได้</p>
-      )}
-    </div>
-    <div className="file-actions">
-      <button 
-        onClick={() => navigate('/my-document')} 
-        className="done-button"
-      >
-        เสร็จสิ้น
-      </button>
-    </div>
-  </div>
-)}
+        {activeTab === 'Preview' && uploadedFile && (
+          <div className="file-preview-container">
+            <h3>แสดงตัวอย่างเอกสาร</h3>
+            <div className="file-details">
+              <p><strong>ชื่อ:</strong> {uploadedFile?.name}</p>
+              <p><strong>ประเภท:</strong> {uploadedFile?.type}</p>
+              <p><strong>แผนก:</strong> {uploadedFile?.department}</p>
+              <p><strong>วันที่:</strong> {uploadedFile?.date}</p>
+              <p><strong>คำอธิบาย:</strong> {uploadedFile?.description}</p>
+              <p><strong>อัปโหลดโดย:</strong> {uploadedByName}</p>
+            </div>
 
-      </div>
+            <div className="file-preview">
+              {/* ใช้ fileMimeType แทนที่จะใช้ type เพื่อแสดงตัวอย่างไฟล์ได้อย่างถูกต้อง */}
+              {uploadedFile?.mimeType?.includes('image') ? (
+                <img
+                  src={uploadedFile?.FileUrl}
+                  alt={uploadedFile.name}
+                  className="preview-image"
+                  style={{ maxWidth: '80%', maxHeight: '400px' }}
+                />
+              ) : uploadedFile?.mimeType?.includes('pdf') ? (
+                <iframe
+                  src={uploadedFile?.FileUrl}
+                  title={uploadedFile.name}
+                  width="100%"
+                  height="500px"
+                  className="preview-pdf"
+                ></iframe>
+              ) : (
+                  <p>ไม่สามารถแสดงตัวอย่างไฟล์นี้ได้</p>
+              )}
+            </div>
+            <div className="file-actions">
+              <a
+                 href={`http://localhost:3000/api/files/download/${uploadedFile?.FileUrl.split('/').pop()}`}
+    className="download-button"
+              >
+                ดาวน์โหลด
+              </a>
+            </div>
+            <button
+              onClick={() => navigate('/my-document')}
+              className="done-button"
+            >
+              เสร็จสิ้น
+            </button>
+          </div>
+
+        )}
     </div>
+    </div >
   );
 };
+
 export default Document;
