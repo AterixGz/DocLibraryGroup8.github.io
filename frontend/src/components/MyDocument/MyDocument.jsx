@@ -28,6 +28,7 @@ const MyDocument = () => {
   const [toastMessage, setToastMessage] = useState(null);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [documentToEdit, setDocumentToEdit] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const userId = localStorage.getItem("userData")
     ? JSON.parse(localStorage.getItem("userData")).id
@@ -37,7 +38,62 @@ const MyDocument = () => {
   const token = localStorage.getItem("userData")
     ? JSON.parse(localStorage.getItem("userData")).token
     : null;
+  // This function should be added to your MyDocument component
+  // It will handle the form submission and API call
 
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true); // Set loading state to true
+    
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name");
+    const type = formData.get("type");
+    const date = formData.get("date");
+    const department = formData.get("department");
+    
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/files/${documentToEdit.id}`,
+        {
+          method: "PUT",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            type,
+            date,
+            department
+          }),
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      
+      const updatedDocument = await response.json();
+      
+      setDocuments((prevDocs) =>
+        prevDocs.map((item) =>
+          item.id === documentToEdit.id ? updatedDocument : item
+        )
+      );
+      
+      setToastMessage(`แก้ไขเอกสาร "${name}" สำเร็จ!`);
+      setTimeout(() => setToastMessage(null), 3000);
+      
+      closeEditPopup();
+      
+    } catch (error) {
+      console.error("Failed to update document:", error);
+      setToastMessage(`แก้ไขเอกสารไม่สำเร็จ: ${error.message}`);
+      setTimeout(() => setToastMessage(null), 3000);
+    } finally {
+      setIsSubmitting(false); // Reset loading state regardless of outcome
+    }
+  };
+  
   const openEditPopup = (doc) => {
     setDocumentToEdit(doc);
     setShowEditPopup(true);
@@ -50,14 +106,20 @@ const MyDocument = () => {
   useEffect(() => {
     const fetchUserFiles = async () => {
       try {
+        // ตรวจสอบว่ามี userId ก่อนที่จะดึงข้อมูล
+        if (!userId) return;
+
         const res = await fetch(`http://localhost:3000/api/files/user/${userId}`);
+        if (!res.ok) throw new Error('Failed to fetch user files');
+
         const data = await res.json();
-        setDocuments(data);
+        setDocuments(data); // ตั้งค่าข้อมูลโดยตรงจาก API
       } catch (err) {
         console.error("Failed to fetch user files:", err);
       }
     };
-    if (userId) fetchUserFiles();
+
+    fetchUserFiles();
   }, [userId]);
 
   useEffect(() => {
@@ -300,6 +362,7 @@ const MyDocument = () => {
           }
         );
         if (res.ok) {
+          // อัปเดต state เพื่อลบเอกสารออกจากรายการที่แสดง
           setDocuments((prevDocs) =>
             prevDocs.filter((item) => item.id !== documentToDelete.id)
           );
@@ -308,9 +371,13 @@ const MyDocument = () => {
           closePopup();
         } else {
           console.error("Failed to delete from backend");
+          setToastMessage(`ไม่สามารถลบเอกสาร "${documentToDelete.name}" ได้`);
+          setTimeout(() => setToastMessage(null), 3000);
         }
       } catch (err) {
         console.error("Error deleting file:", err);
+        setToastMessage(`เกิดข้อผิดพลาด: ${err.message}`);
+        setTimeout(() => setToastMessage(null), 3000);
       }
     }
   };
@@ -387,48 +454,47 @@ const MyDocument = () => {
                     </span> */}
           </div>
           <div className="multi-select-actions">
-              <table>
-                <thead>
-                  <tr>
-                    <th
-                      className={`checkbox-th ${
-                        isDownloading ? "no-radius" : ""
+            <table>
+              <thead>
+                <tr>
+                  <th
+                    className={`checkbox-th ${isDownloading ? "no-radius" : ""
                       }`}
+                  >
+                    <button
+                      onClick={toggleCheckbox}
+                      className="toggle-checkbox-btn"
                     >
-                      <button
-                        onClick={toggleCheckbox}
-                        className="toggle-checkbox-btn"
-                      >
-                        {showCheckbox ? "ยกเลิกการเลือก" : "เลือกหลายรายการ"}
-                      </button>
+                      {showCheckbox ? "ยกเลิกการเลือก" : "เลือกหลายรายการ"}
+                    </button>
+                  </th>
+                  {showCheckbox && (
+                    <th className="actions-th">
+                      <div className="actions-group">
+                        <button
+                          onClick={handleSelectAll}
+                          className="toggle-select-all-btn"
+                        >
+                          {currentDocuments.every((doc) =>
+                            selectedDocuments.includes(doc.id)
+                          )
+                            ? "ยกเลิกการเลือกทั้งหมด"
+                            : "เลือกทั้งหมด"}
+                        </button>
+                        <button
+                          onClick={handleDownloadSelected}
+                          disabled={selectedDocuments.length === 0}
+                          className="download-selected-btn"
+                        >
+                          ดาวน์โหลดเอกสารที่เลือก ({selectedDocuments.length})
+                        </button>
+                      </div>
                     </th>
-                    {showCheckbox && (
-                      <th className="actions-th">
-                        <div className="actions-group">
-                          <button
-                            onClick={handleSelectAll}
-                            className="toggle-select-all-btn"
-                          >
-                            {currentDocuments.every((doc) =>
-                              selectedDocuments.includes(doc.id)
-                            )
-                              ? "ยกเลิกการเลือกทั้งหมด"
-                              : "เลือกทั้งหมด"}
-                          </button>
-                          <button
-                            onClick={handleDownloadSelected}
-                            disabled={selectedDocuments.length === 0}
-                            className="download-selected-btn"
-                          >
-                            ดาวน์โหลดเอกสารที่เลือก ({selectedDocuments.length})
-                          </button>
-                        </div>
-                      </th>
-                    )}
-                  </tr>
-                </thead>
-              </table>
-          
+                  )}
+                </tr>
+              </thead>
+            </table>
+
           </div>
 
           <hr className="hr-top"></hr>
@@ -448,9 +514,8 @@ const MyDocument = () => {
               {currentDocuments.map((doc, index) => (
                 <tr
                   key={doc.id}
-                  className={`row-item ${
-                    selectedDocuments.includes(doc.id) ? "row-selected" : ""
-                  }`}
+                  className={`row-item ${selectedDocuments.includes(doc.id) ? "row-selected" : ""
+                    }`}
                   onClick={() => handleSelectDocument(doc.id)}
                 >
                   {showCheckbox && (
@@ -465,51 +530,51 @@ const MyDocument = () => {
                   )}
                   <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
                   <td>
-                    
-                      <a
-                        href="#"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePreview(doc.FileUrl);
-                        }}
-                        className="preview-link"
-                      >
-                        {doc.name}
-                      </a>
-                    
+
+                    <a
+                      href="#"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePreview(doc.FileUrl);
+                      }}
+                      className="preview-link"
+                    >
+                      {doc.name}
+                    </a>
+
                   </td>
                   <td>{doc.type}</td>
                   <td>{doc.date}</td>
                   <td>{doc.department}</td>
-                 
-                    <td className="action-buttons">
-                      <div className="button-container">
-                        <button
-                          className="download-btn"
-                          onClick={(e) => {
-                            e.stopPropagation(); // ป้องกันการ trigger การเลือกแถว
-                            handleSingleDownload(doc.FileUrl, doc.name); // เรียกฟังก์ชัน handleSingleDownload
-                          }}
-                        >
-                          ดาวน์โหลด
-                        </button>
-                        <button
-                          className="delete-btn"
-                          onClick={() => openDeletePopup(doc)}
-                        >
-                          ลบ
-                        </button>
-                        <button
-                          className="edit-btn"
-                          onClick={() => openEditPopup(doc)}
-                        >
-                          <span>
-                            <i className="bi bi-three-dots-vertical"></i>
-                          </span>
-                        </button>
-                      </div>
-                    </td>
-                  
+
+                  <td className="action-buttons">
+                    <div className="button-container">
+                      <button
+                        className="download-btn"
+                        onClick={(e) => {
+                          e.stopPropagation(); // ป้องกันการ trigger การเลือกแถว
+                          handleSingleDownload(doc.FileUrl, doc.name); // เรียกฟังก์ชัน handleSingleDownload
+                        }}
+                      >
+                        ดาวน์โหลด
+                      </button>
+                      <button
+                        className="delete-btn"
+                        onClick={() => openDeletePopup(doc)}
+                      >
+                        ลบ
+                      </button>
+                      <button
+                        className="edit-btn"
+                        onClick={() => openEditPopup(doc)}
+                      >
+                        <span>
+                          <i className="bi bi-three-dots-vertical"></i>
+                        </span>
+                      </button>
+                    </div>
+                  </td>
+
                 </tr>
               ))}
             </tbody>
@@ -553,26 +618,7 @@ const MyDocument = () => {
                   transition={{ duration: 0.3 }}
                 >
                   <h2>แก้ไขเอกสาร</h2>
-                  <form
-                    className="edit-form"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      const formData = new FormData(e.currentTarget);
-                      const name = formData.get("name");
-                      const type = formData.get("type");
-                      const date = formData.get("date");
-                      const department = formData.get("department");
-
-                      setDocuments((prevDocs) =>
-                        prevDocs.map((item) =>
-                          item.id === documentToEdit.id
-                            ? { ...item, name, type, date, department }
-                            : item
-                        )
-                      );
-                      closeEditPopup();
-                    }}
-                  >
+                  <form className="edit-form" onSubmit={handleEditSubmit}>
                     <div className="form-group">
                       <label className="label-edit" htmlFor="name">
                         ชื่อเอกสาร

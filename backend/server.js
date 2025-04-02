@@ -87,6 +87,31 @@ app.get('/api/files/user/:userId', async (req, res) => {
   }
 });
 
+// เพิ่ม route สำหรับการอัปเดตไฟล์
+app.put('/api/files/:id', async (req, res) => {
+  const fileId = req.params.id;
+  const { name, type, date, department } = req.body;
+  
+  try {
+    const result = await pool.query(
+      `UPDATE files 
+       SET filename = $1, file_type = $2, document_date = $3, department = $4 
+       WHERE id = $5 
+       RETURNING id, filename AS name, url AS FileUrl, file_type AS type, department, document_date AS date, description, uploaded_by, uploaded_at`,
+      [name, type, date, department, fileId]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+    
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error updating file:', err);
+    res.status(500).json({ message: 'Failed to update file' });
+  }
+});
+
 // อัปเดต route การอัปโหลดไฟล์
 app.post('/api/files/upload', upload.single('file'), async (req, res) => {
   const file = req.file;
