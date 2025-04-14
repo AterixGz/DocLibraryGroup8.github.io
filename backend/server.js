@@ -275,6 +275,24 @@ app.get('/api/profile', async (req, res) => {
   }
 });
 
+
+// Report Pages
+// Get latest files
+app.get('/api/files/latest', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, filename, department, uploaded_at 
+       FROM files 
+       ORDER BY uploaded_at DESC 
+       LIMIT 3`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Failed to fetch latest files:', err);
+    res.status(500).json({ error: 'Failed to fetch latest files' });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
