@@ -297,3 +297,211 @@ app.get('/api/files/latest', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+// Permission
+// Get all permissions
+app.get("/api/permissions", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT id, name, description, created_at FROM permissions ORDER BY id");
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching permissions:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Get permission by ID
+app.get("/api/permissions/:id", async (req, res) => {
+  try {
+    const permissionId = parseInt(req.params.id);
+    const result = await pool.query(
+      "SELECT id, name FROM permissions WHERE id = $1", 
+      [permissionId]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Permission not found" });
+    }
+    
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Error fetching permission:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Create new permission
+app.post("/api/permissions", async (req, res) => {
+  try {
+    const { name, description, code } = req.body;
+    
+    if (!name || !code) {
+      return res.status(400).json({ error: "Name and code are required" });
+    }
+    
+    const result = await pool.query(
+      "INSERT INTO permissions (name, description, code, created_at) VALUES ($1, $2, $3, NOW()) RETURNING id, name, description, code, created_at",
+      [name, description, code]
+    );
+    
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error creating permission:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Update permission
+app.put("/api/permissions/:id", async (req, res) => {
+  try {
+    const permissionId = parseInt(req.params.id);
+    const { name, description, code } = req.body;
+    
+    // Check if permission exists
+    const checkResult = await pool.query("SELECT id FROM permissions WHERE id = $1", [permissionId]);
+    
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ error: "Permission not found" });
+    }
+    
+    const result = await pool.query(
+      "UPDATE permissions SET name = $1, description = $2, code = $3, updated_at = NOW() WHERE id = $4 RETURNING id, name, description, code, updated_at",
+      [name, description, code, permissionId]
+    );
+    
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Error updating permission:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Delete permission
+app.delete("/api/permissions/:id", async (req, res) => {
+  try {
+    const permissionId = parseInt(req.params.id);
+    
+    // Check if permission exists
+    const checkResult = await pool.query("SELECT id FROM permissions WHERE id = $1", [permissionId]);
+    
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ error: "Permission not found" });
+    }
+    
+    // Delete user permissions references first
+    await pool.query("DELETE FROM user_permissions WHERE permission_id = $1", [permissionId]);
+    
+    // Then delete the permission
+    await pool.query("DELETE FROM permissions WHERE id = $1", [permissionId]);
+    
+    res.json({ message: "Permission deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting permission:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Get user permissions
+app.get("/api/users/:userId/permissions", async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    
+    const result = await pool.query(
+      `SELECT p.id, p.name, p.description, p.code 
+       FROM permissions p
+       JOIN user_permissions up ON p.id = up.permission_id
+       WHERE up.user_id = $1
+       ORDER BY p.id`,
+      [userId]
+    );
+    
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching user permissions:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Assign permission to user
+app.post("/api/users/:userId/permissions", async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { permissionId } = req.body;
+    
+    if (!permissionId) {
+      return res.status(400).json({ error: "Permission ID is required" });
+    }
+    
+    // Check if user exists
+    const userCheck = await pool.query("SELECT id FROM users WHERE id = $1", [userId]);
+    if (userCheck.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    
+    // Check if permission exists
+    const permCheck = await pool.query("SELECT id FROM permissions WHERE id = $1", [permissionId]);
+    if (permCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Permission not found" });
+    }
+    
+    // Check if already assigned
+    const existCheck = await pool.query(
+      "SELECT id FROM user_permissions WHERE user_id = $1 AND permission_id = $2",
+      [userId, permissionId]
+    );
+    
+    if (existCheck.rows.length > 0) {
+      return res.status(400).json({ error: "Permission already assigned to user" });
+    }
+    
+    await pool.query(
+      "INSERT INTO user_permissions (user_id, permission_id, created_at) VALUES ($1, $2, NOW())",
+      [userId, permissionId]
+    );
+    
+    res.status(201).json({ message: "Permission assigned successfully" });
+  } catch (err) {
+    console.error("Error assigning permission:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Remove permission from user
+app.delete("/api/users/:userId/permissions/:permissionId", async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const permissionId = parseInt(req.params.permissionId);
+    
+    await pool.query(
+      "DELETE FROM user_permissions WHERE user_id = $1 AND permission_id = $2",
+      [userId, permissionId]
+    );
+    
+    res.json({ message: "Permission removed successfully" });
+  } catch (err) {
+    console.error("Error removing permission:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Check if user has specific permission
+app.get("/api/users/:userId/check-permission/:permissionCode", async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { permissionCode } = req.params;
+    
+    const result = await pool.query(
+      `SELECT COUNT(*) FROM user_permissions up
+       JOIN permissions p ON up.permission_id = p.id
+       WHERE up.user_id = $1 AND p.code = $2`,
+      [userId, permissionCode]
+    );
+    
+    const hasPermission = parseInt(result.rows[0].count) > 0;
+    
+    res.json({ hasPermission });
+  } catch (err) {
+    console.error("Error checking permission:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});

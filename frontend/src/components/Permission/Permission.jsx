@@ -4,8 +4,8 @@ import "./Permission.css";
 import users from "../../data/users";
 
 function PermissionManagement() {
-  const userData = JSON.parse(localStorage.getItem("userData"));
-  const role = userData?.role;
+  const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+  const role = userData?.role || 'guest';
 
   // ลบการตรวจสอบสิทธิ์ออก
   // if (role !== "admin") {
@@ -203,6 +203,11 @@ function PermissionManagement() {
           </div>
         </div>
       )}
+
+      <div className="permission-management">
+        <h1>จัดการสิทธิ์การใช้งาน</h1>
+        <p>{role}</p>
+      </div>
 
       <div className="permission-management__table-container">
         <table className="permission-management__table">
