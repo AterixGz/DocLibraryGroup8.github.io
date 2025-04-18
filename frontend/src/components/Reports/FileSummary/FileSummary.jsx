@@ -1,20 +1,54 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./FileSummary.css";
+
 function FileSummary() {
+  const [fileSummary, setFileSummary] = useState({});
+  const [uploadsByUser, setUploadsByUser] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/api/uploads-summary")
+      .then((response) => response.json())
+      .then((data) => setFileSummary(data))
+      .catch((err) => console.error("Error fetching file summary:", err));
+  }, []);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/api/uploads-by-user")
+      .then((response) => response.json())
+      .then((data) => setUploadsByUser(data))
+      .catch((err) => console.error("Error fetching uploads by user:", err));
+  }, []);
+
+  // เรียงลำดับ uploadsByUser โดยให้อันดับสูงสุดอยู่บนสุด
+  const sortedUploadsByUser = uploadsByUser.length
+    ? [...uploadsByUser].sort((a, b) => b.count - a.count)
+    : [];
+
   return (
     <aside className="file-summary">
       <p className="title-filesummary">ประเภทไฟล์</p>
       <ul>
-        <li>PDF: 1032 ฉบับ</li>
-        <li>PNG: 192 ฉบับ</li>
-        <li>JPG: 121 ฉบับ</li>
-        <li>และอื่นๆ: 10 ฉบับ</li>
+        {Object.keys(fileSummary).length ? (
+          Object.keys(fileSummary).map((ext) => (
+            <li key={ext}>
+              {ext}: {fileSummary[ext]} ฉบับ
+            </li>
+          ))
+        ) : (
+          <li>Loading...</li>
+        )}
       </ul>
       <p className="title-filesummary">อัพโหลดไฟล์ (30 วันที่ผ่านมา)</p>
       <ul>
-        <li>สมจิตร คิดเรื่องแสง: 10 ฉบับ</li>
-        <li>สมจิตร คิดเรื่องแสง: 8 ฉบับ</li>
-        <li>สมจิตร คิดเรื่องแสง: 4 ฉบับ</li>
+        {sortedUploadsByUser.length ? (
+          sortedUploadsByUser.map((item, index) => (
+            <li key={index}>
+              {item.uploader}: {item.count} ฉบับ
+            </li>
+          ))
+        ) : (
+          <li>Loading...</li>
+        )}
       </ul>
     </aside>
   );

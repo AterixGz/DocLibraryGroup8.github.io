@@ -293,6 +293,42 @@ app.get('/api/files/latest', async (req, res) => {
   }
 });
 
+
+app.get("/api/uploads-summary", (req, res) => {
+  const uploadDir = path.join(__dirname, "uploads");
+  fs.readdir(uploadDir, (err, files) => {
+    if (err) {
+      console.error("Error reading uploads directory:", err);
+      return res.status(500).json({ error: "Unable to read uploads directory" });
+    }
+    const summary = {};
+    files.forEach((file) => {
+      // ดึงนามสกุลไฟล์ (แปลงเป็นตัวพิมพ์ใหญ่ และตัดเครื่องหมาย . ออก)
+      const ext = path.extname(file).toUpperCase().replace(".", "");
+      summary[ext] = (summary[ext] || 0) + 1;
+    });
+    res.json(summary);
+  });
+});
+
+// Endpoint สำหรับสรุปการอัพโหลดไฟล์ 30 วันที่ผ่านมา แบ่งกลุ่มตามชื่อคนที่อัพโหลด
+app.get("/api/uploads-by-user", async (req, res) => {
+  try {
+    const query = `
+      SELECT (u.first_name || ' ' || u.last_name) AS uploader, COUNT(*) AS count
+      FROM files f
+      JOIN users u ON f.uploaded_by = u.id
+      WHERE f.uploaded_at >= NOW() - INTERVAL '30 DAY'
+      GROUP BY uploader
+    `;
+    const result = await pool.query(query);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error aggregating uploads by user:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

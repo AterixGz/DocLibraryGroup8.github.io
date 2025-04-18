@@ -5,7 +5,7 @@
 
 tr {
     height: 40px;
-};
+}
 
 #title-report-table {
     margin: 0;
@@ -16,30 +16,38 @@ tr {
 }
 
 #span-pagination {
-    display: inline-flex; /* ใช้ inline-flex เพื่อให้จัดข้อความตรงกลางในกล่อง */
-    justify-content: center; /* จัดข้อความให้อยู่กลางแนวนอน */
-    align-items: center; /* จัดข้อความให้อยู่กลางแนวตั้ง */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
     margin: 0 10px;
 }
 
 .pagination-button-report {
-    display: inline-flex; /* ใช้ inline-flex เพื่อให้จัดข้อความตรงกลางในกล่อง */
-    justify-content: center; /* จัดข้อความให้อยู่กลางแนวนอน */
+    display: inline-flex;
+    justify-content: center;
     align-items: center;
-    background-color: transparent;
+    background-color: #d4d4d4;
+    color: white;
     border-radius: 15px;
-    padding: 10px;
+    padding: 10px 15px;
     height: 35px;
     margin: 20px 10px 0 10px;
-    border: 1px solid transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.pagination-button-report:hover {
-    border: 1px solid #BBBBBB;
+.pagination-button-report:hover:not(:disabled) {
+    background-color: #005a9e;
 }
 
-.pagination-button-report:active {
-    background-color: #F3F3F3;
+.pagination-button-report:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.pagination-button-report:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .border-bottom-document-report {
