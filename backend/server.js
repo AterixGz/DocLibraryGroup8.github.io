@@ -91,26 +91,30 @@ app.get('/api/files/user/:userId', async (req, res) => {
 app.put('/api/files/:id', async (req, res) => {
   const fileId = req.params.id;
   const { name, type, date, department } = req.body;
-  
+
   try {
     const result = await pool.query(
       `UPDATE files 
        SET filename = $1, file_type = $2, document_date = $3, department = $4 
        WHERE id = $5 
-       RETURNING id, filename AS name, url AS FileUrl, file_type AS type, department, document_date AS date, description, uploaded_by, uploaded_at`,
+       RETURNING *`, // เปลี่ยนเป็นคืนทุก field
       [name, type, date, department, fileId]
     );
-    
+
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'File not found' });
     }
-    
-    res.json(result.rows[0]);
+
+    const fileData = result.rows[0];
+    fileData.FileUrl = fileData.url; // ⭐ เพิ่มให้ React ใช้ FileUrl ได้ทุกครั้ง
+
+    res.json(fileData); // ส่งกลับให้ frontend ใช้ได้เลย
   } catch (err) {
     console.error('Error updating file:', err);
     res.status(500).json({ message: 'Failed to update file' });
   }
 });
+
 
 // อัปเดต route การอัปโหลดไฟล์
 app.post('/api/files/upload', upload.single('file'), async (req, res) => {
@@ -133,7 +137,10 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
       [name || file.originalname, url, type, department, date, description, uploadedBy]
     );
     console.log("Database Insert Result:", result.rows[0]);
-    res.status(201).json(result.rows[0]);
+    const fileData = result.rows[0];
+    fileData.FileUrl = fileData.url; // ให้ชื่อฟิลด์สอดคล้องกับ frontend
+
+    res.status(201).json(fileData);
   } catch (err) {
     console.error("Error uploading file:", err);
     res.status(500).json({ message: 'Failed to upload file' });
@@ -144,31 +151,31 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
 app.get('/api/files/download/:filename', (req, res) => {
   const filename = req.params.filename;
   const filePath = path.join(__dirname, 'uploads', filename);
-  
+
   // ตรวจสอบว่าไฟล์มีอยู่จริง
   if (!fs.existsSync(filePath)) {
     return res.status(404).send('File not found');
   }
-  
+
   // อ่านไฟล์
   const file = fs.readFileSync(filePath);
-  
+
   // กำหนดชนิดของไฟล์ (MIME type)
   const mimeType = path.extname(filename).toLowerCase();
   let contentType = 'application/octet-stream'; // ค่าเริ่มต้น
-  
+
   // กำหนด content type ตามนามสกุลไฟล์
   if (mimeType === '.pdf') contentType = 'application/pdf';
   else if (mimeType === '.doc' || mimeType === '.docx') contentType = 'application/msword';
   else if (mimeType === '.xls' || mimeType === '.xlsx') contentType = 'application/vnd.ms-excel';
   else if (mimeType === '.png') contentType = 'image/png';
   else if (mimeType === '.jpg' || mimeType === '.jpeg') contentType = 'image/jpeg';
-  
+
   // ตั้งค่าส่วนหัวสำหรับการดาวน์โหลด
   res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
   res.setHeader('Content-Type', contentType);
   res.setHeader('Content-Length', file.length);
-  
+
   // ส่งไฟล์
   res.send(file);
 });
@@ -351,14 +358,14 @@ app.get("/api/permissions/:id", async (req, res) => {
   try {
     const permissionId = parseInt(req.params.id);
     const result = await pool.query(
-      "SELECT id, name FROM permissions WHERE id = $1", 
+      "SELECT id, name FROM permissions WHERE id = $1",
       [permissionId]
     );
-    
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Permission not found" });
     }
-    
+
     res.json(result.rows[0]);
   } catch (err) {
     console.error("Error fetching permission:", err);
@@ -370,16 +377,16 @@ app.get("/api/permissions/:id", async (req, res) => {
 app.post("/api/permissions", async (req, res) => {
   try {
     const { name, description, code } = req.body;
-    
+
     if (!name || !code) {
       return res.status(400).json({ error: "Name and code are required" });
     }
-    
+
     const result = await pool.query(
       "INSERT INTO permissions (name, description, code, created_at) VALUES ($1, $2, $3, NOW()) RETURNING id, name, description, code, created_at",
       [name, description, code]
     );
-    
+
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error("Error creating permission:", err);
@@ -392,19 +399,19 @@ app.put("/api/permissions/:id", async (req, res) => {
   try {
     const permissionId = parseInt(req.params.id);
     const { name, description, code } = req.body;
-    
+
     // Check if permission exists
     const checkResult = await pool.query("SELECT id FROM permissions WHERE id = $1", [permissionId]);
-    
+
     if (checkResult.rows.length === 0) {
       return res.status(404).json({ error: "Permission not found" });
     }
-    
+
     const result = await pool.query(
       "UPDATE permissions SET name = $1, description = $2, code = $3, updated_at = NOW() WHERE id = $4 RETURNING id, name, description, code, updated_at",
       [name, description, code, permissionId]
     );
-    
+
     res.json(result.rows[0]);
   } catch (err) {
     console.error("Error updating permission:", err);
@@ -416,20 +423,20 @@ app.put("/api/permissions/:id", async (req, res) => {
 app.delete("/api/permissions/:id", async (req, res) => {
   try {
     const permissionId = parseInt(req.params.id);
-    
+
     // Check if permission exists
     const checkResult = await pool.query("SELECT id FROM permissions WHERE id = $1", [permissionId]);
-    
+
     if (checkResult.rows.length === 0) {
       return res.status(404).json({ error: "Permission not found" });
     }
-    
+
     // Delete user permissions references first
     await pool.query("DELETE FROM user_permissions WHERE permission_id = $1", [permissionId]);
-    
+
     // Then delete the permission
     await pool.query("DELETE FROM permissions WHERE id = $1", [permissionId]);
-    
+
     res.json({ message: "Permission deleted successfully" });
   } catch (err) {
     console.error("Error deleting permission:", err);
@@ -441,7 +448,7 @@ app.delete("/api/permissions/:id", async (req, res) => {
 app.get("/api/users/:userId/permissions", async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
-    
+
     const result = await pool.query(
       `SELECT p.id, p.name, p.description, p.code 
        FROM permissions p
@@ -450,7 +457,7 @@ app.get("/api/users/:userId/permissions", async (req, res) => {
        ORDER BY p.id`,
       [userId]
     );
-    
+
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching user permissions:", err);
@@ -463,38 +470,38 @@ app.post("/api/users/:userId/permissions", async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
     const { permissionId } = req.body;
-    
+
     if (!permissionId) {
       return res.status(400).json({ error: "Permission ID is required" });
     }
-    
+
     // Check if user exists
     const userCheck = await pool.query("SELECT id FROM users WHERE id = $1", [userId]);
     if (userCheck.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
-    
+
     // Check if permission exists
     const permCheck = await pool.query("SELECT id FROM permissions WHERE id = $1", [permissionId]);
     if (permCheck.rows.length === 0) {
       return res.status(404).json({ error: "Permission not found" });
     }
-    
+
     // Check if already assigned
     const existCheck = await pool.query(
       "SELECT id FROM user_permissions WHERE user_id = $1 AND permission_id = $2",
       [userId, permissionId]
     );
-    
+
     if (existCheck.rows.length > 0) {
       return res.status(400).json({ error: "Permission already assigned to user" });
     }
-    
+
     await pool.query(
       "INSERT INTO user_permissions (user_id, permission_id, created_at) VALUES ($1, $2, NOW())",
       [userId, permissionId]
     );
-    
+
     res.status(201).json({ message: "Permission assigned successfully" });
   } catch (err) {
     console.error("Error assigning permission:", err);
@@ -507,12 +514,12 @@ app.delete("/api/users/:userId/permissions/:permissionId", async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
     const permissionId = parseInt(req.params.permissionId);
-    
+
     await pool.query(
       "DELETE FROM user_permissions WHERE user_id = $1 AND permission_id = $2",
       [userId, permissionId]
     );
-    
+
     res.json({ message: "Permission removed successfully" });
   } catch (err) {
     console.error("Error removing permission:", err);
@@ -525,16 +532,16 @@ app.get("/api/users/:userId/check-permission/:permissionCode", async (req, res) 
   try {
     const userId = parseInt(req.params.userId);
     const { permissionCode } = req.params;
-    
+
     const result = await pool.query(
       `SELECT COUNT(*) FROM user_permissions up
        JOIN permissions p ON up.permission_id = p.id
        WHERE up.user_id = $1 AND p.code = $2`,
       [userId, permissionCode]
     );
-    
+
     const hasPermission = parseInt(result.rows[0].count) > 0;
-    
+
     res.json({ hasPermission });
   } catch (err) {
     console.error("Error checking permission:", err);

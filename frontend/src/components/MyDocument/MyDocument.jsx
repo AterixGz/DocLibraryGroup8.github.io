@@ -44,47 +44,46 @@ const MyDocument = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true); // Set loading state to true
-    
+
     const formData = new FormData(e.currentTarget);
     const name = formData.get("name");
     const type = formData.get("type");
     const date = formData.get("date");
     const department = formData.get("department");
-    
+
     try {
       const response = await fetch(
         `http://localhost:3000/api/files/${documentToEdit.id}`,
         {
           method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             name,
             type,
             date,
-            department
+            department,
           }),
         }
       );
-      
+
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-      
+
       const updatedDocument = await response.json();
-      
+
       setDocuments((prevDocs) =>
         prevDocs.map((item) =>
           item.id === documentToEdit.id ? updatedDocument : item
         )
       );
-      
+
       setToastMessage(`แก้ไขเอกสาร "${name}" สำเร็จ!`);
       setTimeout(() => setToastMessage(null), 3000);
-      
+
       closeEditPopup();
-      
     } catch (error) {
       console.error("Failed to update document:", error);
       setToastMessage(`แก้ไขเอกสารไม่สำเร็จ: ${error.message}`);
@@ -93,7 +92,7 @@ const MyDocument = () => {
       setIsSubmitting(false); // Reset loading state regardless of outcome
     }
   };
-  
+
   const openEditPopup = (doc) => {
     setDocumentToEdit(doc);
     setShowEditPopup(true);
@@ -109,8 +108,10 @@ const MyDocument = () => {
         // ตรวจสอบว่ามี userId ก่อนที่จะดึงข้อมูล
         if (!userId) return;
 
-        const res = await fetch(`http://localhost:3000/api/files/user/${userId}`);
-        if (!res.ok) throw new Error('Failed to fetch user files');
+        const res = await fetch(
+          `http://localhost:3000/api/files/user/${userId}`
+        );
+        if (!res.ok) throw new Error("Failed to fetch user files");
 
         const data = await res.json();
         setDocuments(data); // ตั้งค่าข้อมูลโดยตรงจาก API
@@ -166,10 +167,14 @@ const MyDocument = () => {
   };
 
   const handlePreview = (fileUrl) => {
+    if (!fileUrl) {
+      setAlertMessage("ไม่พบ URL สำหรับ preview");
+      return;
+    }
     if (fileUrl.endsWith(".xlsx")) {
       setAlertMessage("ไม่สามารถแสดงตัวอย่างไฟล์ Excel ได้ในขณะนี้");
     } else {
-      setPreviewFile(fileUrl);
+      setPreviewFile(fileUrl); // URL ที่ใช้ iframe src ได้
     }
   };
 
@@ -219,21 +224,28 @@ const MyDocument = () => {
       message: `ดาวน์โหลดเอกสารเสร็จสิ้น`,
       isSingle: true,
     };
-
     setDownloadPopups((prev) => [...prev, newPopup]);
 
-    // ตั้งเวลาให้ popup หายไปหลัง 5 วินาที
     setTimeout(() => {
       setDownloadPopups((prev) =>
         prev.filter((popup) => popup.id !== newPopup.id)
       );
     }, 5000);
 
-    // Trigger download
+    // ✅ Extract filename from URL
+    const filename = fileUrl.split("/").pop();
+
+    // ✅ ใช้ API download ที่ตั้ง header ถูกต้อง
+    const downloadUrl = `http://localhost:3000/api/files/download/${encodeURIComponent(
+      filename
+    )}`;
+
     const link = document.createElement("a");
-    link.href = fileUrl;
-    link.download = fileName;
+    link.href = downloadUrl;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   };
 
   const handleDownloadSelected = () => {
@@ -251,18 +263,33 @@ const MyDocument = () => {
 
     setDownloadPopups((prev) => [...prev, newPopup]);
 
-    // ตั้งเวลาให้ popup หายไปหลัง 5 วินาที
     setTimeout(() => {
       setDownloadPopups((prev) =>
         prev.filter((popup) => popup.id !== newPopup.id)
       );
     }, 5000);
 
-    filesToDownload.forEach((file) => {
-      const link = document.createElement("a");
-      link.href = file.FileUrl;
-      link.download = file.name;
-      link.click();
+    filesToDownload.forEach((file, index) => {
+      const url = file.fileurl || file.FileUrl || file.url;
+
+      if (!url) {
+        console.warn("⚠️ ไม่มี URL สำหรับไฟล์:", file);
+        return; // ข้ามไฟล์ที่ไม่มี URL
+      }
+
+      const filename = url.split("/").pop();
+      const downloadUrl = `http://localhost:3000/api/files/download/${encodeURIComponent(
+        filename
+      )}`;
+
+      setTimeout(() => {
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.setAttribute("download", file.name || filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }, index * 300); // มี delay ป้องกัน browser block
     });
   };
 
@@ -458,8 +485,9 @@ const MyDocument = () => {
               <thead>
                 <tr>
                   <th
-                    className={`checkbox-th ${isDownloading ? "no-radius" : ""
-                      }`}
+                    className={`checkbox-th ${
+                      isDownloading ? "no-radius" : ""
+                    }`}
                   >
                     <button
                       onClick={toggleCheckbox}
@@ -494,7 +522,6 @@ const MyDocument = () => {
                 </tr>
               </thead>
             </table>
-
           </div>
 
           <hr className="hr-top"></hr>
@@ -514,8 +541,9 @@ const MyDocument = () => {
               {currentDocuments.map((doc, index) => (
                 <tr
                   key={doc.id}
-                  className={`row-item ${selectedDocuments.includes(doc.id) ? "row-selected" : ""
-                    }`}
+                  className={`row-item ${
+                    selectedDocuments.includes(doc.id) ? "row-selected" : ""
+                  }`}
                   onClick={() => handleSelectDocument(doc.id)}
                 >
                   {showCheckbox && (
@@ -530,18 +558,16 @@ const MyDocument = () => {
                   )}
                   <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
                   <td>
-
                     <a
                       href="#"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handlePreview(doc.FileUrl);
+                        handlePreview(doc.fileurl || doc.FileUrl || doc.url);
                       }}
                       className="preview-link"
                     >
                       {doc.name}
                     </a>
-
                   </td>
                   <td>{doc.type}</td>
                   <td>{doc.date}</td>
@@ -553,7 +579,10 @@ const MyDocument = () => {
                         className="download-btn"
                         onClick={(e) => {
                           e.stopPropagation(); // ป้องกันการ trigger การเลือกแถว
-                          handleSingleDownload(doc.FileUrl, doc.name); // เรียกฟังก์ชัน handleSingleDownload
+                          handleSingleDownload(
+                            doc.fileurl || doc.url,
+                            doc.name
+                          ); // เรียกฟังก์ชัน handleSingleDownload
                         }}
                       >
                         ดาวน์โหลด
@@ -574,7 +603,6 @@ const MyDocument = () => {
                       </button>
                     </div>
                   </td>
-
                 </tr>
               ))}
             </tbody>

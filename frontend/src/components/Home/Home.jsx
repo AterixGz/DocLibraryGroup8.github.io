@@ -31,13 +31,13 @@ const Home = ({ role }) => {
       try {
         const res = await fetch("http://localhost:3000/api/files");
         const data = await res.json();
-        setDocuments([...data, ...uploadedFiles]); // Combine with files from context
+        setDocuments(data); // Combine with files from context
       } catch (err) {
         console.error("Failed to fetch files:", err);
       }
     };
     fetchFiles();
-  }, [uploadedFiles]);
+  }, []);
 
   // 🔄 โหลดไฟล์ทั้งหมดจาก backend
   const sortDocuments = (docs, option, order) => {
@@ -48,8 +48,8 @@ const Home = ({ role }) => {
         return order === "asc" ? dateA - dateB : dateB - dateA;
       } else if (option === "name") {
         return order === "asc"
-          ? a.filename.localeCompare(b.filename)
-          : b.filename.localeCompare(a.filename);
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
       } else if (option === "category") {
         return order === "asc"
           ? a.type.localeCompare(b.type)
@@ -74,7 +74,12 @@ const Home = ({ role }) => {
   };
 
   const handlePreview = (fileUrl) => {
-    if (fileUrl.endsWith(".xlsx")) {
+    if (!fileUrl) {
+      setAlertMessage("ไม่พบ URL สำหรับ preview");
+      return;
+    }
+    if (fileUrl?.endsWith(".xlsx")) {
+      // ✅ กันกรณี null/undefined เพิ่มอีกชั้น
       setAlertMessage("ไม่สามารถแสดงตัวอย่างไฟล์ Excel ได้ในขณะนี้");
     } else {
       setPreviewFile(fileUrl);
@@ -127,55 +132,74 @@ const Home = ({ role }) => {
       message: `ดาวน์โหลดเอกสารเสร็จสิ้น`,
       isSingle: true,
     };
-
     setDownloadPopups((prev) => [...prev, newPopup]);
 
-    // ตั้งเวลาให้ popup หายไปหลัง 5 วินาที
     setTimeout(() => {
       setDownloadPopups((prev) =>
         prev.filter((popup) => popup.id !== newPopup.id)
       );
     }, 5000);
 
-    // Trigger download
-    filesToDownload.forEach((file) => {
-      const link = document.createElement("a");
-      link.href = file.FileUrl;
-      link.download = file.name;
-      link.click();
-    });
+    // ✅ Extract filename from URL
+    const filename = fileUrl.split("/").pop();
+
+    // ✅ ใช้ API download ที่ตั้ง header ถูกต้อง
+    const downloadUrl = `http://localhost:3000/api/files/download/${encodeURIComponent(
+      filename
+    )}`;
+
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleDownloadSelected = () => {
     setIsSingleDownload(false);
-
+  
     const filesToDownload = documents.filter((doc) =>
       selectedDocuments.includes(doc.id)
     );
-    
-
+  
     const newPopup = {
       id: Date.now(),
       message: `ดาวน์โหลดเอกสารทั้งหมด ${selectedDocuments.length} รายการเสร็จสิ้น`,
       isSingle: false,
     };
-
+  
     setDownloadPopups((prev) => [...prev, newPopup]);
-
-    // ตั้งเวลาให้ popup หายไปหลัง 5 วินาที
+  
     setTimeout(() => {
       setDownloadPopups((prev) =>
         prev.filter((popup) => popup.id !== newPopup.id)
       );
     }, 5000);
-
-    filesToDownload.forEach((file) => {
-      const link = document.createElement("a");
-      link.href = file.FileUrl;
-      link.download = file.name;
-      link.click();
+  
+    filesToDownload.forEach((file, index) => {
+      const url = file.fileurl || file.FileUrl || file.url;
+  
+      if (!url) {
+        console.warn("⚠️ ไม่มี URL สำหรับไฟล์:", file);
+        return; // ข้ามไฟล์ที่ไม่มี URL
+      }
+  
+      const filename = url.split("/").pop();
+      const downloadUrl = `http://localhost:3000/api/files/download/${encodeURIComponent(filename)}`;
+  
+      setTimeout(() => {
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.setAttribute("download", file.name || filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }, index * 300); // มี delay ป้องกัน browser block
     });
   };
+  
+  
 
   // Function to close popup by ID
   const closeDownloadPopup = (id) => {
@@ -423,7 +447,7 @@ const Home = ({ role }) => {
                         href="#"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handlePreview(doc.FileUrl);
+                          handlePreview(doc.fileurl || doc.url);
                         }}
                         className="preview-link"
                       >
@@ -437,10 +461,15 @@ const Home = ({ role }) => {
                   {role !== "guest" && (
                     <td>
                       <a
+                        href="#"
                         className="download-link"
                         onClick={(e) => {
-                          e.stopPropagation(); // ป้องกันการ trigger การเลือกแถว
-                          handleSingleDownload(doc.FileUrl, doc.name); // เรียกฟังก์ชัน handleSingleDownload
+                          e.preventDefault(); // ✅ ป้องกัน redirect
+                          e.stopPropagation(); // ✅ ป้องกันแถวถูกเลือก
+                          handleSingleDownload(
+                            doc.fileurl || doc.url,
+                            doc.name
+                          );
                         }}
                       >
                         ดาวน์โหลด
