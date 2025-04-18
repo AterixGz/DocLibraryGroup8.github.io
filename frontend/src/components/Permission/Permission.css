@@ -62,8 +62,21 @@
 .permission-management__table {
   width: 100%;
   border-collapse: collapse;
-  border-radius: 10px; /* เพิ่มมุมมนให้กับตาราง */
+  border-radius: 10px 10px 0 0;
   overflow: hidden; /* ทำให้มุมมนไม่ถูกตัด */
+  table-layout: fixed;
+}
+
+.permission-management__tbody-container {
+  max-height: 550px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.permission-management__tbody-container td {
+  padding: 12px 16px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
 }
 
 .permission-management__table th,
@@ -74,6 +87,7 @@
 }
 
 .permission-management__table th {
+  position: sticky;
   background-color: #ff5722;
   color: white;
   font-size: 16px;
@@ -82,6 +96,35 @@
 
 .permission-management__table tr:nth-child(even) {
   background-color: #f2f2f2;
+}
+
+.permission-management__table th:nth-child(1),
+.permission-management__table td:nth-child(1) {
+  width: 20%; /* ชื่อบุคลากร */
+}
+
+.permission-management__table th:nth-child(2),
+.permission-management__table td:nth-child(2) {
+  width: 15%; /* แผนก */
+}
+
+.permission-management__table th:nth-child(3),
+.permission-management__table td:nth-child(3) {
+  width: 15%; /* รหัสพนักงาน */
+}
+
+.permission-management__table th:nth-child(4),
+.permission-management__table td:nth-child(4),
+.permission-management__table th:nth-child(5),
+.permission-management__table td:nth-child(5),
+.permission-management__table th:nth-child(6),
+.permission-management__table td:nth-child(6) {
+  width: 12%; /* คอลัมน์ Toggle */
+}
+
+.permission-management__table th:nth-child(7),
+.permission-management__table td:nth-child(7) {
+  width: 8%; /* ปุ่มลบ */
 }
 
 .permission-management__delete-btn {

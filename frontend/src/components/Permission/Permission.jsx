@@ -26,6 +26,7 @@ function PermissionManagement() {
     firstName: "",
     lastName: "",
     username: "",
+    department: "",
     employeeId: "",
   });
   const [loading, setLoading] = useState(false);
@@ -204,16 +205,17 @@ function PermissionManagement() {
         </div>
       )}
 
-      <div className="permission-management">
+      {/* <div className="permission-management">
         <h1>จัดการสิทธิ์การใช้งาน</h1>
         <p>{role}</p>
-      </div>
+      </div> */}
 
       <div className="permission-management__table-container">
         <table className="permission-management__table">
           <thead>
             <tr>
               <th>บุคลากร</th>
+              <th>แผนก</th>
               <th>รหัสพนักงาน</th>
               <th>Document</th>
               <th>Permission</th>
@@ -221,21 +223,25 @@ function PermissionManagement() {
               <th></th>
             </tr>
           </thead>
+          </table>
+          <div className="permission-management__tbody-container">
+          <table className="permission-management__table">
           <tbody>
             {filteredUsers.map((user, index) => (
               <tr key={user.username}>
-                <td>{`${user.firstName} ${user.lastName}`}</td>
-                <td>{user.employeeId}</td>
-                {["documentAccess", "permissionAccess", "reportsAccess"].map((perm) => (
-                  <td key={perm}>
-                    <div className="toggle-switch">
-                      <input
-                        type="checkbox"
-                        id={`${perm}-${index}`}
-                        checked={user[perm]}
-                        onChange={() => handleTogglePermission(index, perm)}
-                      />
-                      <label htmlFor={`${perm}-${index}`}></label>
+              <td>{`${user.firstName} ${user.lastName}`}</td>
+              <td>{`${user.department}`}</td>
+              <td>{user.employeeId}</td>
+              {["documentAccess", "permissionAccess", "reportsAccess"].map((perm) => (
+                <td key={perm}>
+                  <div className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      id={`${perm}-${index}`}
+                      checked={user[perm]}
+                      onChange={() => handleTogglePermission(index, perm)}
+                    />
+                    <label htmlFor={`${perm}-${index}`}></label>
                     </div>
                   </td>
                 ))}
@@ -249,7 +255,8 @@ function PermissionManagement() {
           </tbody>
         </table>
       </div>
-
+    </div>
+    
       <button
         onClick={handleConfirmUpdate}
         className="permission-management__confirm-btn"
