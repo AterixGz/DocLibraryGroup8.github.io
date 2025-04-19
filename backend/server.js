@@ -507,15 +507,29 @@ app.delete('/api/files/permanent-delete/:id', async (req, res) => {
 });
 
 app.get('/api/files/trash', async (req, res) => {
+  const userId = req.query.userId;
+
   try {
-    const result = await pool.query(`
-      SELECT id, filename AS name, url AS FileUrl, file_type AS type, department,
-             document_date AS date, description, uploaded_by, uploaded_at, deleted_at 
-      FROM deleted_files ORDER BY deleted_at DESC
-    `);
+    let result;
+
+    if (userId) {
+      result = await pool.query(`
+        SELECT id, filename AS name, url AS FileUrl, file_type AS type, department,
+               document_date AS date, description, uploaded_by, uploaded_at, deleted_at 
+        FROM deleted_files 
+        WHERE uploaded_by = $1
+        ORDER BY deleted_at DESC
+      `, [userId]);
+    } else {
+      // fallback ถ้าไม่มี userId ก็ไม่คืนไฟล์เลย
+      return res.status(400).json({ message: 'Missing user ID' });
+    }
+
     res.json(result.rows);
   } catch (err) {
     console.error(err);
     res.status(500).send('Failed to fetch trash');
   }
 });
+
+

@@ -1,27 +1,260 @@
-.trash-container {
+.trashpage-container {
     padding: 2rem;
-  }
-  .trash-table {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-top: 2rem;
+}
+
+.trashpage-title {
+    font-size: 36px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: bold;
+}
+
+.trashpage-table {
     width: 100%;
     border-collapse: collapse;
-  }
-  .trash-table th, .trash-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-  .btn-restore {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.trashpage-table th,
+.trashpage-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.trashpage-table thead th {
+    background-color: #f8f8f8;
+    color: #333;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.trashpage-table tbody tr:hover {
+    background-color: #fff7f4;
+}
+
+.trashpage-preview-link {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.trashpage-preview-link:hover {
+    color: darkred;
+    text-decoration: underline;
+}
+
+/* ปุ่มกู้คืน */
+.trashpage-btn-restore {
     background-color: #4caf50;
     color: white;
     border: none;
-    padding: 5px 10px;
-    margin-right: 5px;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-weight: bold;
     cursor: pointer;
-  }
-  .btn-delete {
+    transition: background-color 0.3s ease, transform 0.2s;
+    margin-right: 0.5rem;
+}
+
+.trashpage-btn-restore:hover {
+    background-color: #388e3c;
+    transform: translateY(-2px);
+}
+
+/* ปุ่มลบถาวร */
+.trashpage-btn-delete {
     background-color: #f44336;
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-weight: bold;
     cursor: pointer;
-  }
-  
+    transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.trashpage-btn-delete:hover {
+    background-color: #d32f2f;
+    transform: translateY(-2px);
+}
+
+/* Preview modal */
+.trashpage-preview-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.trashpage-modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    height: 80%;
+    position: relative;
+    max-width: 1000px !important;
+}
+
+.trashpage-preview-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.trashpage-close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: red;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    /* เหมือนของ Home */
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.trashpage-close-button:hover {
+    background-color: #d32f2f;
+}
+
+/* 🔔 Popup Overlay */
+.trash-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+/* 🔔 Alert/Confirm Box */
+.trash-popup-box {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: slideDown 0.3s ease;
+}
+
+.trash-popup-box p {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.trash-popup-actions button {
+    margin: 0 8px;
+}
+
+/* ❌ Close Button */
+.trash-popup-close-btn {
+    margin-top: 1rem;
+    padding: 6px 16px;
+    border-radius: 8px;
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.trash-popup-close-btn:hover {
+    background-color: #b71c1c;
+}
+
+/* ✅ Success Toast */
+.trash-popup-success {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 999;
+}
+
+.trash-popup-success-box {
+    background-color: #4caf50;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease;
+}
+
+.trash-popup-success-box i {
+    font-size: 1.2rem;
+}
+
+/* Animations */
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .trashpage-container {
+        padding: 1rem;
+    }
+
+    .trashpage-table th,
+    .trashpage-table td {
+        padding: 10px;
+        font-size: 0.95rem;
+    }
+
+    .trashpage-btn-restore,
+    .trashpage-btn-delete {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+
+    .trashpage-modal-content {
+        width: 95%;
+        height: 85%;
+    }
+}
