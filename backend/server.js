@@ -431,3 +431,91 @@ app.post("/api/permissions", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+app.delete('/api/files/soft-delete/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log("👉 Soft delete request for ID:", id); // ✅ debug
+
+  try {
+    const result = await pool.query('SELECT * FROM files WHERE id = $1', [id]);
+
+    if (result.rows.length === 0) {
+      console.warn("❌ File not found for soft delete:", id); // log เพิ่มเติม
+      return res.status(404).json({ message: 'File not found' });
+    }
+
+    const file = result.rows[0];
+
+    await pool.query(`
+      INSERT INTO deleted_files 
+      (original_file_id, filename, url, uploaded_by, uploaded_at, file_type, department, document_date, description, deleted_at)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW()) -- ✅ เพิ่ม deleted_at
+    `, [
+      file.id, file.filename, file.url, file.uploaded_by, file.uploaded_at,
+      file.file_type, file.department, file.document_date, file.description
+    ]);
+
+    await pool.query('DELETE FROM files WHERE id = $1', [id]);
+
+    res.json({ message: 'File moved to trash' });
+  } catch (err) {
+    console.error("❌ Soft delete failed:", err);
+    res.status(500).send('Soft delete failed');
+  }
+});
+
+
+app.put('/api/files/restore/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM deleted_files WHERE id = $1', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ message: 'Not found in trash' });
+
+    const file = result.rows[0];
+
+    await pool.query(`
+      INSERT INTO files (filename, url, uploaded_by, uploaded_at, file_type, department, document_date, description)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+    `, [
+      file.filename, file.url, file.uploaded_by, file.uploaded_at,
+      file.file_type, file.department, file.document_date, file.description
+    ]);
+
+    await pool.query('DELETE FROM deleted_files WHERE id = $1', [id]);
+    res.json({ message: 'Restored' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Restore failed');
+  }
+});
+
+app.delete('/api/files/permanent-delete/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('SELECT url FROM deleted_files WHERE id = $1', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ message: 'Not found' });
+
+    const filePath = path.join(__dirname, 'uploads', path.basename(result.rows[0].url));
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+
+    await pool.query('DELETE FROM deleted_files WHERE id = $1', [id]);
+    res.json({ message: 'Permanently deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Permanent delete failed');
+  }
+});
+
+app.get('/api/files/trash', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, filename AS name, url AS FileUrl, file_type AS type, department,
+             document_date AS date, description, uploaded_by, uploaded_at, deleted_at 
+      FROM deleted_files ORDER BY deleted_at DESC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Failed to fetch trash');
+  }
+});

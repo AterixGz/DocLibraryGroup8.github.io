@@ -48,6 +48,9 @@ function Sidebar({ user, onLogout }) {
           </Link>
         </li> */}
         <li className="menu-item">
+          <Link to="/trash" className={`sidebar-item ${isActive("/trash") ? "active" : ""}`}><i class="fi fi-rr-trash"></i> Trash</Link>
+        </li>
+        <li className="menu-item">
           <Link
             to="/approve"
             className={`sidebar-item ${isActive("/approve") ? "active" : ""}`}

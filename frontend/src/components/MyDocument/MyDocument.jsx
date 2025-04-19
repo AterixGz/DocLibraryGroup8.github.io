@@ -384,26 +384,23 @@ const MyDocument = () => {
     if (documentToDelete) {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/files/${documentToDelete.id}`,
-          {
-            method: "DELETE",
-          }
+          `http://localhost:3000/api/files/soft-delete/${documentToDelete.id}`,
+          { method: "DELETE" }
         );
         if (res.ok) {
-          // อัปเดต state เพื่อลบเอกสารออกจากรายการที่แสดง
           setDocuments((prevDocs) =>
             prevDocs.filter((item) => item.id !== documentToDelete.id)
           );
-          setToastMessage(`ลบเอกสาร "${documentToDelete.name}" สำเร็จ!`);
+          setToastMessage(`ย้าย "${documentToDelete.name}" ไปยังถังขยะแล้ว`);
           setTimeout(() => setToastMessage(null), 3000);
           closePopup();
         } else {
-          console.error("Failed to delete from backend");
-          setToastMessage(`ไม่สามารถลบเอกสาร "${documentToDelete.name}" ได้`);
+          console.error("Soft delete failed");
+          setToastMessage("ไม่สามารถลบได้");
           setTimeout(() => setToastMessage(null), 3000);
         }
       } catch (err) {
-        console.error("Error deleting file:", err);
+        console.error("Soft delete error:", err);
         setToastMessage(`เกิดข้อผิดพลาด: ${err.message}`);
         setTimeout(() => setToastMessage(null), 3000);
       }
