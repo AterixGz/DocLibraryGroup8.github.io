@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import { Link } from "react-router-dom"; // <-- Import Link for routing
 import "./MyDocument.css";
 import { FileContext } from "../FileContext/FileContext";
 import FileData from "../../data/FileData";
@@ -434,6 +435,7 @@ const MyDocument = () => {
             />
           </div>
 
+
           <div className="dropdown">
             <label className="filter-label">จัดเรียงตาม: </label>
             <select
@@ -481,13 +483,13 @@ const MyDocument = () => {
                     </span> */}
           </div>
           <div className="multi-select-actions">
+
             <table>
               <thead>
                 <tr>
                   <th
-                    className={`checkbox-th ${
-                      isDownloading ? "no-radius" : ""
-                    }`}
+                    className={`checkbox-th ${isDownloading ? "no-radius" : ""
+                      }`}
                   >
                     <button
                       onClick={toggleCheckbox}
@@ -522,6 +524,9 @@ const MyDocument = () => {
                 </tr>
               </thead>
             </table>
+            <Link to="/document" className="add-document-btn">
+            เพิ่มเอกสารใหม่
+            </Link>
           </div>
 
           <hr className="hr-top"></hr>
@@ -541,9 +546,8 @@ const MyDocument = () => {
               {currentDocuments.map((doc, index) => (
                 <tr
                   key={doc.id}
-                  className={`row-item ${
-                    selectedDocuments.includes(doc.id) ? "row-selected" : ""
-                  }`}
+                  className={`row-item ${selectedDocuments.includes(doc.id) ? "row-selected" : ""
+                    }`}
                   onClick={() => handleSelectDocument(doc.id)}
                 >
                   {showCheckbox && (

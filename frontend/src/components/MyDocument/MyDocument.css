@@ -536,3 +536,51 @@
   transform: translateY(-2px); /* Slight lift effect */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
 }
+
+.add-document-container {
+  display: flex;
+  justify-content: flex-end;
+  /* margin: 0px 0; */
+}
+
+.multi-select-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.add-document-btn {
+  background-color: #F14D31;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.add-document-btn:hover {
+  background-color: #e05500;
+}
+/* With these changes, a new button labeled “เพิ่มเอกสารใหม่” will appear below the search bar and will navigate to "/document" when clicked, fitting nicely with the existing theme.// filepath: c:\DATA\Coding\Github\spu205\DocLibraryGroup8\frontend\src\components\MyDocument\MyDocument.css */
+.add-document-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.add-document-btn {
+  margin-top: 16px;
+  background-color: #F14D31;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.add-document-btn:hover {
+  background-color: #e05500;
+}
+/* With these changes, a new button labeled “เพิ่มเอกสารใหม่” will appear below the search bar and will navigate to "/document" when clicked, fitting nicely with the existing theme. */

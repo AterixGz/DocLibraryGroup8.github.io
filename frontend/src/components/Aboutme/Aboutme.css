@@ -29,14 +29,14 @@
 }
 
 .team-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+  justify-items: center;
 }
 
 .about-me-card {
-  width: 300px;
+  width: 250px;
   height: 400px;
   background-size: cover;
   background-position: center;

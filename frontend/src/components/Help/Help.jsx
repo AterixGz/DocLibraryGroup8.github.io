@@ -80,7 +80,7 @@ function Help() {
         
       </header>
 
-      <div className="help-navigation">
+      {/* <div className="help-navigation">
         <input
           type="text"
           className="help-search"
@@ -88,7 +88,7 @@ function Help() {
           onChange={handleSearch}
         />
        
-      </div>
+      </div> */}
 
       <main className="help-content">
         {helpSections.filter((section) =>

@@ -3,13 +3,13 @@ import { motion } from "framer-motion";
 import "./AboutMe.css";
 
 const teamMembers = [
-  {
-    name: "นายปวิช ปัญญาศุภาพงศ์ 66070599",
-    imageClass: "john-image",
-    description: "สวัสดีครับ! เราทีม และผมเป็นส่วนนึงในการพัฒนา Project Doc library", 
-    details: "เรารับผิดชอบในการออกแบบ UI/UX สำหรับระบบโปรไฟล์และการลงชื่อเข้าใช้ (Sign In) รวมถึงการสัมภาษณ์ผู้ใช้เพื่อเก็บข้อมูลความต้องการ (User Requirements), About Me หน้านี้ด้วย และเขียนโค้ดที่ตอบโจทย์การใช้งานจริง",
-    link: "https://www.instagram.com/px._.w11t/",
-  },
+  // {
+  //   name: "นายปวิช ปัญญาศุภาพงศ์ 66070599",
+  //   imageClass: "john-image",
+  //   description: "สวัสดีครับ! เราทีม และผมเป็นส่วนนึงในการพัฒนา Project Doc library", 
+  //   details: "เรารับผิดชอบในการออกแบบ UI/UX สำหรับระบบโปรไฟล์และการลงชื่อเข้าใช้ (Sign In) รวมถึงการสัมภาษณ์ผู้ใช้เพื่อเก็บข้อมูลความต้องการ (User Requirements), About Me หน้านี้ด้วย และเขียนโค้ดที่ตอบโจทย์การใช้งานจริง",
+  //   link: "https://www.instagram.com/px._.w11t/",
+  // },
   {
     name: "นายธัญพิสิษฐ์ บัวบุตร 66028215",
     imageClass: "jane-image",
@@ -76,7 +76,7 @@ const AboutMe = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Learn More
+                  Get in Touch
                 </a>
               </div>
             </div>

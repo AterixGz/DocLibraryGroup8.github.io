@@ -1,220 +1,141 @@
-
-
-.sidebar {
-  height: 100%;
+.sidebar-container {
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100vh;
+  background-color: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  border-radius: 0 1rem 1rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   overflow-y: auto;
+  border: 1px solid #ddd;
+  transition: width 0.3s ease;
 }
 
-/* Sidebar item styles */
-.sidebar-item {
-  color: #ffffff !important;
+.sidebar-container.collapsed {
+  width: 70px;
+}
+
+/* ปุ่มย่อ/ขยาย Sidebar */
+.sidebar-toggle {
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.collapse-button {
+  background-color: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #333;
+}
+
+/* ส่วนของโลโก้ */
+.logo-section {
+  background-color: #ffffff;
   padding: 10px;
-  width: 13.2rem;
-  border-radius: 1rem 0 0 1rem;
-  text-decoration: none;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  padding-left: 40px; /* เพิ่ม padding ซ้าย */
+  text-align: center;
+  border-radius: 1rem;
+  border: 2px solid #ff5500; /* เพิ่ม border สีส้ม */
+  margin-left: -40px;       /* ดันให้ด้านซ้ายชิดขอบจอ โดยเอาค่า padding ออก */
+  margin-top: 15px;
+  margin-bottom: 15px;
+  width: calc(100% + 20px);   /* ขยายความกว้างเพื่อให้แสดง border ซ้ายชิดขอบ */
 }
 
-/* Hover effect */
+.logo-link {
+  display: inline-block;
+}
+
+.logo-image {
+  width: 100%;
+  max-width: 210px;
+  border-radius: 0.5rem;
+}
+
+/* เมนู Sidebar */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  margin-bottom: 10px;
+}
+
+.sidebar-item {
+  display: block;
+  text-decoration: none;
+  color: #333;
+  padding: 10px 15px;
+  border-radius: 0.75rem;
+  transition: background-color 0.3s ease, box-shadow 0.2s ease;
+}
+
 .sidebar-item:hover {
-  background-color: #E97B68;  /* Light hover color */
-  color: white !important;
-  background-color: #E97B68;
-  width: 13.2rem;
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .sidebar-item.active {
-  background-color: #E97B68;  /* Active state background */
-  color: #f14d31 !important;  /* Active state text color */
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #000;
   font-weight: bold;
-  transform: scale(1.02); /* Slightly enlarge when active */
-  width: 13.2rem;
-  border-radius: 1rem 0 0 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Administrator dropdown */
-.nav-link.sidebar-item {
+/* ปุ่ม Administrator */
+.admin-dropdown {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 10px 15px;
+  color: #333;
+  border-radius: 0.75rem;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.nav-link.sidebar-item.active {
-  background-color: #ffffff; /* Active background for the dropdown */
-  color: white !important; /* Active text color in the dropdown */
+.admin-dropdown:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
-/* Add border for dropdown menu when open */
-.nav.flex-column.ms-3 {
-  border-radius: 8px;
-  padding: 5px;
+.admin-submenu {
+  list-style: none;
+  padding-left: 15px;
+  margin-top: 5px;
 }
 
-/* Remove padding in ul */
-.no-padding {
-  padding-left: 10px !important;
+.submenu-item {
+  margin-bottom: 5px;
 }
 
-/* Active link styles */
-.nav-link.sidebar-item.active {
-  background-color: #E97B68;
-  color: #f14d31;
-  width: 13.07rem;
-
+/* Footer ของ Sidebar */
+.sidebar-footer {
+  margin-top: 20px;
 }
 
-/* Transition effect for nav items */
-.nav-item.p-1 {
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  align-items: center; /* Align icons vertically */
+.divider {
+  border: none;
+  height: 2px;
+  background-color: #ff7043;
+  margin: 10px 0;
 }
 
-/* Footer link */
 .footer-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
   text-decoration: none;
-  width: 100%;
-  padding: 10px;
   color: #333;
-  transition: color 0.3s ease, transform 0.2s ease;
-}
-
-.footer-link:hover {
-  color: #f14d31;
-}
-
-.footer-link:active {
-  color: #f8bdaa; /* Darker color when active */
-  transform: scale(0.98); /* Slightly shrink when active */
-}
-
-/* Profile image in Footer */
-.footer-profile-image {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #f14d31;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.footer-profile-image:hover {
-  transform: scale(1.1);
-}
-
-.footer-profile-image:active {
-  transform: scale(0.95); /* Shrink slightly when clicked */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add shadow on click */
-}
-
-/* Logo section */
-.logo-section {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
   padding: 10px 0;
-}
-
-.logo-image {
-  object-fit: contain;
-  display: block;
-  margin: 0 auto; /* Centers the logo */
-  background-color: white; /* Background for a clean look */
-  border-radius: 8px; /* Slightly rounded corners */
-  border: 2px solid #ffffff; /* Border around the logo */
-  padding: 5px; /* Spacing between image and border */
-}
-
-.styled-logo {
-  width: 215px; /* Adjust width based on the logo */
-  height: auto; /* Adjust height proportionally */
-  border-radius: 0 1rem 1rem 0; /* Rounded corners */
-  padding: 5px; /* Inner spacing */
-  background-color: white;
-  margin-top: 4rem;
-}
-
-.logo-text {
-  font-size: 1.2rem;
-  color: #ffffff;
-  margin-left: 10px;
-}
-
-/* Divider styling */
-.divider {
-  background-color: #ff7043;
-  height: 2px;
-}
-
-/* Footer section */
-.footer-section {
-  padding: 10px;
-  color: #ffffff;
-  text-align: center;
-  border-radius: 0 0 1rem;
-}
-
-.footer-link {
-  color: #ffffff !important;
-  display: flex;
-  align-items: center;
-}
-
-.footer-link:hover {
-  text-decoration: none;
-  color: #ffccbc !important;
-}
-
-.footer-profile-image {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ffffff;
-  margin-right: 1rem;
-}
-
-/* Footer Section */
-.footer-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 15px;
-  background-color: #E97B68;
-  margin-top: auto;
-  border-radius: 0 0 1rem ;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
-}
-
-.footer-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Ensure profile info and image are on opposite sides */
-  text-decoration: none;
-  width: 100%;
-  color: #ffffff;
-  padding: 10px 15px;
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
-}
-
-.footer-link:hover {
-  background-color: #f14d31; /* Hover effect to match sidebar color */
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-}
-
-.user-name {
-  font-size: 1rem;
-  font-weight: 500;
-  color: white;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-right: 10px; /* Padding to avoid text getting too close to image */
 }
 
 .footer-profile-image {
@@ -222,88 +143,30 @@
   height: 45px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #ffffff;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 2px solid #fff;
 }
 
-.footer-profile-image:hover {
-  transform: scale(1.1);
-}
-
-.footer-profile-image:active {
-  transform: scale(0.95); /* Shrink slightly when clicked */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add shadow on click */
-}
-
-.btn-danger {
-  font-size: 1rem;
-  color: #ffffff;
-  background-color: #E97B68;
-  border: none;
-  border-radius: 0.5rem;
+/* ปรับแต่งปุ่ม Log Out */
+.logout-button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #F14D31;
+  color: #fff;
+  border: 1px solid #F14D31;
+  border-radius: 0.75rem;
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.btn-danger:hover {
-  background-color: #F14D31;
+.logout-button:hover {
+  background-color: #E97B68;
+  transform: scale(1.02);
 }
 
-.btn-danger:active {
-  background-color: #ff7043;
+.logout-button:active {
+  background-color: #D45A3E;
   transform: scale(0.98);
-}
-
-/* Divider styling */
-.divider {
-  background-color: #ff7043;
- 
-  margin: -3px 0;
-}
-
-
-/* Icon adjustments */
-.nav-link.sidebar-item {
-  display: flex;
-  align-items: center;  /* Align icon and text vertically */
-}
-
-.nav-link.sidebar-item i {
-  margin-top: 3px;  /* Adjust icon position */
-  margin-right: 1rem;
-}
-
-.icon-large {
-  font-size: 1.5rem;  /* Can adjust icon size as needed */
-}
-
-.icon-adjust {
-  margin-top: 3px;  /* Adjust margin for icon */
-}
-
-/* Sidebar general styles */
-.sidebar-container1 {
-  position: fixed;
-  top: 0;
-  left: -250px;  /* Start off-screen */
-  bottom: 0;
-  width: 250px;
-  min-width: 250px;
-  max-width: 250px;
-  background-color: #F14D31;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border-radius: 0 1rem 1rem 0;
-  animation: slideIn 0.5s ease-out forwards; /* Slide-in effect */
-}
-
-/* Slide-in animation for the sidebar */
-@keyframes slideIn {
-  from {
-    left: -250px;  /* Off-screen initially */
-  }
-  to {
-    left: 0;  /* Slide to the final position */
-  }
 }
