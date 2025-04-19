@@ -171,30 +171,50 @@ function PermissionManagement() {
               }}
               className="modal-form"
             >
-              {["firstName", "lastName", "username", "employeeId"].map((field) => (
-                <div className="form-group" key={field}>
-                  <label className="form-label">
-                    {field === "firstName"
-                      ? "ชื่อ"
-                      : field === "lastName"
-                      ? "นามสกุล"
-                      : field === "username"
-                      ? "ชื่อผู้ใช้"
-                      : "รหัสพนักงาน"}{" "}
-                    :
+              {["employeeId"].map((field) => {
+                const labelText = field === "employeeId" ? "รหัสพนักงาน" : "";
+                return (
+                  <div key={field}>
+                    <label>{labelText}</label>
                     <input
-                      type="text"
-                      value={newUser[field]}
-                      onChange={(e) =>
-                        setNewUser({ ...newUser, [field]: e.target.value })
-                      }
-                      required
-                      className="form-input"
-                      placeholder={`กรอก${field}`}
-                    />
-                  </label>
-                </div>
-              ))}
+                        id={field}
+                        type="text"
+                        value={newUser[field]}
+                        onChange={(e) => setNewUser({ ...newUser, [field]: e.target.value })}
+                        required
+                        className="form-input"
+                        placeholder={`กรอก${labelText}`}
+                      />
+                  </div>
+                );
+              })}
+              {/* {["firstName", "lastName", "department", "employeeId"].map((field) => {
+                  const labelText =
+                    field === "firstName"
+                      ? "ชื่อ "
+                      : field === "lastName"
+                      ? "นามสกุล "
+                      : field === "department"
+                      ? "แผนกที่สังกัด "
+                      : "รหัสพนักงาน ";
+
+                  return (
+                    <div className="form-group" key={field}>
+                      <label className="form-label" htmlFor={field}>
+                        {labelText}:
+                      </label>
+                      <input
+                        id={field}
+                        type="text"
+                        value={newUser[field]}
+                        onChange={(e) => setNewUser({ ...newUser, [field]: e.target.value })}
+                        required
+                        className="form-input"
+                        placeholder={`กรอก${labelText}`}
+                      />
+                    </div>
+                  ); */}
+                
 
               <div className="modal-actions">
                 <button type="submit" className="btn btn-save">บันทึก</button>
@@ -231,7 +251,7 @@ function PermissionManagement() {
               <tr key={user.username}>
               <td>{`${user.firstName} ${user.lastName}`}</td>
               <td>{`${user.department}`}</td>
-              <td>{user.employeeId}</td>
+              <td>{`${user.employeeId}`}</td>
               {["documentAccess", "permissionAccess", "reportsAccess"].map((perm) => (
                 <td key={perm}>
                   <div className="toggle-switch">
