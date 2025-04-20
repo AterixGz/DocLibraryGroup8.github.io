@@ -5,14 +5,18 @@ const { Pool } = require('pg');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+// เพิ่มด้านบน
+const authenticateToken = require('./middleware/authenticate');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // PostgreSQL connection
 const pool = new Pool({
@@ -53,7 +57,7 @@ app.get('/api/test-db', async (req, res) => {
 // Get all users
 app.get("/api/users", async (req, res) => {
   try {
-    const result = await pool.query("SELECT id, username, first_name, last_name, role_id, email, department, position, employee_id FROM users");
+    const result = await pool.query("SELECT id, username, first_name, last_name, role_id, email, department, employee_id FROM users");
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching users:", err);
@@ -230,30 +234,36 @@ app.post('/api/login', async (req, res) => {
     const result = await pool.query(
       `SELECT u.*, r.name AS role_name FROM users u
        JOIN roles r ON u.role_id = r.id
-       WHERE u.username = $1 AND u.password = $2`,
-      [username, password]
+       WHERE u.username = $1`,
+      [username]
     );
 
-    if (result.rows.length > 0) {
-      const user = result.rows[0];
-      res.json({
-        message: 'Login successful',
-        user: {
-          id: user.id,
-          username: user.username,
-          role: user.role_name,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          email: user.email,
-          department: user.department,
-          position: user.position,
-          avatar: user.avatar,
-          employee_id: user.employee_id
-        }
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid credentials' });
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Invalid credentials' });
     }
+
+    const user = result.rows[0];
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // ✅ login success
+    res.json({
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role_name,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        department: user.department,
+        avatar: user.avatar,
+        employee_id: user.employee_id
+      }
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send('Login failed');
@@ -281,7 +291,7 @@ app.get('/api/profile', async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT id, username, first_name, last_name, role_id, email, department, position, avatar, employee_id
+      `SELECT id, username, first_name, last_name, role_id, email, department, avatar, employee_id
        FROM users WHERE id = $1`,
       [userId]
     );
@@ -299,7 +309,6 @@ app.get('/api/profile', async (req, res) => {
       last_name: user.last_name,
       email: user.email,
       department: user.department,
-      position: user.position,
       avatar: user.avatar,
       employee_id: user.employee_id,
     });
@@ -364,73 +373,112 @@ app.get("/api/uploads-by-user", async (req, res) => {
 });
 
 // Permission
-app.get('/api/permission', async (req, res) => {
+// GET permission ของ user แบบ name-based
+app.get("/api/users/:id/permissions", async (req, res) => {
+  const userId = req.params.id;
   try {
     const result = await pool.query(`
-      SELECT u.employee_id, u.first_name, u.last_name, u.department,
-             p.document_access AS "documentAccess",
-             p.permission_access AS "permissionAccess",
-             p.reports_access AS "reportsAccess"
-      FROM users u
-      JOIN user_permissions p ON u.id = p.user_id
-    `);    
-    console.log("Permissions data:", result.rows); // เพิ่ม logging
-    res.json(result.rows);
+      SELECT p.name FROM user_permissions up
+      JOIN permissions p ON up.permission_id = p.id
+      WHERE up.user_id = $1
+    `, [userId]);
+
+    const permissionNames = result.rows.map(row => row.name);
+    res.json(permissionNames);
   } catch (err) {
-    console.error('Error fetching permissions:', err);
-    res.status(500).json({ error: 'Internal server error', details: err.message });
+    console.error("Error fetching user permissions:", err);
+    res.status(500).json({ error: "Failed to fetch permissions" });
   }
 });
 
-app.put('/api/permission', async (req, res) => {
-  const { employee_id, permissionName, value } = req.body;
-  
-  // ปรับปรุงการตรวจสอบข้อมูล
-  if (!employee_id || !permissionName || value === undefined) {
-    return res.status(400).json({ error: 'Missing data' });
-  }
-  
-  // เพิ่มการตรวจสอบชื่อของ permissionName ให้ถูกต้อง
-  const validPermissions = ['document_access', 'permission_access', 'reports_access'];
-  if (!validPermissions.includes(permissionName)) {
-    return res.status(400).json({ 
-      error: 'Invalid permission name',
-      message: `Permission name must be one of: ${validPermissions.join(', ')}`
-    });
+// เพิ่ม / ลบ permission ของ user
+app.post('/api/roles/:id/permissions', async (req, res) => {
+  const roleId = req.params.id;
+  const { permissions } = req.body;
+
+  if (!Array.isArray(permissions)) {
+    return res.status(400).json({ error: "permissions must be an array" });
   }
 
   const client = await pool.connect();
   try {
-    const updateQuery = `
-      UPDATE user_permissions
-      SET ${permissionName} = $1
-      WHERE user_id = (
-        SELECT id FROM users WHERE employee_id = $2
-      )
-      RETURNING *;
-    `;
+    await client.query('BEGIN');
 
-    
-    console.log('Executing query:', updateQuery, 'with values:', [value, employee_id]);
-    
-    const result = await client.query(updateQuery, [value, employee_id]);
+    // ลบของเก่าออกก่อน
+    await client.query('DELETE FROM role_permissions WHERE role_id = $1', [roleId]);
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Employee not found' });
+    // ใส่ใหม่ทั้งหมด
+    for (let permName of permissions) {
+      const permRes = await client.query('SELECT id FROM permissions WHERE name = $1', [permName]);
+      if (permRes.rows.length > 0) {
+        const permId = permRes.rows[0].id;
+        await client.query('INSERT INTO role_permissions (role_id, permission_id) VALUES ($1, $2)', [roleId, permId]);
+      }
     }
 
-    res.json({ 
-      message: 'Permission updated successfully', 
-      updated: result.rows[0] 
-    });
-  } catch (error) {
-    console.error('Error updating permission:', error);
-    res.status(500).json({ 
-      error: 'Internal server error',
-      message: error.message 
-    });
+    await client.query('COMMIT');
+    res.json({ message: 'Permissions updated successfully' });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error("Error saving role permissions:", err);
+    res.status(500).json({ error: "Failed to save permissions" });
   } finally {
     client.release();
+  }
+});
+
+
+app.get("/api/permissions", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM permissions ORDER BY module, name");
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching permissions:", err);
+    res.status(500).json({ error: "Failed to fetch permissions" });
+  }
+});
+
+// GET permission ตาม role id
+app.get('/api/roles/:id/permissions', async (req, res) => {
+  const roleId = req.params.id;
+
+  try {
+    const result = await pool.query(`
+      SELECT p.id, p.name, p.description
+      FROM role_permissions rp
+      JOIN permissions p ON rp.permission_id = p.id
+      WHERE rp.role_id = $1
+    `, [roleId]);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching role permissions:", err);
+    res.status(500).json({ error: "Failed to fetch role permissions" });
+  }
+});
+
+app.get('/api/roles', authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM roles');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Failed to fetch roles');
+  }
+});
+
+app.get("/api/users", authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT u.id, u.username, u.first_name, u.last_name, u.role_id,
+             r.name AS role_name, u.email, u.department, u.employee_id
+      FROM users u
+      LEFT JOIN roles r ON u.role_id = r.id;
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -577,3 +625,82 @@ app.put('/api/files/approve/:id', async (req, res) => {
   }
 });
 
+app.post("/api/users/create", async (req, res) => {
+  const {
+    username, password, first_name, last_name,
+    email, department, role_id, employee_id // เพิ่มตรงนี้
+  } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await pool.query(
+      `INSERT INTO users 
+      (username, password, first_name, last_name, email, department, role_id, employee_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`, // เพิ่ม $8
+      [username, hashedPassword, first_name, last_name, email, department, role_id, employee_id]
+    );
+
+    res.json({ message: "สร้างผู้ใช้สำเร็จ" });
+  } catch (err) {
+    console.error("Error creating user:", err);
+    res.status(500).json({ error: "สร้างผู้ใช้ล้มเหลว" });
+  }
+});
+
+app.get('/api/departments', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT department_id, department_name FROM departments ORDER BY department_name');
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching departments:', err);
+    res.status(500).json({ error: 'Failed to fetch departments' });
+  }
+});
+
+app.put('/api/users/:id', async (req, res) => {
+  const { id } = req.params;
+  const { first_name, last_name, email, department, role_id, password } = req.body;
+
+  try {
+    const fields = [first_name, last_name, email, department, role_id];
+    let query = `
+      UPDATE users SET first_name = $1, last_name = $2, email = $3, department = $4, role_id = $5`;
+
+    if (password) {
+      const hashed = await bcrypt.hash(password, 10);
+      query += `, password = $6 WHERE id = $7 RETURNING *`;
+      fields.push(hashed, id);
+    } else {
+      query += ` WHERE id = $6 RETURNING *`;
+      fields.push(id);
+    }
+
+    const result = await pool.query(query, fields);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Update user failed:", err);
+    res.status(500).json({ error: "Update failed" });
+  }
+});
+
+app.delete("/api/users/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING *', [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "User deleted", user: result.rows[0] });
+  } catch (err) {
+    console.error("Error deleting user:", err);
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+});

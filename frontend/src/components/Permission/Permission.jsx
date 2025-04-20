@@ -1,420 +1,673 @@
-import React, { useState, useEffect, useRef } from "react";
-import { motion as m, AnimatePresence } from "framer-motion";
+// ✅ PermissionPage.jsx - Full Updated Version
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import "./Permission.css";
+import { FiMoreVertical } from "react-icons/fi";
 
-function PermissionManagement() {
-  const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-  const role = userData?.role || 'guest';
+const PermissionPage = () => {
+  const [roles, setRoles] = useState([]);
+  const [permissions, setPermissions] = useState([]);
+  const [rolePermissions, setRolePermissions] = useState({});
+  const [users, setUsers] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [activeTab, setActiveTab] = useState("members");
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [nextEmpId, setNextEmpId] = useState("");
+  const [showConfirmDelete, setShowConfirmDelete] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [editUser, setEditUser] = useState({});
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [notification, setNotification] = useState(null);
+  const [editPassword, setEditPassword] = useState("");
 
-  // ลบการตรวจสอบสิทธิ์ออก
-  // if (role !== "admin") {
-  //   return (
-  //     <div className="permission-management__container">
-  //       <p>คุณไม่มีสิทธิ์เข้าถึงหน้านี้!</p>
-  //     </div>
-  //   );
-  // }
 
-  const [userList, setUserList] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showAddUserModal, setShowAddUserModal] = useState(false);
-  const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [newUser, setNewUser] = useState({
-    firstName: "",
-    lastName: "",
     username: "",
+    password: "",
+    first_name: "",
+    last_name: "",
+    email: "",
     department: "",
-    employeeId: "",
+    role_id: "",
+    employee_id: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [showSavePopup, setShowSavePopup] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const alertShown = useRef(false);
+
+  const token = localStorage.getItem("token");
+  const currentUserId = JSON.parse(localStorage.getItem("userData"))?.id;
+
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        // ดึงข้อมูลผู้ใช้
-        const usersResponse = await fetch("http://localhost:3000/api/users");
-        const usersData = await usersResponse.json();
-        
-        let permissionsData = [];
-        
-        try {
-          // แยกการดึงข้อมูลสิทธิ์ออกมาในบล็อก try/catch แยก
-          const permissionsResponse = await fetch("http://localhost:3000/api/permission");
-          const permissionsResult = await permissionsResponse.json();
-          console.log("Permissions data:", permissionsResult);
-          
-          // ถ้าสำเร็จ ให้ใช้ข้อมูลที่ได้มา
-          if (!permissionsResult.error) {
-            permissionsData = Array.isArray(permissionsResult) 
-              ? permissionsResult 
-              : (permissionsResult.data || []);
-          }
-        } catch (permErr) {
-          console.error("Error fetching permissions:", permErr);
-          // ไม่ต้อง alert ตรงนี้ เพื่อให้โค้ดทำงานต่อได้
-        }
-        
-        // รวมข้อมูลผู้ใช้กับสิทธิ์ แม้ว่าจะไม่มีข้อมูลสิทธิ์ก็ตาม
-        const mergedData = usersData.map(user => {
-          const userPermissions = permissionsData.find(p => p.employee_id === user.employee_id) || {};
-          return {
-            ...user,
-            documentAccess: userPermissions.documentAccess || false,
-            permissionAccess: userPermissions.permissionAccess || false,
-            reportsAccess: userPermissions.reportsAccess || false,
-          };
-        });
-        
-        setUserList(mergedData);
-        setFilteredUsers(mergedData);
-      } catch (error) {
-        console.error("Error in fetchUsers:", error);
-        alert(`เกิดข้อผิดพลาดในการดึงข้อมูล: ${error.message}`);
-      }
-    };
-    
-    fetchUsers();
-  }, []);
-  
-  const handleSearch = (e) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
-    setFilteredUsers(
-      userList.filter(
-        (user) =>
-          user.firstName.toLowerCase().includes(term) ||
-          user.lastName.toLowerCase().includes(term) ||
-          user.username.toLowerCase().includes(term)
-      )
-    );
-  };
+    if (!token) return;
+    fetchRoles();
+    fetchPermissions();
+    fetchDepartments();
+  }, [token]);
 
-  // const handleTogglePermission = (index, permission) => {
-  //   const updatedUsers = [...filteredUsers];
-  //   updatedUsers[index][permission] = !updatedUsers[index][permission];
-  //   setFilteredUsers(updatedUsers);
-
-  //   const userIndex = userList.findIndex(
-  //     (user) => user.username === updatedUsers[index].username
-  //   );
-  //   if (userIndex !== -1) {
-  //     const updatedOriginalUsers = [...userList];
-  //     updatedOriginalUsers[userIndex][permission] =
-  //       updatedUsers[index][permission];
-  //     setUserList(updatedOriginalUsers);
-  //   }
-  // };
-
-  const handleTogglePermission = async (index, permissionKey) => {
-    try {
-    const updatedValue = !filteredUsers[index][permissionKey];
-    
-    // แปลงชื่อ permission เป็นรูปแบบที่ถูกต้อง
-    const permissionMapping = {
-      "documentAccess": "document_access",
-      "permissionAccess": "permission_access",
-      "reportsAccess": "reports_access"
-    };
-
-    const updatedUsers = [...filteredUsers];
-    updatedUsers[index] = {
-      ...updatedUsers[index],
-      [permissionKey]: updatedValue
-    };
-    setFilteredUsers(updatedUsers);
-  
-      const response = await fetch('http://localhost:3000/api/permission', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          employee_id: filteredUsers[index].employee_id,
-          permissionName: permissionMapping[permissionKey],
-          value: updatedValue,
-        }),
-      });
-      
-      if (!response.ok) {
-        // ถ้าไม่สำเร็จให้กลับไปใช้ค่าเดิม
-        updatedUsers[index][permissionKey] = !updatedValue;
-        setFilteredUsers([...updatedUsers]);
-        
-        const errorData = await response.json();
-        console.error('Server error:', errorData);
-        throw new Error(errorData.message || errorData.error || 'Unknown error');
-      }
-      
-    } catch (error) {
-      console.error('Error toggling permission:', error);
-      alert(`เกิดข้อผิดพลาด: ${error.message}`);
+  // ✅ fetch users หลัง roles โหลดเสร็จ
+  useEffect(() => {
+    if (roles.length > 0) {
+      fetchUsers(); // <-- ตอนนี้ roles มีแล้ว
     }
-  
-    //   // อัพเดต UI ตามผลลัพธ์
-    //   const updatedUsers = [...filteredUsers];
-    //   updatedUsers[index][permissionKey] = updatedValue;
-    //   setFilteredUsers(updatedUsers);
-    // } catch (error) {
-    //   console.error('Error updating permission:', error.message);
-    // }
-  };
+  }, [roles]); // <-- ทำงานเมื่อ roles เปลี่ยน
 
+  useEffect(() => {
+    if (users.length > 0) {
+      const prefix = "EMP";
+      const maxId = users.reduce((max, user) => {
+        const match = user.employee_id?.match(/^EMP(\d+)$/);
+        const num = match ? parseInt(match[1]) : 0;
+        return Math.max(max, num);
+      }, 0);
 
-  const handleConfirmUpdate = () => {
-    setLoading(true);
-    let progressInterval = setInterval(() => {
-      setProgress((oldProgress) => {
-        if (oldProgress === 100) {
-          clearInterval(progressInterval);
-          setLoading(false);
-          if (!alertShown.current) {
-            alert("สิทธิ์การเข้าถึงได้รับการอัปเดตเรียบร้อยแล้ว!");
-            alertShown.current = true;
-          }
-          console.log("Updated User List:", userList);
-        }
-        return Math.min(oldProgress + 10, 100);
+      const nextNum = maxId + 1;
+      const nextEmpId = `${prefix}${String(nextNum).padStart(3, "0")}`;
+      setNextEmpId(nextEmpId);
+      setNewUser((prev) => ({ ...prev, employee_id: nextEmpId }));
+    }
+  }, [users]);
+
+  const fetchRoles = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/roles", {
+        headers: { Authorization: `Bearer ${token}` },
       });
-    }, 200);
+      const roleList = Array.isArray(res.data) ? res.data : [];
+      setRoles(roleList);
+
+      const all = {};
+      await Promise.all(
+        roleList.map(async (role) => {
+          const rp = await axios.get(
+            `http://localhost:3000/api/roles/${role.id}/permissions`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          const permList = Array.isArray(rp.data) ? rp.data : [];
+          all[role.id] = permList.map((p) => p.name);
+        })
+      );
+
+      setRolePermissions(all);
+    } catch (err) {
+      console.error("Error fetching roles/permissions:", err);
+    }
   };
 
-  const handleAddUser = () => setShowAddUserModal(true);
-
-  const handleDelete = (user) => {
-    setSelectedUser(user);
-    setShowDeletePopup(true);
+  const fetchPermissions = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/permissions", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPermissions(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error("Error fetching permissions:", err);
+    }
   };
 
-  const handleConfirmDelete = () => {
-    const updatedUserList = userList.filter(
-      (user) => user.username !== selectedUser.username
-    );
-    const updatedFilteredUsers = filteredUsers.filter(
-      (user) => user.username !== selectedUser.username
-    );
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const sorted = Array.isArray(res.data)
+        ? res.data.sort((a, b) => {
+            const aNum = parseInt(a.employee_id?.replace(/^EMP/, "")) || 0;
+            const bNum = parseInt(b.employee_id?.replace(/^EMP/, "")) || 0;
+            return aNum - bNum;
+          })
+        : [];
 
-    setUserList(updatedUserList);
-    setFilteredUsers(updatedFilteredUsers);
-    setShowDeletePopup(false);
+      // 🔄 แปลง role_id เป็นชื่อจาก roles
+      const updated = sorted.map((user) => {
+        const matchedRole = roles.find((r) => r.id === user.role_id);
+        return { ...user, role_name: matchedRole?.name || user.role_id };
+      });
+
+      setUsers(updated);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    }
   };
 
-  const handleAddNewUser = () => {
-    const newUserData = {
-      ...newUser,
-      documentAccess: true,
-      permissionAccess: false,
-      reportsAccess: false,
+  const fetchDepartments = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/departments", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setDepartments(res.data || []);
+    } catch (err) {
+      console.error("Error fetching departments:", err);
+    }
+  };
+
+  const togglePermission = (roleId, permissionName) => {
+    const current = rolePermissions[roleId] || [];
+    const updated = current.includes(permissionName)
+      ? current.filter((p) => p !== permissionName)
+      : [...current, permissionName];
+    setRolePermissions((prev) => ({ ...prev, [roleId]: updated }));
+  };
+
+  const getRoleLabel = (roleName) => {
+    if (typeof roleName !== "string") return roleName;
+    const role = roleName.toLowerCase();
+    const classMap = {
+      admin: "role-label-admin",
+      manager: "role-label-manager",
+      worker: "role-label-worker",
+      guest: "role-label-guest",
     };
-    setUserList([...userList, newUserData]);
-    setFilteredUsers([...filteredUsers, newUserData]);
-    setShowAddUserModal(false);
-    setNewUser({
-      firstName: "",
-      lastName: "",
-      username: "",
-      employeeId: "",
-    });
+
+    return (
+      <span className={`role-label ${classMap[role] || "role-label-default"}`}>
+        {role.charAt(0).toUpperCase() + role.slice(1)}
+      </span>
+    );
   };
 
-  const handleCloseModal = () => {
-    setShowAddUserModal(false);
+  const handleEditSubmit = async () => {
+    try {
+      const updatedUser = { ...editUser };
+      if (editPassword.trim()) {
+        updatedUser.password = editPassword;
+      }
+      await axios.put(
+        `http://localhost:3000/api/users/${editUser.id}`,
+        updatedUser,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      showNotification("✅ แก้ไขข้อมูลสําเร็จ", "success");
+      setShowEditForm(null);
+      setEditPassword("");
+      fetchUsers();
+    } catch (err) {
+      console.error("❌ Error updating user:", err.response?.data || err);
+      showNotification("❌ แก้ไขข้อมูลไม่สำเร็จ", "error");
+    }
   };
-  
+
+  const deleteUser = async (userId) => {
+    if (userId === currentUserId) {
+      return showNotification(
+        "❌ ไม่สามารถลบผู้ใช้ที่กำลังใช้งานอยู่ได้",
+        "error"
+      );
+    }
+    try {
+      await axios.delete(`http://localhost:3000/api/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      showNotification("✅ ลบผู้ใช้สำเร็จ", "success");
+      setShowConfirmDelete(null);
+      fetchUsers();
+    } catch (err) {
+      showNotification("❌ ลบผู้ใช้ไม่สำเร็จ", "error");
+    }
+  };
+
+  const saveChanges = async () => {
+    for (let role of roles) {
+      try {
+        await axios.post(
+          `http://localhost:3000/api/roles/${role.id}/permissions`,
+          { permissions: rolePermissions[role.id] || [] },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } catch (err) {
+        console.error(`Failed to save permissions for role ${role.name}`, err);
+      }
+    }
+    showNotification("Permissions updated successfully");
+  };
+
+  const handleCreateUser = async () => {
+    const {
+      username,
+      password,
+      first_name,
+      last_name,
+      email,
+      department,
+      role_id,
+      employee_id,
+    } = newUser;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (
+      !username ||
+      !password ||
+      !first_name ||
+      !last_name ||
+      !email ||
+      !department ||
+      !role_id
+    ) {
+      setErrorMessage("กรุณากรอกข้อมูลให้ครบถ้วน");
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      setErrorMessage("กรุณากรอกอีเมลให้ถูกต้อง เช่น example@email.com");
+      return;
+    }
+
+    try {
+      await axios.post("http://localhost:3000/api/users/create", newUser, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      showNotification("✅ สร้างผู้ใช้สำเร็จ", "success");
+      setShowCreateForm(false);
+      setNewUser({
+        username: "",
+        password: "",
+        first_name: "",
+        last_name: "",
+        email: "",
+        department: "",
+        role_id: "",
+        employee_id: "",
+      });
+      setErrorMessage("");
+      fetchUsers();
+    } catch (err) {
+      console.error("❌ Error creating user:", err);
+      showNotification("❌ สร้างผู้ใช้ไม่สำเร็จ", "error");
+    }
+  };
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 4000);
+  };
+
   return (
-    <div className="permission-management__container">
-      <h2 className="permission-management__header">จัดการสิทธิ์ในการเข้าถึง</h2>
-
-      <AnimatePresence>
-        {loading && (
-          <m.div
-            className="loading-bar"
-            style={{ width: `${progress}%` }}
-            initial={{ y: -50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -50, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 100, damping: 25 }}
-          />
-        )}
-      </AnimatePresence>
-
-      <div className="permission-management__controls">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={handleSearch}
-          placeholder="ค้นหาผู้ใช้..."
-          className="permission-management__search-input"
-        />
-        <button
-          onClick={handleAddUser}
-          className="permission-management__add-user-btn"
-        >
-          เพิ่มพนักงาน
-        </button>
-      </div>
-
-      {showAddUserModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3 className="modal-header">เพิ่มพนักงาน</h3>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleAddNewUser();
-              }}
-              className="modal-form"
-            >
-              {["first_name", "last_name", "department", "employeeId"].map((field) => {
-                  const labelText =
-                    field === "first_name"
-                      ? "ชื่อ "
-                      : field === "last_name"
-                      ? "นามสกุล "
-                      : field === "department"
-                      ? "แผนกที่สังกัด "
-                      : "รหัสพนักงาน ";
-
-                  return (
-                    <div className="form-group" key={field}>
-                      <label className="form-label" htmlFor={field}>
-                        {labelText}:
-                      </label>
-                      <input
-                        id={field}
-                        type="text"
-                        value={newUser[field]}
-                        onChange={(e) => setNewUser({ ...newUser, [field]: e.target.value })}
-                        required
-                        className="form-input"
-                        placeholder={`กรอก${labelText}`}
-                      />
-                    </div>
-                  );
-                })}
-                
-
-              <div className="modal-actions">
-                <button type="submit" className="btn btn-save">บันทึก</button>
-                <button type="button" onClick={handleCloseModal} className="btn btn-cancel">ยกเลิก</button>
-              </div>
-            </form>
+    <div className="perm-page">
+      <div className="perm-header">
+        <h2>Permission Management</h2>
+        <div className="perm-tabs">
+          <div
+            className={`perm-tab ${activeTab === "members" ? "active" : ""}`}
+            onClick={() => setActiveTab("members")}
+          >
+            Members
+          </div>
+          <div
+            className={`perm-tab ${
+              activeTab === "permissions" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("permissions")}
+          >
+            Permissions
           </div>
         </div>
-      )}
+      </div>
 
-      {/* <div className="permission-management">
-        <h1>จัดการสิทธิ์การใช้งาน</h1>
-        <p>{role}</p>
-      </div> */}
-
-      <div className="permission-management__table-container">
-        <table className="permission-management__table">
-          <thead>
-            <tr>
-              <th>บุคลากร</th>
-              <th>แผนก</th>
-              <th>รหัสพนักงาน</th>
-              <th>Document</th>
-              <th>Permission</th>
-              <th>Reports</th>
-              <th></th>
-            </tr>
-          </thead>
-          </table>
-          <div className="permission-management__tbody-container">
-          <table className="permission-management__table">
-          <tbody>
-            {filteredUsers.map((user, index) => (
-              <tr key={user.username}>
-                <td>{`${user.first_name} ${user.last_name}`}</td>
-                <td>{user.department}</td>
-                <td>{user.employee_id}</td>
-                {["documentAccess", "permissionAccess", "reportsAccess"].map((perm) => (
-                  <td key={perm}>
-                    <div className="toggle-switch">
-                      <input
-                        type="checkbox"
-                        id={`${perm}-${user.employee_id}`}
-                        checked={user[perm]}
-                        onChange={() => handleTogglePermission(index, perm)}
-                      />
-                      <label htmlFor={`${perm}-${user.employee_id}`}></label>
-                    </div>
-                  </td>
+      {activeTab === "permissions" && (
+        <div className="perm-card">
+          <div className="perm-card-header">
+            <h3>Permission Roles</h3>
+            <p>Configure permission roles for your organization.</p>
+          </div>
+          <div className="perm-table-scroll">
+            <table className="perm-table">
+              <thead>
+                <tr>
+                  <th>Permission</th>
+                  {roles.map((role) => (
+                    <th key={role.id}>{role.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {permissions.map((perm) => (
+                  <tr key={perm.name}>
+                    <td>
+                      <strong>{perm.name.replace(/_/g, " ")}</strong>
+                      <div className="desc">{perm.description}</div>
+                    </td>
+                    {roles.map((role) => (
+                      <td key={role.id}>
+                        <label className="perm-switch">
+                          <input
+                            type="checkbox"
+                            checked={
+                              rolePermissions[role.id]?.includes(perm.name) ||
+                              false
+                            }
+                            onChange={() =>
+                              togglePermission(role.id, perm.name)
+                            }
+                          />
+                          <span className="slider round"></span>
+                        </label>
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-                <td>
-                  <button className="custom-btn-danger" onClick={() => handleDelete(user)}>
-                    <i className="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-    
-    <button
-        onClick={() => setShowSavePopup(true)}
-        className="permission-management__confirm-btn"
-        disabled={loading}
-      >
-        {loading ? "กำลังโหลด..." : "ยืนยัน"}
-      </button>
+              </tbody>
+            </table>
+          </div>
+          <div className="perm-save-section">
+            <button className="perm-save-btn" onClick={saveChanges}>
+              Save Changes
+            </button>
+          </div>
+        </div>
+      )}
 
-      {/* เพิ่ม Modal Popup สำหรับการบันทึก */}
-      {showSavePopup && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>ยืนยันการบันทึก</h3>
-            <p>คุณต้องการยืนยันการบันทึก ใช่หรือไม่?</p>
-            <div className="modal-actions">
-              <button 
-                onClick={() => {
-                  handleConfirmUpdate();
-                  setShowSavePopup(false);
-                }} 
-                className="btn custom-btn-danger"
-              >
-                ยืนยัน
-              </button>
+      {activeTab === "members" && (
+        <div className="perm-card">
+          <div className="perm-card-header">
+            <h3>Members</h3>
+            <p>List of current users in your organization.</p>
+            <button
+              className="perm-create-btn"
+              onClick={() => setShowCreateForm(true)}
+            >
+              + เพิ่มผู้ใช้งาน
+            </button>
+          </div>
+          <div className="perm-table-scroll">
+            <table className="perm-member-table">
+              <thead>
+                <tr>
+                  <th>EmpID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Department</th>
+                  <th>เครื่องมือ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user.id}>
+                    <td>{user.employee_id}</td>
+                    <td>
+                      {user.first_name} {user.last_name}
+                    </td>
+                    <td>{user.email}</td>
+                    <td>{getRoleLabel(user.role_name)}</td>
+                    <td>{user.department}</td>
+                    <td className="perm-action-cell">
+                      <div className="perm-dropdown no-button-style">
+                        <div>
+                          <FiMoreVertical
+                            style={{ cursor: "pointer" }}
+                            size={20}
+                            onClick={() =>
+                              setDropdownOpen(
+                                dropdownOpen === user.id ? null : user.id
+                              )
+                            }
+                          />
+                        </div>
+                        {dropdownOpen === user.id && (
+                          <div className="perm-dropdown-menu flat">
+                            <button
+                              onClick={() => {
+                                setEditUser(user);
+                                setShowEditForm(true);
+                              }}
+                            >
+                              แก้ไข
+                            </button>
+                            <button onClick={() => setShowConfirmDelete(user)}>
+                              ลบ
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {showCreateForm && (
+        <>
+          <div
+            className="perm-modal-overlay"
+            onClick={() => setShowCreateForm(false)}
+          />
+          <div className="perm-modal">
+            <div className="perm-modal-header">
+              <h3>เพิ่มผู้ใช้งานใหม่</h3>
               <button
-                onClick={() => setShowSavePopup(false)}
-                className="btn btn-cancel"
+                className="perm-modal-close"
+                onClick={() => setShowCreateForm(false)}
               >
-                ยกเลิก
+                ×
               </button>
+            </div>
+            <div className="perm-modal-body">
+              {errorMessage && (
+                <div className="perm-error-popup">{errorMessage}</div>
+              )}
+              <label>รหัสพนักงาน</label>
+              <input value={newUser.employee_id} disabled readOnly />
+              <label>ชื่อผู้ใช้</label>
+              <input
+                value={newUser.username}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, username: e.target.value })
+                }
+                placeholder="Username"
+              />
+              <label>รหัสผ่าน</label>
+              <input
+                type="password"
+                value={newUser.password}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, password: e.target.value })
+                }
+                placeholder="Password"
+              />
+              <label>ชื่อจริง</label>
+              <input
+                value={newUser.first_name}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, first_name: e.target.value })
+                }
+                placeholder="First Name"
+              />
+              <label>นามสกุล</label>
+              <input
+                value={newUser.last_name}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, last_name: e.target.value })
+                }
+                placeholder="Last Name"
+              />
+              <label>อีเมล</label>
+              <input
+                type="email"
+                value={newUser.email}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, email: e.target.value })
+                }
+                placeholder="E-mail"
+              />
+              <label>แผนก</label>
+              <select
+                value={newUser.department}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, department: e.target.value })
+                }
+              >
+                <option value="">-- เลือกแผนก --</option>
+                {departments.map((dep) => (
+                  <option key={dep.department_id} value={dep.department_name}>
+                    {dep.department_name}
+                  </option>
+                ))}
+              </select>
+              <label>บทบาท</label>
+              <select
+                value={newUser.role_id}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, role_id: parseInt(e.target.value) })
+                }
+              >
+                <option value="">-- เลือกบทบาท --</option>
+                {roles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
+                ))}
+              </select>
+              <button className="perm-save-btn" onClick={handleCreateUser}>
+                บันทึก
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {showConfirmDelete && (
+        <div
+          className="perm-modal-overlay"
+          onClick={() => setShowConfirmDelete(null)}
+        >
+          <div className="perm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="perm-modal-header">
+              <h3>ยืนยันการลบ</h3>
+              <button
+                className="perm-modal-close"
+                onClick={() => setShowConfirmDelete(null)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="perm-modal-body">
+              คุณต้องการลบผู้ใช้ {showConfirmDelete.employee_id}{" "}
+              {showConfirmDelete.first_name} {showConfirmDelete.last_name}{" "}
+              ใช่ไหม?
+              <div
+                style={{
+                  marginTop: "1rem",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: "1rem",
+                }}
+              >
+                <button
+                  className="perm-cancel-btn"
+                  onClick={() => setShowConfirmDelete(null)}
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  className="perm-delete-btn"
+                  onClick={() => deleteUser(showConfirmDelete.id)}
+                >
+                  ลบ
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {showDeletePopup && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>ยืนยันการลบ</h3>
-            <p>คุณต้องการลบผู้ใช้นี้ใช่ไหม?</p>
-            <div className="modal-actions">
-              <button onClick={handleConfirmDelete} className="btn custom-btn-danger">
-                ยืนยัน
-              </button>
+      {showEditForm && (
+        <div
+          className="perm-modal-overlay"
+          onClick={() => setShowEditForm(null)}
+        >
+          <div className="perm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="perm-modal-header">
+              <h3>แก้ไขข้อมูลผู้ใช้</h3>
               <button
-                onClick={() => setShowDeletePopup(false)}
-                className="btn btn-cancel"
+                className="perm-modal-close"
+                onClick={() => setShowEditForm(null)}
               >
-                ยกเลิก
+                ×
+              </button>
+            </div>
+            <div className="perm-modal-body">
+              <label>รหัสพนักงาน</label>
+              <input value={editUser.employee_id} disabled readOnly />
+              <label>ชื่อผู้ใช้</label>
+              <input value={editUser.username} disabled readOnly />
+              <label>รหัสผ่านใหม่ (หากต้องการเปลี่ยน)</label>
+              <input
+                type="password"
+                value={editPassword}
+                onChange={(e) => setEditPassword(e.target.value)}
+              />
+              <label>ชื่อจริง</label>
+              <input
+                value={editUser.first_name}
+                onChange={(e) =>
+                  setEditUser({ ...editUser, first_name: e.target.value })
+                }
+              />
+              <label>นามสกุล</label>
+              <input
+                value={editUser.last_name}
+                onChange={(e) =>
+                  setEditUser({ ...editUser, last_name: e.target.value })
+                }
+              />
+              <label>อีเมล</label>
+              <input
+                type="email"
+                value={editUser.email}
+                onChange={(e) =>
+                  setEditUser({ ...editUser, email: e.target.value })
+                }
+              />
+              <label>แผนก</label>
+              <select
+                value={editUser.department}
+                onChange={(e) =>
+                  setEditUser({ ...editUser, department: e.target.value })
+                }
+              >
+                <option value="">-- เลือกแผนก --</option>
+                {departments.map((dep) => (
+                  <option key={dep.department_id} value={dep.department_name}>
+                    {dep.department_name}
+                  </option>
+                ))}
+              </select>
+              <label>บทบาท</label>
+              <select
+                value={editUser.role_id}
+                onChange={(e) =>
+                  setEditUser({
+                    ...editUser,
+                    role_id: parseInt(e.target.value),
+                  })
+                }
+              >
+                {roles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
+                ))}
+              </select>
+              <button className="perm-save-btn" onClick={handleEditSubmit}>
+                บันทึกการแก้ไข
               </button>
             </div>
           </div>
+        </div>
+      )}
+      {notification && (
+        <div className={`perm-toast ${notification.type}`}>
+          {notification.message}
         </div>
       )}
     </div>
   );
-}
+};
 
-export default PermissionManagement;
+export default PermissionPage;
