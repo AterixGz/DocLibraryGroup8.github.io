@@ -78,7 +78,7 @@
 .tab-content input[type="text"],
 .tab-content input[type="number"],
 .tab-content input[type="file"],
-.tab-content input[type="date"],
+.tab-content input[type="datetime"],
 .tab-content select,
 .tab-content textarea {
   width: 100%;
@@ -172,15 +172,6 @@ label {
   font-weight: 400;
 }
 
-.form-item input[type="date"] {
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
 /* Textarea Styling */
 .tab-content textarea {
   width: 100%;
@@ -216,6 +207,83 @@ label {
   font-weight: 400px;
   margin-bottom: 0.5rem;
   color: #f8f8f8;
+}
+.file-upload-container {
+  width: 100%;
+  max-width: 700px;
+  
+  margin: 0 auto;
+  font-family: sans-serif;
+}
+
+input#file-input {
+  display: none; /* ซ่อน input จริง */
+}
+
+.custom-file-upload {
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  display: block;
+  padding: 40px 20px;
+  text-align: center;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: border 0.3s ease;
+}
+
+.custom-file-upload:hover {
+  border-color: #007bff;
+}
+
+.custom-file-upload img {
+  width: 80px;
+  margin-bottom: 10px;
+}
+
+.custom-file-upload p {
+  margin: 5px 0;
+  color: #444;
+  font-size: 16px;
+}
+
+.custom-file-upload .browse {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.custom-file-upload .file-types {
+  color: #888;
+  font-size: 12px;
+}
+
+
+.form-group-horizontal {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+
+label {
+  font-size: 16px;
+  color: #555;
+  font-weight: 400;
+}
+
+.form-item input[type="datetime"],
+.form-item select {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ปุ่มเลือกไฟล์ */

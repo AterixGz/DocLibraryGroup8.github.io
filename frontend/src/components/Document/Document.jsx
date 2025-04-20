@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { FileContext } from "../FileContext/FileContext";
 import { useNavigate } from "react-router-dom";
 import "./Document.css";
-
+import image from "../Document/logo1.png"; // นำเข้าภาพโลโก้
 const Document = () => {
   const { addFiles } = useContext(FileContext);
   const [file, setFile] = useState(null);
@@ -10,7 +10,6 @@ const Document = () => {
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [department, setDepartment] = useState("");
-  const [date, setDate] = useState("");
   const [description, setDescription] = useState("");
   const [uploadedBy, setUploadedBy] = useState("");
   const [uploadedByName, setUploadedByName] = useState(""); // เพิ่ม state สำหรับเก็บชื่อผู้อัปโหลด
@@ -18,7 +17,9 @@ const Document = () => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 16));
   // แก้ตรงนี้ในฟังก์ชัน upload file
+
 
 
   const navigate = useNavigate();
@@ -50,9 +51,7 @@ const Document = () => {
     setFileMimeType(selectedFile?.type || '');
   };
 
-  const handleDateChange = (e) => {
-    setDate(e.target.value); // เก็บค่าวันที่ในรูปแบบ YYYY-MM-DD
-  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -155,34 +154,40 @@ const Document = () => {
                 <label>ประเภทเอกสาร</label>
                 <select value={type} onChange={(e) => setType(e.target.value)} required>
                   <option value="">เลือกประเภท</option>
-                  <option value="รายงาน">รายงาน</option>
-                  <option value="แบบฟอร์ม">แบบฟอร์ม</option>
-                  <option value="อื่นๆ">อื่นๆ</option>
+                  <option value="รายงานประจำปี">รายงานประจำปี</option>
+                  <option value="ผลการดำเนินงาน">ผลการดำเนินงาน</option>
+                  <option value="รายงานปริมาณการผลิตรายเดือน">รายงานปริมาณการผลิตรายเดือน</option>
+                  <option value="การขายมูลค่าและค่าภาคหลวง">การขาย มูลค่า และค่าภาคหลวง</option>
+                  <option value="การจัดสรรค่าภาคหลวงให้ท้องถิ่น">การจัดสรรค่าภาคหลวงให้ท้องถิ่น</option>
+                  <option value="ปริมาณสำรองปิโตรเลียม">ปริมาณสำรองปิโตรเลียม</option>
+
                 </select>
               </div>
-              <div>
-                <label>แผนก</label>
-                <select
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  required
-                >
-                  <option value="">เลือกแผนก</option>
-                  <option value="การเงิน">การเงิน</option>
-                  <option value="ทรัพยากรบุคคล">ทรัพยากรบุคคล</option>
-                  <option value="ไอที">ไอที</option>
-                  <option value="การตลาด">การตลาด</option>
-                  <option value="อื่นๆ">อื่นๆ</option>
-                </select>
-              </div>
-              <div>
-                <label>วันที่</label>
-                <input
-                  type="date"
-                  value={date}
-                  onChange={handleDateChange}
-                  required
-                />
+              <div className="form-group-horizontal">
+                <div className="form-item">
+                  <label>แผนก</label>
+                  <select
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    required
+                  >
+                    <option value="">เลือกแผนก</option>
+                    <option value="การเงิน">การเงิน</option>
+                    <option value="ทรัพยากรบุคคล">ทรัพยากรบุคคล</option>
+                    <option value="ไอที">ไอที</option>
+                    <option value="การตลาด">การตลาด</option>
+                    <option value="อื่นๆ">อื่นๆ</option>
+                  </select>
+                </div>
+                <div className="form-item">
+                  <label>วันที่</label>
+                  <input
+                    type="datetime"
+                    value={new Date(date).toLocaleDateString('th-TH')}
+                    readOnly
+                    className="date-display"
+                  />
+                </div>
               </div>
               <div>
                 <label>คำอธิบาย</label>
@@ -190,19 +195,25 @@ const Document = () => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="กรอกคำอธิบายเอกสาร"
-                  required
+
                 />
               </div>
-              <div>
-                <label>เลือกไฟล์</label>
+              <div class="file-upload-container">
+                <p>อัปโหลดไฟล์</p>
+                <label for="file-input" class="custom-file-upload">
+                  <img src={image} alt="Upload Icon" />
+                  <p><strong>Drag & Drop</strong> <br />or <span class="browse">browse</span></p>
+                  <p class="file-types">Supports: PDF, DOC, DOCX, XLSX, XLS, PNG, JPG</p>
+                </label>
                 <input
+                  id="file-input"
                   type="file"
                   onChange={handleFileChange}
                   accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpg"
                   required
                 />
               </div>
-              <button type="submit" disabled={loading}>
+              <button type="submit" disabled={loading} class="continue-button">
                 {loading ? 'กำลังอัปโหลด...' : 'อัปโหลด'}
               </button>
             </form>
@@ -216,7 +227,7 @@ const Document = () => {
               <p><strong>ชื่อ:</strong> {uploadedFile?.name}</p>
               <p><strong>ประเภท:</strong> {uploadedFile?.type}</p>
               <p><strong>แผนก:</strong> {uploadedFile?.department}</p>
-              <p><strong>วันที่:</strong> {uploadedFile?.date}</p>
+              <p><strong>วันที่:</strong> {new Date(date).toLocaleDateString('th-TH')}</p>
               <p><strong>คำอธิบาย:</strong> {uploadedFile?.description}</p>
               <p><strong>อัปโหลดโดย:</strong> {uploadedByName}</p>
             </div>
@@ -228,7 +239,7 @@ const Document = () => {
                   src={uploadedFile?.FileUrl}
                   alt={uploadedFile.name}
                   className="preview-image"
-                  style={{ maxWidth: '80%', maxHeight: '400px' }}
+                  style={{ maxWidth: '100%', maxHeight: '400px' }}
                 />
               ) : uploadedFile?.mimeType?.includes('pdf') ? (
                 <iframe
@@ -239,27 +250,20 @@ const Document = () => {
                   className="preview-pdf"
                 ></iframe>
               ) : (
-                  <p>ไม่สามารถแสดงตัวอย่างไฟล์นี้ได้</p>
+                <p>ไม่สามารถแสดงตัวอย่างไฟล์นี้ได้</p>
               )}
             </div>
-            <div className="file-actions">
-              <a
-                 href={`http://localhost:3000/api/files/download/${uploadedFile?.FileUrl.split('/').pop()}`}
-    className="download-button"
-              >
-                ดาวน์โหลด
-              </a>
-            </div>
+
             <button
               onClick={() => navigate('/my-document')}
-              className="done-button"
+              className="continue-button"
             >
               เสร็จสิ้น
             </button>
           </div>
 
         )}
-    </div>
+      </div>
     </div >
   );
 };

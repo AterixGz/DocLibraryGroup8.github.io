@@ -509,7 +509,7 @@ const MyDocument = () => {
               </thead>
             </table>
             <Link to="/document" className="add-document-btn">
-              เพิ่มเอกสารใหม่
+            ✙ เพิ่มเอกสารใหม่
             </Link>
           </div>
 
