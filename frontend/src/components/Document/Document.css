@@ -18,7 +18,25 @@
   margin-bottom: 15px;
   gap: 15px;
 }
+.uploaded-file-info {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
+.remove-file-button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.remove-file-button:hover {
+  background-color: #ff1a1a;
+}
 .tab-button {
   flex: 1;
   padding: 12px 0;

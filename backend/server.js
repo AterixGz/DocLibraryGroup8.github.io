@@ -21,7 +21,10 @@ const pool = new Pool({
     rejectUnauthorized: false,
   },
 });
-
+//Timezone Thailand
+pool.on('connect', (client) => {
+  client.query('SET timezone = "Asia/Bangkok"');
+});
 // Multer config for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -77,20 +80,35 @@ app.get('/api/files', async (req, res) => {
 
 
 // Get files uploaded by specific user
+// In your API route
 app.get('/api/files/user/:userId', async (req, res) => {
   const userId = parseInt(req.params.userId);
 
   try {
     const result = await pool.query(
-      `SELECT id, filename AS name, url AS FileUrl, file_type AS type,
-              department, document_date AS date, description,
-              uploaded_by, uploaded_at, status
+      `SELECT id,
+              filename AS name,
+              url AS FileUrl,
+              file_type AS type,
+              department, 
+              TO_CHAR(document_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS date,
+              TO_CHAR(uploaded_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS uploaded_at_formatted,
+              description,
+              uploaded_by,
+              uploaded_at,
+              status
        FROM files
        WHERE uploaded_by = $1
        ORDER BY uploaded_at DESC`,
       [userId]
     );
-    res.json(result.rows);
+
+    const formattedResults = result.rows.map(row => ({
+      ...row,
+      uploaded_at_formatted: row.uploaded_at_formatted,
+    }));
+
+    res.json(formattedResults);
   } catch (err) {
     console.error('Failed to fetch user files:', err);
     res.status(500).send('Failed to fetch user files');

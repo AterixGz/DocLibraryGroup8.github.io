@@ -17,14 +17,25 @@ const Document = () => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 16));
-  // แก้ตรงนี้ในฟังก์ชัน upload file
+  const [uploadedFileName, setUploadedFileName] = useState(""); // เพิ่ม state สำหรับเก็บชื่อไฟล์ที่อัปโหลด
+
+  const [date, setDate] = useState(() => {
+    // สร้างวันที่ปัจจุบันและปรับให้เป็นเวลาไทย (UTC+7)
+    const now = new Date();
+    const thaiTime = new Date(now.getTime() + (7 * 60 * 60 * 1000));
+    return thaiTime.toISOString().slice(0, 16);
+  });
+
 
 
 
   const navigate = useNavigate();
   const steps = ["Upload", "Preview"];
-
+  useEffect(() => {
+    // ตั้งค่าวันที่และเวลาปัจจุบันครั้งเดียวเมื่อ component โหลด
+    setDate(new Date().toISOString().slice(0, 16));
+    // ไม่จำเป็นต้องอัพเดททุกวินาที เพราะอาจทำให้เกิดปัญหาเมื่อกรอกข้อมูล
+  }, []);
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("userData"));
     if (userData) {
@@ -47,9 +58,10 @@ const Document = () => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
-    // เพิ่มการเก็บ MIME type
     setFileMimeType(selectedFile?.type || '');
+    setUploadedFileName(selectedFile?.name || ""); // เก็บชื่อไฟล์ที่อัปโหลด
   };
+
 
 
 
@@ -78,8 +90,8 @@ const Document = () => {
     formData.append("department", department);
     formData.append("date", date);
     formData.append("description", description);
-    formData.append("uploadedBy", uploadedBy); // ส่ง user ID
-    formData.append("mimeType", fileMimeType); // ส่ง MIME type ไปด้วย
+    formData.append("uploadedBy", uploadedBy);
+    formData.append("mimeType", fileMimeType);
 
     try {
       const response = await fetch("http://localhost:3000/api/files/upload", {
@@ -90,20 +102,20 @@ const Document = () => {
       const result = await response.json();
 
       if (response.ok) {
+        // สร้าง object ที่ตรงกับการใช้งานในโค้ด React
         const newFile = {
           id: result.id,
-          name: result.filename,
-          type: result.file_type,
-          department: result.department,
-          date: result.document_date,
-          description: result.description,
-          FileUrl: result.url,
-          uploadedBy: result.uploaded_by,
+          name: result.filename || name, // ให้ใช้ filename จาก API หรือ name ที่ส่งไป
+          type: result.file_type || type,
+          department: result.department || department,
+          date: result.document_date || date,
+          description: result.description || description,
+          FileUrl: result.url || result.FileUrl, // รองรับทั้งสองกรณี
+          uploadedBy: result.uploaded_by || uploadedBy,
           mimeType: fileMimeType
         };
 
         console.log("ข้อมูลไฟล์ที่อัปโหลด:", newFile);
-        console.log("URL ของไฟล์:", result.url);
 
         setUploadedFile(newFile);
         addFiles(newFile);
@@ -118,7 +130,11 @@ const Document = () => {
       setLoading(false);
     }
   };
-
+  const handleRemoveFile = () => {
+    setFile(null);
+    setFileMimeType("");
+    setUploadedFileName(""); // ลบชื่อไฟล์ที่อัปโหลด
+  };
   return (
     <div className="step-tabs-container">
       <div className="tabs">
@@ -180,10 +196,13 @@ const Document = () => {
                   </select>
                 </div>
                 <div className="form-item">
-                  <label>วันที่</label>
+                  <label>วันที่และเวลา</label>
                   <input
-                    type="datetime"
-                    value={new Date(date).toLocaleDateString('th-TH')}
+                    type="text"
+                    value={new Date(new Date(date).getTime() + 7 * 60 * 60 * 1000).toLocaleString('th-TH', {
+                      dateStyle: 'short',
+                      timeStyle: 'short',
+                    })}
                     readOnly
                     className="date-display"
                   />
@@ -198,12 +217,12 @@ const Document = () => {
 
                 />
               </div>
-              <div class="file-upload-container">
+              <div className="file-upload-container">
                 <p>อัปโหลดไฟล์</p>
-                <label for="file-input" class="custom-file-upload">
+                <label htmlFor="file-input" className="custom-file-upload">
                   <img src={image} alt="Upload Icon" />
-                  <p><strong>Drag & Drop</strong> <br />or <span class="browse">browse</span></p>
-                  <p class="file-types">Supports: PDF, DOC, DOCX, XLSX, XLS, PNG, JPG</p>
+                  <p><strong>Drag & Drop</strong> <br />or <span className="browse">browse</span></p>
+                  <p className="file-types">Supports: PDF, DOC, DOCX, XLSX, XLS, PNG, JPG</p>
                 </label>
                 <input
                   id="file-input"
@@ -213,6 +232,19 @@ const Document = () => {
                   required
                 />
               </div>
+              {/* แสดงชื่อไฟล์ที่อัปโหลดและปุ่มลบ */}
+              {uploadedFileName && (
+                <div className="uploaded-file-info">
+                  <p><strong>ไฟล์ที่เลือก:</strong> {uploadedFileName}</p>
+                  <button
+                    type="button"
+                    onClick={handleRemoveFile}
+                    className="remove-file-button"
+                  >
+                    ลบไฟล์
+                  </button>
+                </div>
+              )}
               <button type="submit" disabled={loading} class="continue-button">
                 {loading ? 'กำลังอัปโหลด...' : 'อัปโหลด'}
               </button>
@@ -227,13 +259,23 @@ const Document = () => {
               <p><strong>ชื่อ:</strong> {uploadedFile?.name}</p>
               <p><strong>ประเภท:</strong> {uploadedFile?.type}</p>
               <p><strong>แผนก:</strong> {uploadedFile?.department}</p>
-              <p><strong>วันที่:</strong> {new Date(date).toLocaleDateString('th-TH')}</p>
+              <p>
+                <strong>วันที่:</strong>{" "}
+                {uploadedFile?.date
+                  ? new Date(new Date(uploadedFile.date).getTime() + 7 * 60 * 60 * 1000).toLocaleString('th-TH', {
+                    dateStyle: 'short',
+                    timeStyle: 'short',
+                  })
+                  : new Date(new Date(date).getTime() + 7 * 60 * 60 * 1000).toLocaleString('th-TH', {
+                    dateStyle: 'short',
+                    timeStyle: 'short',
+                  })}
+              </p>
               <p><strong>คำอธิบาย:</strong> {uploadedFile?.description}</p>
               <p><strong>อัปโหลดโดย:</strong> {uploadedByName}</p>
             </div>
 
             <div className="file-preview">
-              {/* ใช้ fileMimeType แทนที่จะใช้ type เพื่อแสดงตัวอย่างไฟล์ได้อย่างถูกต้อง */}
               {uploadedFile?.mimeType?.includes('image') ? (
                 <img
                   src={uploadedFile?.FileUrl}
@@ -261,7 +303,6 @@ const Document = () => {
               เสร็จสิ้น
             </button>
           </div>
-
         )}
       </div>
     </div >
