@@ -61,9 +61,13 @@ app.get("/api/users", async (req, res) => {
 // Get all files
 app.get('/api/files', async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT id, filename AS name, url AS FileUrl, file_type AS type, department, document_date AS date, description, uploaded_by, uploaded_at FROM files ORDER BY uploaded_at DESC'
-    );
+    const result = await pool.query(`
+      SELECT id, filename AS name, url AS FileUrl, file_type AS type,
+             department, document_date AS date, description,
+             uploaded_by, uploaded_at, status
+      FROM files
+      ORDER BY uploaded_at DESC
+    `);
     res.json(result.rows);
   } catch (err) {
     console.error('Failed to fetch files:', err);
@@ -71,13 +75,19 @@ app.get('/api/files', async (req, res) => {
   }
 });
 
+
 // Get files uploaded by specific user
 app.get('/api/files/user/:userId', async (req, res) => {
   const userId = parseInt(req.params.userId);
 
   try {
     const result = await pool.query(
-      'SELECT id, filename AS name, url AS FileUrl, file_type AS type, department, document_date AS date, description, uploaded_by, uploaded_at FROM files WHERE uploaded_by = $1 ORDER BY uploaded_at DESC',
+      `SELECT id, filename AS name, url AS FileUrl, file_type AS type,
+              department, document_date AS date, description,
+              uploaded_by, uploaded_at, status
+       FROM files
+       WHERE uploaded_by = $1
+       ORDER BY uploaded_at DESC`,
       [userId]
     );
     res.json(result.rows);
@@ -121,24 +131,23 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
   const file = req.file;
   const { name, type, department, date, description, uploadedBy } = req.body;
 
-  // Debugging logs
-  console.log("File:", file);
-  console.log("Body:", req.body);
-
   if (!file || !uploadedBy) {
     return res.status(400).json({ message: 'File and uploadedBy are required' });
   }
 
   try {
-    // แก้ตรงนี้ - เพิ่ม domain และ port
     const url = `http://localhost:3000/uploads/${file.filename}`;
+
     const result = await pool.query(
-      'INSERT INTO files (filename, url, file_type, department, document_date, description, uploaded_by, uploaded_at) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING *',
+      `INSERT INTO files 
+        (filename, url, file_type, department, document_date, description, uploaded_by, uploaded_at, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), 'pending')
+       RETURNING *`,
       [name || file.originalname, url, type, department, date, description, uploadedBy]
     );
-    console.log("Database Insert Result:", result.rows[0]);
+
     const fileData = result.rows[0];
-    fileData.FileUrl = fileData.url; // ให้ชื่อฟิลด์สอดคล้องกับ frontend
+    fileData.FileUrl = fileData.url;
 
     res.status(201).json(fileData);
   } catch (err) {
@@ -531,15 +540,66 @@ app.delete('/api/files/permanent-delete/:id', async (req, res) => {
 });
 
 app.get('/api/files/trash', async (req, res) => {
+  const userId = req.query.userId;
+
   try {
-    const result = await pool.query(`
-      SELECT id, filename AS name, url AS FileUrl, file_type AS type, department,
-             document_date AS date, description, uploaded_by, uploaded_at, deleted_at 
-      FROM deleted_files ORDER BY deleted_at DESC
-    `);
+    let result;
+
+    if (userId) {
+      result = await pool.query(`
+        SELECT id, filename AS name, url AS FileUrl, file_type AS type, department,
+               document_date AS date, description, uploaded_by, uploaded_at, deleted_at 
+        FROM deleted_files 
+        WHERE uploaded_by = $1
+        ORDER BY deleted_at DESC
+      `, [userId]);
+    } else {
+      // fallback ถ้าไม่มี userId ก็ไม่คืนไฟล์เลย
+      return res.status(400).json({ message: 'Missing user ID' });
+    }
+
     res.json(result.rows);
   } catch (err) {
     console.error(err);
     res.status(500).send('Failed to fetch trash');
   }
 });
+
+app.get('/api/files/approved', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, filename AS name, url AS FileUrl, file_type AS type, department,
+             document_date AS date, description, uploaded_by, uploaded_at
+      FROM files
+      WHERE status = 'approved'
+      ORDER BY uploaded_at DESC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch approved files' });
+  }
+});
+
+app.put('/api/files/approve/:id', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body; // 'approved' หรือ 'rejected'
+
+  if (!['approved', 'rejected'].includes(status)) {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE files SET status = $1 WHERE id = $2 RETURNING *`,
+      [status, id]
+    );
+    if (result.rows.length === 0)
+      return res.status(404).json({ message: 'File not found' });
+
+    res.json({ message: `File ${status}`, file: result.rows[0] });
+  } catch (err) {
+    console.error('Approval Error:', err);
+    res.status(500).send('Approval failed');
+  }
+});
+

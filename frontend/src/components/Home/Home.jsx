@@ -29,7 +29,7 @@ const Home = ({ role }) => {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/files");
+        const res = await fetch("http://localhost:3000/api/files/approved");
         const data = await res.json();
         setDocuments(data); // Combine with files from context
       } catch (err) {

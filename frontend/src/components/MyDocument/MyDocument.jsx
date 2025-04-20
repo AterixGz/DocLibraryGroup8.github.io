@@ -44,14 +44,14 @@ const MyDocument = () => {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true); // Set loading state to true
-
+    setIsSubmitting(true);
+  
     const formData = new FormData(e.currentTarget);
     const name = formData.get("name");
     const type = formData.get("type");
     const date = formData.get("date");
     const department = formData.get("department");
-
+  
     try {
       const response = await fetch(
         `http://localhost:3000/api/files/${documentToEdit.id}`,
@@ -68,31 +68,26 @@ const MyDocument = () => {
           }),
         }
       );
-
+  
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-
-      const updatedDocument = await response.json();
-
-      setDocuments((prevDocs) =>
-        prevDocs.map((item) =>
-          item.id === documentToEdit.id ? updatedDocument : item
-        )
-      );
-
+  
+      // ✅ เรียกข้อมูลใหม่จาก backend
+      await fetchUserFiles();
+  
       setToastMessage(`แก้ไขเอกสาร "${name}" สำเร็จ!`);
       setTimeout(() => setToastMessage(null), 3000);
-
       closeEditPopup();
     } catch (error) {
       console.error("Failed to update document:", error);
       setToastMessage(`แก้ไขเอกสารไม่สำเร็จ: ${error.message}`);
       setTimeout(() => setToastMessage(null), 3000);
     } finally {
-      setIsSubmitting(false); // Reset loading state regardless of outcome
+      setIsSubmitting(false);
     }
   };
+  
 
   const openEditPopup = (doc) => {
     setDocumentToEdit(doc);
@@ -104,33 +99,26 @@ const MyDocument = () => {
     setDocumentToEdit(null);
   };
   useEffect(() => {
-    const fetchUserFiles = async () => {
-      try {
-        // ตรวจสอบว่ามี userId ก่อนที่จะดึงข้อมูล
-        if (!userId) return;
-
-        const res = await fetch(
-          `http://localhost:3000/api/files/user/${userId}`
-        );
-        if (!res.ok) throw new Error("Failed to fetch user files");
-
-        const data = await res.json();
-        setDocuments(data); // ตั้งค่าข้อมูลโดยตรงจาก API
-      } catch (err) {
-        console.error("Failed to fetch user files:", err);
-      }
-    };
-
+    
     fetchUserFiles();
   }, [userId]);
+  
+  const fetchUserFiles = async () => {
+    try {
+      // ตรวจสอบว่ามี userId ก่อนที่จะดึงข้อมูล
+      if (!userId) return;
 
-  useEffect(() => {
-    // กรองเอกสารตาม Token ที่ตรงกับผู้ใช้ที่ล็อกอิน
-    const filteredDocuments = [...FileData, ...uploadedFiles].filter(
-      (doc) => doc.token === token
-    );
-    setDocuments(filteredDocuments); // ตั้งค่าเอกสารที่กรองแล้ว
-  }, [token, uploadedFiles]); // รีเฟรชเมื่อ Token หรือ uploadedFiles เปลี่ยนแปลง
+      const res = await fetch(
+        `http://localhost:3000/api/files/user/${userId}`
+      );
+      if (!res.ok) throw new Error("Failed to fetch user files");
+
+      const data = await res.json();
+      setDocuments(data); // ตั้งค่าข้อมูลโดยตรงจาก API
+    } catch (err) {
+      console.error("Failed to fetch user files:", err);
+    }
+  };
 
   const sortDocuments = (documents, option, order) => {
     return documents.sort((a, b) => {
@@ -432,7 +420,6 @@ const MyDocument = () => {
             />
           </div>
 
-
           <div className="dropdown">
             <label className="filter-label">จัดเรียงตาม: </label>
             <select
@@ -480,13 +467,13 @@ const MyDocument = () => {
                     </span> */}
           </div>
           <div className="multi-select-actions">
-
             <table>
               <thead>
                 <tr>
                   <th
-                    className={`checkbox-th ${isDownloading ? "no-radius" : ""
-                      }`}
+                    className={`checkbox-th ${
+                      isDownloading ? "no-radius" : ""
+                    }`}
                   >
                     <button
                       onClick={toggleCheckbox}
@@ -522,7 +509,7 @@ const MyDocument = () => {
               </thead>
             </table>
             <Link to="/document" className="add-document-btn">
-            เพิ่มเอกสารใหม่
+              เพิ่มเอกสารใหม่
             </Link>
           </div>
 
@@ -536,6 +523,7 @@ const MyDocument = () => {
                 <th>ประเภทเอกสาร</th>
                 <th>วันที่ลง</th>
                 <th>หน่วยงาน</th>
+                <th>สถานะ</th>
                 <th className="th-to">เครื่องมือ</th>
               </tr>
             </thead>
@@ -543,8 +531,9 @@ const MyDocument = () => {
               {currentDocuments.map((doc, index) => (
                 <tr
                   key={doc.id}
-                  className={`row-item ${selectedDocuments.includes(doc.id) ? "row-selected" : ""
-                    }`}
+                  className={`row-item ${
+                    selectedDocuments.includes(doc.id) ? "row-selected" : ""
+                  }`}
                   onClick={() => handleSelectDocument(doc.id)}
                 >
                   {showCheckbox && (
@@ -573,6 +562,15 @@ const MyDocument = () => {
                   <td>{doc.type}</td>
                   <td>{doc.date}</td>
                   <td>{doc.department}</td>
+                  <td>
+                    <span className={`status-tag ${doc.status}`}>
+                      {doc.status === "approved"
+                        ? "อนุมัติแล้ว"
+                        : doc.status === "pending"
+                        ? "รออนุมัติ"
+                        : "ไม่อนุมัติ"}
+                    </span>
+                  </td>
 
                   <td className="action-buttons">
                     <div className="button-container">
