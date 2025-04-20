@@ -337,93 +337,117 @@ app.get("/api/uploads-by-user", async (req, res) => {
 });
 
 // Permission
-// new permissions
+// 🔹 1. เพิ่มพนักงานใหม่
+app.post("/api/users", async (req, res) => {
+  const { first_name, last_name, employee_id, department_id } = req.body;
+  try {
+    const client = await pool.connect();
+    const result = await client.query(
+      `INSERT INTO users (first_name, last_name, employee_id, department_id)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [first_name, last_name, employee_id, department_id]
+    );
+    client.release();
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error adding user:", err);
+    res.status(500).json({ error: "เพิ่มผู้ใช้ไม่สำเร็จ" });
+  }
+});
+
+// 🔹 2. เพิ่มสิทธิ์ให้พนักงาน
 app.post("/api/permissions", async (req, res) => {
   const { employeeId, permissionName } = req.body;
   const grantedBy = 1; // สมมุติว่า admin ID คือ 1
 
   try {
     const client = await pool.connect();
+    await client.query("BEGIN");
 
-    try {
-      await client.query('BEGIN');
-
-      // 1. ค้นหาผู้ใช้งานจาก employeeId
-      const userQuery = `
-        SELECT u.user_id, u.first_name, u.last_name, u.employee_id, d.department_name
-        FROM users u
-        LEFT JOIN departments d ON u.department_id = d.department_id
-        WHERE u.employee_id = $1
-      `;
-      const userResult = await client.query(userQuery, [employeeId]);
-
-      if (userResult.rows.length === 0) {
-        await client.query('ROLLBACK');
-        return res.status(404).json({ error: "ไม่พบพนักงานนี้ในระบบ" });
-      }
-
-      const user = userResult.rows[0];
-
-      // 2. ตรวจสอบชื่อสิทธิ์ และหา permission_id
-      const permQuery = `SELECT permission_id FROM permissions WHERE permission_name = $1`;
-      const permResult = await client.query(permQuery, [permissionName]);
-
-      if (permResult.rows.length === 0) {
-        await client.query('ROLLBACK');
-        return res.status(404).json({ error: "ไม่พบสิทธิ์นี้ในระบบ" });
-      }
-
-      const permissionId = permResult.rows[0].permission_id;
-
-      // 3. เพิ่มสิทธิ์ให้ผู้ใช้
-      const insertQuery = `
-        INSERT INTO user_permissions (user_id, permission_id, granted_by)
-        VALUES ($1, $2, $3)
-      `;
-      await client.query(insertQuery, [user.user_id, permissionId, grantedBy]);
-
-      // 4. ดึงสิทธิ์ทั้งหมดของผู้ใช้คนนี้
-      const allPermsQuery = `
-        SELECT p.permission_name
-        FROM user_permissions up
-        JOIN permissions p ON up.permission_id = p.permission_id
-        WHERE up.user_id = $1
-      `;
-      const allPermsResult = await client.query(allPermsQuery, [user.user_id]);
-      const permissions = allPermsResult.rows.map(p => p.permission_name);
-
-      // 5. แปลงเป็นสิทธิ์แต่ละหมวด
-      const documentAccess = permissions.includes("document");
-      const permissionAccess = permissions.includes("permission");
-      const reportsAccess = permissions.includes("reports");
-
-      await client.query('COMMIT');
-
-      // 6. ส่ง response กลับไป
-      res.status(201).json({
-        message: "เพิ่มสิทธิ์สำเร็จ",
-        user: {
-          firstName: user.first_name,
-          lastName: user.last_name,
-          department: user.department_name || "ไม่ระบุแผนก",
-          employeeId: user.employee_id,
-          documentAccess,
-          permissionAccess,
-          reportsAccess
-        }
-      });
-
-    } catch (err) {
-      await client.query('ROLLBACK');
-      console.error("Transaction failed:", err);
-      res.status(500).json({ error: "เกิดข้อผิดพลาดระหว่างการเพิ่มสิทธิ์" });
-    } finally {
-      client.release();
+    const userResult = await client.query(
+      `SELECT user_id, first_name, last_name, employee_id, department_id FROM users WHERE employee_id = $1`,
+      [employeeId]
+    );
+    if (userResult.rows.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ error: "ไม่พบพนักงานนี้ในระบบ" });
     }
+    const user = userResult.rows[0];
 
+    const permResult = await client.query(
+      `SELECT permission_id FROM permissions WHERE permission_name = $1`,
+      [permissionName]
+    );
+    if (permResult.rows.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ error: "ไม่พบสิทธิ์นี้ในระบบ" });
+    }
+    const permissionId = permResult.rows[0].permission_id;
+
+    await client.query(
+      `INSERT INTO user_permissions (user_id, permission_id, granted_by)
+       VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+      [user.user_id, permissionId, grantedBy]
+    );
+
+    const allPermsResult = await client.query(
+      `SELECT p.permission_name FROM user_permissions up
+       JOIN permissions p ON up.permission_id = p.permission_id
+       WHERE up.user_id = $1`,
+      [user.user_id]
+    );
+
+    const permissions = allPermsResult.rows.map(p => p.permission_name);
+    await client.query("COMMIT");
+    client.release();
+
+    res.status(201).json({
+      message: "เพิ่มสิทธิ์สำเร็จ",
+      user: {
+        firstName: user.first_name,
+        lastName: user.last_name,
+        employeeId: user.employee_id,
+        documentAccess: permissions.includes("document"),
+        permissionAccess: permissions.includes("permission"),
+        reportsAccess: permissions.includes("reports")
+      }
+    });
   } catch (err) {
-    console.error("Database connection error:", err);
-    res.status(500).json({ error: "ไม่สามารถเชื่อมต่อกับฐานข้อมูลได้" });
+    console.error("Error adding permission:", err);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดระหว่างการเพิ่มสิทธิ์" });
+  }
+});
+
+// 🔹 3. ดึงรายการผู้ใช้พร้อมสิทธิ์ทั้งหมด
+app.get("/api/permission", async (req, res) => {
+  try {
+    const client = await pool.connect();
+    const result = await client.query(
+      `SELECT u.user_id, u.first_name, u.last_name, u.employee_id, d.department_name,
+              ARRAY_REMOVE(ARRAY_AGG(p.permission_name), NULL) AS permissions
+       FROM users u
+       LEFT JOIN departments d ON u.department_id = d.department_id
+       LEFT JOIN user_permissions up ON u.user_id = up.user_id
+       LEFT JOIN permissions p ON up.permission_id = p.permission_id
+       GROUP BY u.user_id, d.department_name`
+    );
+
+    const users = result.rows.map(u => ({
+      firstName: u.first_name,
+      lastName: u.last_name,
+      employeeId: u.employee_id,
+      department: u.department_name,
+      documentAccess: u.permissions.includes("document"),
+      permissionAccess: u.permissions.includes("permission"),
+      reportsAccess: u.permissions.includes("reports")
+    }));
+
+    client.release();
+    res.json(users);
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).json({ error: "ไม่สามารถดึงข้อมูลผู้ใช้ได้" });
   }
 });
 
