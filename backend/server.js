@@ -346,117 +346,73 @@ app.get("/api/uploads-by-user", async (req, res) => {
 });
 
 // Permission
-// 🔹 1. เพิ่มพนักงานใหม่
-app.post("/api/users", async (req, res) => {
-  const { first_name, last_name, employee_id, department_id } = req.body;
+app.get('/api/permission', async (req, res) => {
   try {
-    const client = await pool.connect();
-    const result = await client.query(
-      `INSERT INTO users (first_name, last_name, employee_id, department_id)
-       VALUES ($1, $2, $3, $4)
-       RETURNING *`,
-      [first_name, last_name, employee_id, department_id]
-    );
-    client.release();
-    res.status(201).json(result.rows[0]);
+    const result = await pool.query(`
+      SELECT u.employee_id, u.first_name, u.last_name, u.department,
+             p.document_access AS "documentAccess",
+             p.permission_access AS "permissionAccess",
+             p.reports_access AS "reportsAccess"
+      FROM users u
+      JOIN user_permissions p ON u.id = p.user_id
+    `);    
+    console.log("Permissions data:", result.rows); // เพิ่ม logging
+    res.json(result.rows);
   } catch (err) {
-    console.error("Error adding user:", err);
-    res.status(500).json({ error: "เพิ่มผู้ใช้ไม่สำเร็จ" });
+    console.error('Error fetching permissions:', err);
+    res.status(500).json({ error: 'Internal server error', details: err.message });
   }
 });
 
-// 🔹 2. เพิ่มสิทธิ์ให้พนักงาน
-app.post("/api/permissions", async (req, res) => {
-  const { employeeId, permissionName } = req.body;
-  const grantedBy = 1; // สมมุติว่า admin ID คือ 1
-
-  try {
-    const client = await pool.connect();
-    await client.query("BEGIN");
-
-    const userResult = await client.query(
-      `SELECT user_id, first_name, last_name, employee_id, department_id FROM users WHERE employee_id = $1`,
-      [employeeId]
-    );
-    if (userResult.rows.length === 0) {
-      await client.query("ROLLBACK");
-      return res.status(404).json({ error: "ไม่พบพนักงานนี้ในระบบ" });
-    }
-    const user = userResult.rows[0];
-
-    const permResult = await client.query(
-      `SELECT permission_id FROM permissions WHERE permission_name = $1`,
-      [permissionName]
-    );
-    if (permResult.rows.length === 0) {
-      await client.query("ROLLBACK");
-      return res.status(404).json({ error: "ไม่พบสิทธิ์นี้ในระบบ" });
-    }
-    const permissionId = permResult.rows[0].permission_id;
-
-    await client.query(
-      `INSERT INTO user_permissions (user_id, permission_id, granted_by)
-       VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
-      [user.user_id, permissionId, grantedBy]
-    );
-
-    const allPermsResult = await client.query(
-      `SELECT p.permission_name FROM user_permissions up
-       JOIN permissions p ON up.permission_id = p.permission_id
-       WHERE up.user_id = $1`,
-      [user.user_id]
-    );
-
-    const permissions = allPermsResult.rows.map(p => p.permission_name);
-    await client.query("COMMIT");
-    client.release();
-
-    res.status(201).json({
-      message: "เพิ่มสิทธิ์สำเร็จ",
-      user: {
-        firstName: user.first_name,
-        lastName: user.last_name,
-        employeeId: user.employee_id,
-        documentAccess: permissions.includes("document"),
-        permissionAccess: permissions.includes("permission"),
-        reportsAccess: permissions.includes("reports")
-      }
+app.put('/api/permission', async (req, res) => {
+  const { employee_id, permissionName, value } = req.body;
+  
+  // ปรับปรุงการตรวจสอบข้อมูล
+  if (!employee_id || !permissionName || value === undefined) {
+    return res.status(400).json({ error: 'Missing data' });
+  }
+  
+  // เพิ่มการตรวจสอบชื่อของ permissionName ให้ถูกต้อง
+  const validPermissions = ['document_access', 'permission_access', 'reports_access'];
+  if (!validPermissions.includes(permissionName)) {
+    return res.status(400).json({ 
+      error: 'Invalid permission name',
+      message: `Permission name must be one of: ${validPermissions.join(', ')}`
     });
-  } catch (err) {
-    console.error("Error adding permission:", err);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดระหว่างการเพิ่มสิทธิ์" });
   }
-});
 
-// 🔹 3. ดึงรายการผู้ใช้พร้อมสิทธิ์ทั้งหมด
-app.get("/api/permission", async (req, res) => {
+  const client = await pool.connect();
   try {
-    const client = await pool.connect();
-    const result = await client.query(
-      `SELECT u.user_id, u.first_name, u.last_name, u.employee_id, d.department_name,
-              ARRAY_REMOVE(ARRAY_AGG(p.permission_name), NULL) AS permissions
-       FROM users u
-       LEFT JOIN departments d ON u.department_id = d.department_id
-       LEFT JOIN user_permissions up ON u.user_id = up.user_id
-       LEFT JOIN permissions p ON up.permission_id = p.permission_id
-       GROUP BY u.user_id, d.department_name`
-    );
+    const updateQuery = `
+      UPDATE user_permissions
+      SET ${permissionName} = $1
+      WHERE user_id = (
+        SELECT id FROM users WHERE employee_id = $2
+      )
+      RETURNING *;
+    `;
 
-    const users = result.rows.map(u => ({
-      firstName: u.first_name,
-      lastName: u.last_name,
-      employeeId: u.employee_id,
-      department: u.department_name,
-      documentAccess: u.permissions.includes("document"),
-      permissionAccess: u.permissions.includes("permission"),
-      reportsAccess: u.permissions.includes("reports")
-    }));
+    
+    console.log('Executing query:', updateQuery, 'with values:', [value, employee_id]);
+    
+    const result = await client.query(updateQuery, [value, employee_id]);
 
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+
+    res.json({ 
+      message: 'Permission updated successfully', 
+      updated: result.rows[0] 
+    });
+  } catch (error) {
+    console.error('Error updating permission:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      message: error.message 
+    });
+  } finally {
     client.release();
-    res.json(users);
-  } catch (err) {
-    console.error("Error fetching users:", err);
-    res.status(500).json({ error: "ไม่สามารถดึงข้อมูลผู้ใช้ได้" });
   }
 });
 
