@@ -18,6 +18,7 @@ import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
 import MyDocument from "./components/MyDocument/MyDocument";
 import AboutMe from "./components/Aboutme/Aboutme";
 import Trash from "./components/Trash/Trash";
+import ApprovePage from "./components/Approve/ApprovePage.jsx";
 
 import { FileProvider } from "./components/FileContext/FileContext";
 import { AuthProvider, AuthContext } from "./contexts/AuthContext.jsx";
@@ -56,6 +57,7 @@ function AppRoutes() {
               <Route path="/profile" element={<Profile username={username} />} />
               <Route path="/about-me" element={<AboutMe />} />
               <Route path="/trash" element={<Trash />} />
+              <Route path="/approve" element={<ApprovePage />} />
             </>
           )}
           <Route path="/aboutme" element={<AboutMe />} />

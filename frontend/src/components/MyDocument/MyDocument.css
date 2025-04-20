@@ -25,7 +25,8 @@
   justify-content: flex-start;
   gap: 15px;
   margin-bottom: 20px;
-  flex-wrap: wrap; /* Make sure filter options don't overflow */
+  flex-wrap: wrap;
+  /* Make sure filter options don't overflow */
 }
 
 .filter-button {
@@ -52,7 +53,8 @@
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  max-height: 500px; /* กำหนดความสูงสูงสุดของตาราง */
+  max-height: 500px;
+  /* กำหนดความสูงสูงสุดของตาราง */
   position: relative;
 }
 
@@ -64,11 +66,11 @@
 }
 
 .th-number {
-  border-radius: 8px 0  0 ;
+  border-radius: 8px 0 0;
 }
 
 .th-tool {
-  border-radius: 0 8px 0  0 ;
+  border-radius: 0 8px 0 0;
 }
 
 .document-table th {
@@ -185,7 +187,7 @@
 
 /* Pagination Buttons */
 .pagination-btn {
-  background-color:#F14D31;
+  background-color: #F14D31;
   color: white;
   font-size: 1rem;
   padding: 10px 20px;
@@ -223,34 +225,64 @@
 }
 
 .download-btn {
-  background-color: #F14D31; /* Green background */
-  color: white; /* White text */
-  font-size: 14px; /* Font size */
-  padding: 10px 20px; /* Padding */
-  border: none; /* Remove border */
-  border-radius: 25px; /* Rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: all 0.3s ease; /* Smooth transition */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  background-color: #F14D31;
+  /* Green background */
+  color: white;
+  /* White text */
+  font-size: 14px;
+  /* Font size */
+  padding: 10px 20px;
+  /* Padding */
+  border: none;
+  /* Remove border */
+  border-radius: 25px;
+  /* Rounded corners */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  transition: all 0.3s ease;
+  /* Smooth transition */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow */
 }
 
 .download-btn:hover {
-  background-color: #317433; /* Darker green on hover */
-  transform: translateY(-2px); /* Slight lift effect */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+  background-color: #317433;
+  /* Darker green on hover */
+  transform: translateY(-2px);
+  /* Slight lift effect */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  /* Darker shadow on hover */
 }
 
 .download-btn:disabled {
-  background-color: #ddd; /* Greyed out when disabled */
-  cursor: not-allowed; /* Disable cursor */
-  box-shadow: none; /* Remove shadow when disabled */
+  background-color: #ddd;
+  /* Greyed out when disabled */
+  cursor: not-allowed;
+  /* Disable cursor */
+  box-shadow: none;
+  /* Remove shadow when disabled */
 }
+
+.status-tag.approved {
+  color: green;
+}
+
+.status-tag.pending {
+  color: orange;
+}
+
+.status-tag.rejected {
+  color: red;
+}
+
 
 /* Adjusting for smaller screens */
 @media (max-width: 768px) {
-  .document-table th, .document-table td {
+
+  .document-table th,
+  .document-table td {
     padding: 10px;
-  
+
   }
 
   .document-table td {
@@ -286,7 +318,8 @@
 
 .button-container {
   display: flex;
-  gap: 10px; /* เพิ่มช่องว่างระหว่างปุ่ม */
+  gap: 10px;
+  /* เพิ่มช่องว่างระหว่างปุ่ม */
 }
 
 .download-btn,
@@ -390,6 +423,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -410,6 +444,7 @@
   from {
     transform: scale(0.9);
   }
+
   to {
     transform: scale(1);
   }
@@ -426,20 +461,26 @@
 
 /* Form Groups */
 .form-group {
-  display: flex; /* ใช้ flexbox เพื่อให้ label และ input อยู่ในบรรทัดเดียวกัน */
-  align-items: center; /* จัดแนวกลาง */
-  margin-bottom: 20px; /* ช่องว่างระหว่างฟอร์มกรุ๊ป */
+  display: flex;
+  /* ใช้ flexbox เพื่อให้ label และ input อยู่ในบรรทัดเดียวกัน */
+  align-items: center;
+  /* จัดแนวกลาง */
+  margin-bottom: 20px;
+  /* ช่องว่างระหว่างฟอร์มกรุ๊ป */
 }
 
 .label-edit {
-  flex: 0 0 150px; /* กำหนดความกว้างของ label เป็น 150px */
+  flex: 0 0 150px;
+  /* กำหนดความกว้างของ label เป็น 150px */
   font-weight: 500;
-  margin-bottom: 0; /* เอาช่องว่างระหว่าง label และ input */
+  margin-bottom: 0;
+  /* เอาช่องว่างระหว่าง label และ input */
   color: #555;
 }
 
 .form-input {
-  flex: 1; /* ให้ input/select ขยายเต็มพื้นที่ที่เหลือ */
+  flex: 1;
+  /* ให้ input/select ขยายเต็มพื้นที่ที่เหลือ */
   padding: 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -448,19 +489,22 @@
   transition: border-color 0.3s;
 }
 
-.form-input:hover{
+.form-input:hover {
   border-color: #F14D31 !important;
-  box-shadow: 0 0 5px rgba(241, 77, 49, 0.5); /* เพิ่มเงาเพื่อให้ชัดเจน */
+  box-shadow: 0 0 5px rgba(241, 77, 49, 0.5);
+  /* เพิ่มเงาเพื่อให้ชัดเจน */
 }
 
 .form-input:focus {
   border-color: #F14D31 !important;
-  box-shadow: 0 0 5px rgba(241, 77, 49, 0.5); /* เพิ่มเงาเพื่อให้ชัดเจน */
+  box-shadow: 0 0 5px rgba(241, 77, 49, 0.5);
+  /* เพิ่มเงาเพื่อให้ชัดเจน */
 }
 
 .form-input:active {
   border-color: #F14D31 !important;
-  box-shadow: 0 0 5px rgba(241, 77, 49, 0.5); /* เพิ่มเงาเพื่อให้ชัดเจน */
+  box-shadow: 0 0 5px rgba(241, 77, 49, 0.5);
+  /* เพิ่มเงาเพื่อให้ชัดเจน */
 }
 
 
@@ -471,8 +515,10 @@
 }
 
 /* Add spacing between inputs */
-.form-group input, .form-group select {
-  margin-bottom: 10px; /* ช่องว่างระหว่างช่องกรอก */
+.form-group input,
+.form-group select {
+  margin-bottom: 10px;
+  /* ช่องว่างระหว่างช่องกรอก */
 }
 
 /* Popup Buttons */
@@ -494,14 +540,22 @@
 }
 
 .confirm-btn {
-  background-color: #F14D31; /* Green background */
-  color: white; /* White text */
-  padding: 10px 20px; /* Padding */
-  border: none; /* Remove border */
-  border-radius: 25px; /* Rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: all 0.3s ease; /* Smooth transition */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  background-color: #F14D31;
+  /* Green background */
+  color: white;
+  /* White text */
+  padding: 10px 20px;
+  /* Padding */
+  border: none;
+  /* Remove border */
+  border-radius: 25px;
+  /* Rounded corners */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  transition: all 0.3s ease;
+  /* Smooth transition */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow */
   font-weight: 600;
   font-size: 1rem;
   margin-right: 12px;
@@ -510,20 +564,31 @@
 }
 
 .confirm-btn:hover {
-  background-color: #F14D31; /* Darker green on hover */
-  transform: translateY(-2px); /* Slight lift effect */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+  background-color: #F14D31;
+  /* Darker green on hover */
+  transform: translateY(-2px);
+  /* Slight lift effect */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  /* Darker shadow on hover */
 }
 
 .cancel-btn {
-  background-color: #F14D31; /* Green background */
-  color: white; /* White text */
-  padding: 10px 20px; /* Padding */
-  border: none; /* Remove border */
-  border-radius: 25px; /* Rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: all 0.3s ease; /* Smooth transition */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  background-color: #F14D31;
+  /* Green background */
+  color: white;
+  /* White text */
+  padding: 10px 20px;
+  /* Padding */
+  border: none;
+  /* Remove border */
+  border-radius: 25px;
+  /* Rounded corners */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  transition: all 0.3s ease;
+  /* Smooth transition */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow */
   font-weight: 600;
   font-size: 1rem;
   margin-right: 12px;
@@ -532,9 +597,12 @@
 }
 
 .cancel-btn:hover {
-  background-color: #F14D31; /* Darker green on hover */
-  transform: translateY(-2px); /* Slight lift effect */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+  background-color: #F14D31;
+  /* Darker green on hover */
+  transform: translateY(-2px);
+  /* Slight lift effect */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  /* Darker shadow on hover */
 }
 
 .add-document-container {
@@ -563,6 +631,7 @@
 .add-document-btn:hover {
   background-color: #e05500;
 }
+
 /* With these changes, a new button labeled “เพิ่มเอกสารใหม่” will appear below the search bar and will navigate to "/document" when clicked, fitting nicely with the existing theme.// filepath: c:\DATA\Coding\Github\spu205\DocLibraryGroup8\frontend\src\components\MyDocument\MyDocument.css */
 .add-document-container {
   display: flex;
@@ -583,4 +652,5 @@
 .add-document-btn:hover {
   background-color: #e05500;
 }
+
 /* With these changes, a new button labeled “เพิ่มเอกสารใหม่” will appear below the search bar and will navigate to "/document" when clicked, fitting nicely with the existing theme. */
