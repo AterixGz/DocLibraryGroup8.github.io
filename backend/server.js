@@ -19,6 +19,9 @@ const SECRET_KEY = process.env.SECRET_KEY || 'your-secret-key';
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/Avatar', express.static(path.join(__dirname, 'Avatar')));
+
+
 
 // PostgreSQL connection
 const pool = new Pool({
@@ -50,6 +53,20 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + '-' + file.originalname);
   }
 });
+
+const avatarStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(__dirname, 'Avatar');
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+
+const avatarUpload = multer({ storage: avatarStorage });
+
 
 const upload = multer({ storage });
 
@@ -317,8 +334,11 @@ app.get('/api/profile', async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT id, username, first_name, last_name, role_id, email, department, avatar, employee_id
-       FROM users WHERE id = $1`,
+      `SELECT u.id, u.username, u.first_name, u.last_name, u.email, u.department, u.avatar, u.employee_id,
+              r.name AS role_name
+       FROM users u
+       LEFT JOIN roles r ON u.role_id = r.id
+       WHERE u.id = $1`,
       [userId]
     );
 
@@ -330,7 +350,7 @@ app.get('/api/profile', async (req, res) => {
     res.json({
       id: user.id,
       username: user.username,
-      role: user.role_id,
+      role: user.role_name,
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
@@ -398,15 +418,20 @@ app.get("/api/uploads-by-user", async (req, res) => {
 });
 
 // Permission
-// GET permission ของ user แบบ name-based
+// ✅ ใช้ role_id ดึง permission ตามบทบาท
 app.get("/api/users/:id/permissions", async (req, res) => {
   const userId = req.params.id;
   try {
+    const userResult = await pool.query('SELECT role_id FROM users WHERE id = $1', [userId]);
+    if (userResult.rows.length === 0) return res.status(404).json({ message: 'User not found' });
+
+    const roleId = userResult.rows[0].role_id;
+
     const result = await pool.query(`
-      SELECT p.name FROM user_permissions up
-      JOIN permissions p ON up.permission_id = p.id
-      WHERE up.user_id = $1
-    `, [userId]);
+      SELECT p.name FROM role_permissions rp
+      JOIN permissions p ON rp.permission_id = p.id
+      WHERE rp.role_id = $1
+    `, [roleId]);
 
     const permissionNames = result.rows.map(row => row.name);
     res.json(permissionNames);
@@ -415,6 +440,7 @@ app.get("/api/users/:id/permissions", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch permissions" });
   }
 });
+
 
 // เพิ่ม / ลบ permission ของ user
 app.post('/api/roles/:id/permissions', async (req, res) => {
@@ -771,7 +797,50 @@ app.delete("/api/users/:id", async (req, res) => {
   }
 });
 
-// Start server
+// PUT: อัปเดตเฉพาะโปรไฟล์ตนเอง (ไม่ยุ่งกับ role_id / department)
+app.put('/api/profile/:id', async (req, res) => {
+  const { id } = req.params;
+  const { first_name, last_name, email, avatar } = req.body;
+
+  try {
+    const result = await pool.query(`
+      UPDATE users 
+      SET first_name = $1, last_name = $2, email = $3, avatar = $4
+      WHERE id = $5 
+      RETURNING id, first_name, last_name, email, avatar
+    `, [first_name, last_name, email, avatar, id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Error updating profile:", err);
+    res.status(500).json({ error: "Profile update failed" });
+  }
+});
+
+app.post('/api/profile/upload-avatar/:id', avatarUpload.single('avatar'), async (req, res) => {
+  const userId = req.params.id;
+  const file = req.file;
+
+  if (!file) return res.status(400).json({ message: 'No file uploaded' });
+
+  const fileUrl = `http://localhost:3000/Avatar/${file.filename}`;
+
+  try {
+    const result = await pool.query(
+      `UPDATE users SET avatar = $1 WHERE id = $2 RETURNING avatar`,
+      [fileUrl, userId]
+    );
+    res.json({ avatar: result.rows[0].avatar });
+  } catch (err) {
+    console.error('Error updating avatar:', err);
+    res.status(500).json({ error: 'Failed to update avatar' });
+  }
+});
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });

@@ -1,39 +1,129 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { motion } from "framer-motion";
-import { verifyUser } from "../../data/users";
+import axios from "axios";
 import "./Profile.css";
+import { AuthContext } from "../../contexts/AuthContext"; // ปรับ path ให้ตรงกับของคุณ
 
-function Profile({ username, password }) {
+function Profile() {
   const [userData, setUserData] = useState(null);
-  const [avatar, setAvatar] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const { setUserData: updateUserData } = useContext(AuthContext); // ✅ เปลี่ยนชื่อเพื่อไม่ชน
+
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+  });
+
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    const user = verifyUser(username, password);
-    if (user) {
-      setUserData(user);
-      setAvatar(user.avatar); // ตั้งค่า avatar จากข้อมูลผู้ใช้เริ่มต้น
-    } else {
-      console.error("User not found or password incorrect");
+    const storedUser = localStorage.getItem("userData");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      const token = localStorage.getItem("token");
+
+      axios
+        .get(`http://localhost:3000/api/profile?userId=${parsedUser.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          setUserData(res.data);
+          setFormData({
+            first_name: res.data.first_name || "",
+            last_name: res.data.last_name || "",
+            email: res.data.email || "",
+          });
+          setAvatarPreview(res.data.avatar || "/img/default-avatar.png");
+        })
+        .catch((err) => {
+          console.error("Failed to load profile:", err);
+        });
     }
-  }, [username, password]);
+  }, []);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleAvatarChange = (event) => {
     const file = event.target.files[0];
     if (file) {
+      setAvatarFile(file);
       const reader = new FileReader();
-      reader.onload = (e) => setAvatar(e.target.result); // อัปเดตรูปภาพที่แสดงผล
+      reader.onload = (e) => setAvatarPreview(e.target.result);
       reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadAvatar = async (userId, token) => {
+    if (!avatarFile) return;
+
+    const formData = new FormData();
+    formData.append("avatar", avatarFile);
+
+    const res = await axios.post(
+      `http://localhost:3000/api/profile/upload-avatar/${userId}`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return res.data.avatar;
+  };
+
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const stored = JSON.parse(localStorage.getItem("userData"));
+      const userId = stored.id;
+
+      let avatarUrl = userData.avatar;
+      if (avatarFile) {
+        avatarUrl = await uploadAvatar(userId, token);
+      }
+
+      const res = await axios.put(
+        `http://localhost:3000/api/profile/${userId}`,
+        {
+          ...formData,
+          avatar: avatarUrl,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const updatedUser = {
+        ...stored,
+        ...formData,
+        avatar: avatarUrl,
+      };
+
+      localStorage.setItem("userData", JSON.stringify(updatedUser));
+      updateUserData(updatedUser); // ✅ update context
+      setUserData(updatedUser); // ✅ update local state
+
+      setSuccessMessage("✅ บันทึกข้อมูลเรียบร้อยแล้ว");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      console.error("Error updating profile:", error);
     }
   };
 
   if (!userData) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="loading-container"
-      >
+      <motion.div className="loading-container">
         <p>Loading...</p>
       </motion.div>
     );
@@ -41,36 +131,18 @@ function Profile({ username, password }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -50 }}
+      initial={{ opacity: 0, y: -30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
+      transition={{ duration: 0.6 }}
       className="profile"
     >
-      <motion.h1
-        className="profile__header"
-        initial={{ scale: 0.8 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-      >
-        โปรไฟล์
-      </motion.h1>
-      <motion.hr
-        className="dividermain"
-        initial={{ width: 0 }}
-        animate={{ width: "20%" }}
-        transition={{ duration: 0.7, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="profile__avatar-container"
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      >
-        {/* ภาพโปรไฟล์ */}
+      <h1 className="profile__header">โปรไฟล์</h1>
+      <hr className="dividermain" />
+
+      <div className="profile__avatar-container">
         <label htmlFor="avatar-upload" className="profile__avatar-label">
-          <img src={avatar} alt="Profile" className="profile__avatar" />
+          <img src={avatarPreview} alt="Profile" className="profile__avatar" />
         </label>
-        {/* อินพุตสำหรับอัปโหลด (ซ่อนอยู่) */}
         <input
           id="avatar-upload"
           type="file"
@@ -78,47 +150,99 @@ function Profile({ username, password }) {
           style={{ display: "none" }}
           onChange={handleAvatarChange}
         />
-      </motion.div>
-      <motion.div
-        className="profile__info"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
-      >
-        {/* ข้อมูลส่วนตัว */}
+      </div>
+
+      <div className="profile__info">
         <div className="profile__form-group--name">
-          <motion.div className="profile__form-group">
+          <div className="profile__form-group">
             <label>ชื่อจริง</label>
-            <input type="text" value={userData.firstName} readOnly />
-          </motion.div>
-          <motion.div className="profile__form-group">
+            <input
+              type="text"
+              name="first_name"
+              value={formData.first_name}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="profile__form-group">
             <label>นามสกุล</label>
-            <input type="text" value={userData.lastName} readOnly />
-          </motion.div>
+            <input
+              type="text"
+              name="last_name"
+              value={formData.last_name}
+              onChange={handleChange}
+            />
+          </div>
         </div>
-        <motion.div className="profile__form-group">
+
+        <div className="profile__form-group">
           <label>E-mail</label>
-          <input type="text" value={userData.email} readOnly />
-        </motion.div>
-        {/* ข้อมูลแผนกและตำแหน่ง */}
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </div>
+
         <div className="profile__form-group--name">
-          <motion.div className="profile__form-group">
+          <div className="profile__form-group">
             <label>แผนก</label>
             <input type="text" value={userData.department} readOnly />
-          </motion.div>
-          <motion.div className="profile__form-group">
+          </div>
+          <div className="profile__form-group">
             <label>ตำแหน่ง</label>
-            <input type="text" value={userData.position} readOnly />
-          </motion.div>
+            <input type="text" value={userData.role || "—"} readOnly />
+          </div>
         </div>
-        {/* ข้อมูลรหัสพนักงาน */}
-        <motion.div className="profile__form-group">
+
+        <div className="profile__form-group">
           <label>รหัสพนักงาน</label>
-          <input type="text" value={userData.employeeId} readOnly />
-        </motion.div>
-        {/* ข้อมูลบทบาท */}
-        <motion.div className="profile__form-group"></motion.div>
-      </motion.div>
+          <input type="text" value={userData.employee_id || "—"} readOnly />
+        </div>
+
+        <button
+          className="profile__save-button"
+          onClick={() => setShowConfirm(true)}
+        >
+          💾 บันทึก
+        </button>
+
+        {showConfirm && (
+          <div className="profile__popup-overlay">
+            <div className="profile__confirm-popup">
+              <div className="popup-content">
+                <p>คุณต้องการบันทึกการเปลี่ยนแปลงในโปรไฟล์ใช่หรือไม่?</p>
+                <button
+                  className="popup-confirm"
+                  onClick={() => {
+                    handleSave();
+                    setShowConfirm(false);
+                  }}
+                >
+                  ยืนยัน
+                </button>
+                <button
+                  className="popup-cancel"
+                  onClick={() => setShowConfirm(false)}
+                >
+                  ยกเลิก
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {successMessage && (
+          <motion.div
+            className="profile__success-popup"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            {successMessage}
+          </motion.div>
+        )}
+      </div>
     </motion.div>
   );
 }

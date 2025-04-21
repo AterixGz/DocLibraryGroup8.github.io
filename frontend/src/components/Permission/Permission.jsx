@@ -1,8 +1,9 @@
 // ✅ PermissionPage.jsx - Full Updated Version
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import "./Permission.css";
 import { FiMoreVertical } from "react-icons/fi";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const PermissionPage = () => {
   const [roles, setRoles] = useState([]);
@@ -20,7 +21,7 @@ const PermissionPage = () => {
   const [showEditForm, setShowEditForm] = useState(false);
   const [notification, setNotification] = useState(null);
   const [editPassword, setEditPassword] = useState("");
-
+  const { userData, setUserData } = useContext(AuthContext);
 
   const [newUser, setNewUser] = useState({
     username: "",
@@ -35,7 +36,6 @@ const PermissionPage = () => {
 
   const token = localStorage.getItem("token");
   const currentUserId = JSON.parse(localStorage.getItem("userData"))?.id;
-
 
   useEffect(() => {
     if (!token) return;
@@ -210,18 +210,36 @@ const PermissionPage = () => {
   };
 
   const saveChanges = async () => {
-    for (let role of roles) {
-      try {
+    try {
+      for (let role of roles) {
         await axios.post(
           `http://localhost:3000/api/roles/${role.id}/permissions`,
           { permissions: rolePermissions[role.id] || [] },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-      } catch (err) {
-        console.error(`Failed to save permissions for role ${role.name}`, err);
       }
+
+      // ✅ อัปเดต permission ใหม่ของผู้ใช้ปัจจุบัน
+      const permRes = await axios.get(
+        `http://localhost:3000/api/users/${userData.id}/permissions`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const updatedUser = {
+        ...userData,
+        permissions: permRes.data,
+      };
+
+      localStorage.setItem("userData", JSON.stringify(updatedUser));
+      setUserData(updatedUser); // 🔁 อัปเดต context
+
+      showNotification("✅ Permissions updated successfully", "success");
+    } catch (err) {
+      console.error("Failed to update permissions:", err);
+      showNotification("❌ Failed to update permissions", "error");
     }
-    showNotification("Permissions updated successfully");
   };
 
   const handleCreateUser = async () => {

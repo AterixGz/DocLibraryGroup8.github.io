@@ -212,3 +212,133 @@
   justify-content: center;
   margin-bottom: 2rem;
 }
+
+/* ปุ่มบันทึก */
+.profile__save-button {
+  margin-top: 2rem;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  background-color: #F14D31;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease;
+}
+
+.profile__save-button:hover {
+  background-color: #d94429;
+  transform: scale(1.05);
+}
+
+/* กล่องแจ้งเตือนสำเร็จ */
+.profile__success-msg {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 1.05rem;
+  color: #28a745;
+  font-weight: 600;
+  background-color: #eafaf1;
+  padding: 12px;
+  border: 1px solid #28a745;
+  border-radius: 8px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ปุ่มยกเลิก */
+
+
+/* Popup Overlay กลางจอ */
+.profile__popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* Popup Content กลางจอ */
+.profile__confirm-popup .popup-content {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  animation: scaleUp 0.3s ease;
+}
+
+/* ปุ่ม popup */
+.popup-confirm, .popup-cancel {
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 10px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.popup-confirm {
+  background-color: #28a745;
+  color: white;
+}
+
+.popup-cancel {
+  background-color: #F14D31;
+  color: white;
+}
+
+.popup-confirm:hover {
+  background-color: #1e7e34;
+}
+
+.popup-cancel:hover {
+  background-color: #d13b1f;
+}
+
+/* Success popup ด้านบน */
+.profile__success-popup {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #eafaf1;
+  color: #28a745;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  z-index: 1000;
+  border: 1px solid #28a745;
+  animation: fadeInDown 0.5s ease-in-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
