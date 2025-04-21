@@ -10,6 +10,8 @@ function Sidebar({ user, onLogout }) {
 
   const handleLogout = () => {
     onLogout();
+    localStorage.removeItem("userData");
+    localStorage.removeItem("token");
     navigate("/login");
   };
 
@@ -25,8 +27,11 @@ function Sidebar({ user, onLogout }) {
       {/* Menu Section */}
       <ul className="sidebar-menu">
         <li className="menu-item">
-          <Link to="/" className={`sidebar-item ${isActive("/") ? "active" : ""}`}>
-          <i class="fi fi-rr-home"></i> Home
+          <Link
+            to="/"
+            className={`sidebar-item ${isActive("/") ? "active" : ""}`}
+          >
+            <i class="fi fi-rr-home"></i> Home
           </Link>
         </li>
 
@@ -34,7 +39,9 @@ function Sidebar({ user, onLogout }) {
         <li className="menu-item">
           <Link
             to="/my-document"
-            className={`sidebar-item ${isActive("/my-document") ? "active" : ""}`}
+            className={`sidebar-item ${
+              isActive("/my-document") ? "active" : ""
+            }`}
           >
             <i class="fi fi-rr-document"></i> Document
           </Link>
@@ -48,7 +55,12 @@ function Sidebar({ user, onLogout }) {
           </Link>
         </li> */}
         <li className="menu-item">
-          <Link to="/trash" className={`sidebar-item ${isActive("/trash") ? "active" : ""}`}><i class="fi fi-rr-trash"></i> Trash</Link>
+          <Link
+            to="/trash"
+            className={`sidebar-item ${isActive("/trash") ? "active" : ""}`}
+          >
+            <i class="fi fi-rr-trash"></i> Trash
+          </Link>
         </li>
         <li className="menu-item">
           <Link
@@ -61,7 +73,9 @@ function Sidebar({ user, onLogout }) {
         <li className="menu-item">
           <Link
             to="/permission"
-            className={`sidebar-item ${isActive("/permission") ? "active" : ""}`}
+            className={`sidebar-item ${
+              isActive("/permission") ? "active" : ""
+            }`}
           >
             <i class="fi fi-rr-users-alt"></i> Permission Management
           </Link>

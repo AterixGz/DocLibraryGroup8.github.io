@@ -5,7 +5,7 @@ import "./Login.css";
 import axios from "axios";
 
 function Login() {
-  const { setToken, setRole, setUsername } = useContext(AuthContext);
+  const { setToken, setRole, setUsername, setUserData } = useContext(AuthContext); // ✅ ดึง setUserData
   const usernameRef = useRef();
   const passwordRef = useRef();
   const [showPassword, setShowPassword] = useState(false);
@@ -19,29 +19,42 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+  
     const username = usernameRef.current.value.trim();
     const password = passwordRef.current.value.trim();
-
+  
     if (!username || !password) {
       setErrorMessage("กรุณากรอกข้อมูลให้ครบถ้วน");
       setInputError(true);
       setIsLoading(false);
       return;
     }
-
+  
     try {
-      const response = await axios.post(`${API_URL}/api/login`, { username, password });
+      const response = await axios.post(`${API_URL}/api/login`, {
+        username,
+        password,
+      });
+  
       const userData = response.data.user;
-
+  
+      // ✅ อัปเดต context ก่อน navigate
+      setUserData(userData); // <-- สำคัญ!
       setToken(userData.token);
       setRole(userData.role);
-      setUsername(username);
-
+      setUsername(userData.username);
+  
+      // ✅ บันทึก localStorage ด้วย
+      localStorage.setItem("token", userData.token);
       localStorage.setItem("userData", JSON.stringify(userData));
+  
+      // ✅ ล้างฟอร์ม
       usernameRef.current.value = "";
       passwordRef.current.value = "";
+  
+      // ✅ ไปหน้า home
       navigate("/home");
-
+  
     } catch (error) {
       if (error.response) {
         if (error.response.status === 404) {
@@ -59,6 +72,7 @@ function Login() {
       setIsLoading(false);
     }
   };
+  
 
   const handleGuestLogin = () => {
     const guestToken = "guest_token";

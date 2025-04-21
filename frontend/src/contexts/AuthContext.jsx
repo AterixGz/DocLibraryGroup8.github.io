@@ -7,31 +7,43 @@ export const AuthProvider = ({ children }) => {
     ? JSON.parse(localStorage.getItem("userData"))
     : null;
 
+  const [userData, setUserData] = useState(storedUser || null);
   const [token, setToken] = useState(storedUser?.token || null);
   const [role, setRole] = useState(storedUser?.role || "guest");
   const [username, setUsername] = useState(storedUser?.username || null);
 
-  // sync context to localStorage on change
+  // ✅ Sync ทุกอย่างจาก userData ทันทีเมื่อมีการ login
   useEffect(() => {
-    if (token && role && username) {
-      localStorage.setItem(
-        "userData",
-        JSON.stringify({ token, role, username })
-      );
+    if (userData) {
+      setToken(userData.token || null);
+      setRole(userData.role || "guest");
+      setUsername(userData.username || null);
+      localStorage.setItem("userData", JSON.stringify(userData));
     }
-  }, [token, role, username]);
+  }, [userData]);
 
-  // logout helper
   const logout = () => {
+    setUserData(null);
     setToken(null);
     setRole("guest");
     setUsername(null);
     localStorage.removeItem("userData");
+    localStorage.removeItem("token");
   };
 
   return (
     <AuthContext.Provider
-      value={{ token, setToken, role, setRole, username, setUsername, logout }}
+      value={{
+        token,
+        setToken,
+        role,
+        setRole,
+        username,
+        setUsername,
+        userData,
+        setUserData,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

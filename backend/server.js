@@ -12,6 +12,9 @@ const PORT = process.env.PORT || 3000;
 // เพิ่มด้านบน
 const authenticateToken = require('./middleware/authenticate');
 
+const jwt = require('jsonwebtoken');
+const SECRET_KEY = process.env.SECRET_KEY || 'your-secret-key';
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -231,25 +234,33 @@ app.delete('/api/files/:id', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   try {
-    const result = await pool.query(
-      `SELECT u.*, r.name AS role_name FROM users u
-       JOIN roles r ON u.role_id = r.id
-       WHERE u.username = $1`,
-      [username]
-    );
+    const result = await pool.query(`
+      SELECT u.*, r.name AS role_name FROM users u
+      JOIN roles r ON u.role_id = r.id
+      WHERE u.username = $1
+    `, [username]);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'Invalid credentials' });
-    }
+    if (result.rows.length === 0) return res.status(404).json({ message: 'Invalid credentials' });
 
     const user = result.rows[0];
     const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+    let token = user.token;
+
+    // ✅ ถ้า user ยังไม่มี token → สร้างใหม่แล้วบันทึก
+    if (!token) {
+      const payload = {
+        id: user.id,
+        role: user.role_name,
+        timestamp: Date.now(), // randomizing
+        rand: Math.random().toString(36).substring(2), // ป้องกันการเดา
+      };
+      token = jwt.sign(payload, SECRET_KEY, { expiresIn: '2h' });
+
+      await pool.query(`UPDATE users SET token = $1 WHERE id = $2`, [token, user.id]);
     }
 
-    // ✅ login success
     res.json({
       message: 'Login successful',
       user: {
@@ -261,7 +272,8 @@ app.post('/api/login', async (req, res) => {
         email: user.email,
         department: user.department,
         avatar: user.avatar,
-        employee_id: user.employee_id
+        employee_id: user.employee_id,
+        token // ✅ ใช้ token เดิมหรือใหม่ตามกรณี
       }
     });
   } catch (err) {

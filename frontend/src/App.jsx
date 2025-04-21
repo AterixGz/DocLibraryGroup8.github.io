@@ -25,8 +25,10 @@ import { AuthProvider, AuthContext } from "./contexts/AuthContext.jsx";
 
 import "./App.css";
 
+
 function AppRoutes() {
   const { role, username, logout } = useContext(AuthContext);
+  const { userData } = useContext(AuthContext);
 
   const handleLogout = () => {
     logout();
@@ -35,8 +37,8 @@ function AppRoutes() {
 
   return (
     <div className="d-flex">
-      {role !== "guest" && (
-        <Sidebar user={{ username, role }} onLogout={handleLogout} />
+      {userData && userData.role !== "guest" && (
+        <Sidebar user={userData} onLogout={handleLogout} />
       )}
       <div className="content-container">
         <Routes>
@@ -52,9 +54,15 @@ function AppRoutes() {
               <Route path="/permission" element={<Permission />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/reports/addfilelist" element={<AddFileReport />} />
-              <Route path="/reports/removefilelist" element={<RemoveFileReport />} />
+              <Route
+                path="/reports/removefilelist"
+                element={<RemoveFileReport />}
+              />
               <Route path="/help" element={<Help />} />
-              <Route path="/profile" element={<Profile username={username} />} />
+              <Route
+                path="/profile"
+                element={<Profile username={username} />}
+              />
               <Route path="/about-me" element={<AboutMe />} />
               <Route path="/trash" element={<Trash />} />
               <Route path="/approve" element={<ApprovePage />} />
