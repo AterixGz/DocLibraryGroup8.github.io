@@ -5,7 +5,8 @@ import "./Login.css";
 import axios from "axios";
 
 function Login() {
-  const { setToken, setRole, setUsername, setUserData } = useContext(AuthContext); // ✅ ดึง setUserData
+  const { setToken, setRole, setUsername, setUserData } =
+    useContext(AuthContext); // ✅ ดึง setUserData
   const usernameRef = useRef();
   const passwordRef = useRef();
   const [showPassword, setShowPassword] = useState(false);
@@ -19,42 +20,41 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     const username = usernameRef.current.value.trim();
     const password = passwordRef.current.value.trim();
-  
+
     if (!username || !password) {
       setErrorMessage("กรุณากรอกข้อมูลให้ครบถ้วน");
       setInputError(true);
       setIsLoading(false);
       return;
     }
-  
+
     try {
       const response = await axios.post(`${API_URL}/api/login`, {
         username,
         password,
       });
-  
+
       const userData = response.data.user;
-  
+
       // ✅ อัปเดต context ก่อน navigate
       setUserData(userData); // <-- สำคัญ!
       setToken(userData.token);
       setRole(userData.role);
       setUsername(userData.username);
-  
+
       // ✅ บันทึก localStorage ด้วย
       localStorage.setItem("token", userData.token);
       localStorage.setItem("userData", JSON.stringify(userData));
-  
+
       // ✅ ล้างฟอร์ม
       usernameRef.current.value = "";
       passwordRef.current.value = "";
-  
+
       // ✅ ไปหน้า home
       navigate("/home");
-  
     } catch (error) {
       if (error.response) {
         if (error.response.status === 404) {
@@ -72,36 +72,75 @@ function Login() {
       setIsLoading(false);
     }
   };
-  
 
-  const handleGuestLogin = () => {
+  const handleGuestLogin = async () => {
     const guestToken = "guest_token";
     const guestRole = "guest";
     const guestUsername = "guest";
 
-    setToken(guestToken);
-    setRole(guestRole);
-    setUsername(guestUsername);
+    try {
+      // 🔁 ดึง user จาก localStorage ชั่วคราวเพื่อหาว่า guest มี id อะไร
+      const res = await axios.get(`http://localhost:3000/api/roles`, {
+        headers: { Authorization: `Bearer ${guestToken}` },
+      });
 
-    localStorage.setItem("userData", JSON.stringify({
-      firstName: "Guest",
-      lastName: "User",
-      role: guestRole,
-      token: guestToken,
-      username: guestUsername
-    }));
+      const guestRoleObj = res.data.find((r) => r.name === "guest");
 
-    navigate("/home");
+      if (!guestRoleObj) {
+        alert("ไม่พบ role guest");
+        return;
+      }
+
+      const permRes = await axios.get(
+        `http://localhost:3000/api/roles/${guestRoleObj.id}/permissions`,
+        {
+          headers: { Authorization: `Bearer ${guestToken}` },
+        }
+      );
+
+      const permissions = permRes.data.map((p) => p.name);
+
+      const guestUser = {
+        id: 0, // หรือใส่เลข guest เฉย ๆ
+        first_name: "Guest",
+        last_name: "User",
+        role: guestRole,
+        token: guestToken,
+        username: guestUsername,
+        permissions,
+      };
+
+      localStorage.setItem("userData", JSON.stringify(guestUser));
+      localStorage.setItem("token", guestToken);
+
+      setToken(guestToken);
+      setRole(guestRole);
+      setUsername(guestUsername);
+      setUserData(guestUser); // ✅ สำคัญมาก
+
+      navigate("/home");
+    } catch (err) {
+      console.error("❌ Guest login failed", err);
+      alert("เข้าสู่ระบบแบบ guest ไม่สำเร็จ");
+    }
   };
 
   return (
     <div className="login-page">
       <div className="login-container">
         <div className="login-form">
-          <img src="../img/NewLogo.png" alt="Logo" width="300" height="300" style={{ display: 'block', margin: 'auto' }} />
+          <img
+            src="../img/NewLogo.png"
+            alt="Logo"
+            width="300"
+            height="300"
+            style={{ display: "block", margin: "auto" }}
+          />
           <h2 className="login-form__title">ยินดีต้อนรับ</h2>
           <form onSubmit={handleLogin}>
-            <label className={`login-form__label ${inputError ? "error-label" : ""}`}>
+            <label
+              className={`login-form__label ${inputError ? "error-label" : ""}`}
+            >
               ชื่อผู้ใช้*
             </label>
             <input
@@ -112,7 +151,9 @@ function Login() {
               className={`login-form__input ${inputError ? "input-error" : ""}`}
             />
 
-            <label className={`login-form__label ${inputError ? "error-label" : ""}`}>
+            <label
+              className={`login-form__label ${inputError ? "error-label" : ""}`}
+            >
               รหัสผ่าน*
             </label>
             <div className="password-container">
@@ -121,20 +162,24 @@ function Login() {
                 placeholder="กรอกรหัสผ่าน"
                 ref={passwordRef}
                 required
-                className={`login-form__input password-input ${inputError ? "input-error" : ""}`}
+                className={`login-form__input password-input ${
+                  inputError ? "input-error" : ""
+                }`}
               />
               <button
                 type="button"
                 className="toggle-password"
-                onClick={() => setShowPassword(prev => !prev)}
+                onClick={() => setShowPassword((prev) => !prev)}
               >
-                <i className={showPassword ? "bi bi-eye" : "bi bi-eye-slash"}></i>
+                <i
+                  className={showPassword ? "bi bi-eye" : "bi bi-eye-slash"}
+                ></i>
               </button>
             </div>
 
             {inputError && (
               <div className="error-message-password">
-                <i className="bi bi-exclamation-circle-fill"></i> 
+                <i className="bi bi-exclamation-circle-fill"></i>
                 {errorMessage}
               </div>
             )}
@@ -150,7 +195,11 @@ function Login() {
 
           <div className="or">หรือ</div>
 
-          <button onClick={handleGuestLogin} className="guest-login" disabled={isLoading}>
+          <button
+            onClick={handleGuestLogin}
+            className="guest-login"
+            disabled={isLoading}
+          >
             เข้าสู่ระบบโดยไม่ต้องลงชื่อเข้าใช้
           </button>
         </div>
