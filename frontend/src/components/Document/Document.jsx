@@ -17,6 +17,7 @@ const Document = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [uploadedFileName, setUploadedFileName] = useState("");
+  const [requiredFields, setRequiredFields] = useState({});
 
   const [date, setDate] = useState(() => {
     const now = new Date();
@@ -52,27 +53,52 @@ const Document = () => {
   };
 
   const validateForm = () => {
-    if (!file) {
-      setError("กรุณาเลือกไฟล์");
+    // ตัดช่องว่างจากค่าที่กรอก
+    const trimmedName = name?.trim();
+    const trimmedDescription = description?.trim();
+  
+    // ตรวจว่าทุกช่องว่างหมดเลย
+    if (
+      !file &&
+      !trimmedName &&
+      !type &&
+      !department &&
+      !trimmedDescription
+    ) {
+      setError("กรุณากรอกข้อมูลทั้งหมด");
       return false;
     }
-    if (!name) {
+  
+   
+    if (!trimmedName) {
       setError("กรุณากรอกชื่อเอกสาร");
       return false;
     }
+  
+    if (trimmedName.length < 3) {
+      setError("ชื่อเอกสารต้องมีความยาวอย่างน้อย 3 ตัวอักษร");
+      return false;
+    }
+  
     if (!type) {
       setError("กรุณาเลือกประเภทเอกสาร");
       return false;
     }
+  
     if (!department) {
       setError("กรุณาเลือกแผนก");
       return false;
     }
-    if (!description) {
-      setError("กรุณากรอกคำอธิบาย");
+  
+    if (!trimmedDescription) {
+      setError("กรุณากรอกคำอธิบายของเอกสาร");
       return false;
     }
-    
+     if (!file) {
+      setError("กรุณาเลือกไฟล์ที่ต้องการอัปโหลด");
+      return false;
+    }
+  
     // ตรวจสอบประเภทไฟล์
     const allowedTypes = ['.pdf', '.doc', '.docx', '.xlsx', '.xls', '.png', '.jpg', '.jpeg'];
     const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
@@ -80,9 +106,13 @@ const Document = () => {
       setError("ประเภทไฟล์ไม่ถูกต้อง กรุณาเลือกไฟล์ที่เป็น PDF, DOC, DOCX, XLS, XLSX, PNG หรือ JPG");
       return false;
     }
-    
+  
+    // ทุกอย่างผ่าน
+    setError(null);
     return true;
   };
+  
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,6 +120,12 @@ const Document = () => {
     setSuccess("");
     
     if (!validateForm()) {
+      return;
+    }
+    const allowedTypes = ['.pdf', '.doc', '.docx', '.xlsx', '.xls', '.png', '.jpg'];
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (!allowedTypes.includes(fileExtension)) {
+      setError("ประเภทไฟล์ไม่ถูกต้อง กรุณาเลือกไฟล์ที่เป็น PDF, DOC, DOCX, XLS, XLSX, PNG หรือ JPG");
       return;
     }
 
@@ -163,11 +199,12 @@ const Document = () => {
                 value={name}
                 placeholder="กรอกชื่อเอกสาร"
                 onChange={(e) => setName(e.target.value)}
+                className={requiredFields.name ? "input-error" : ""}
               />
             </div>
             <div>
               <label>ประเภทเอกสาร <span className="required">*</span></label>
-              <select value={type} onChange={(e) => setType(e.target.value)}>
+              <select value={type} onChange={(e) => setType(e.target.value)} className={requiredFields.type ? "input-error" : ""}>
                 <option value="">เลือกประเภท</option>
                 <option value="รายงานประจำปี">รายงานประจำปี</option>
                 <option value="ผลการดำเนินงาน">ผลการดำเนินงาน</option>
@@ -183,6 +220,7 @@ const Document = () => {
                 <select
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
+                  className={requiredFields.department ? "input-error" : ""}
                 >
                   <option value="">เลือกแผนก</option>
                   <option value="การเงิน">การเงิน</option>
@@ -211,6 +249,7 @@ const Document = () => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="กรอกคำอธิบายเอกสาร"
+                className={requiredFields.description ? "input-error" : ""}
               />
             </div>
             <div>
@@ -226,14 +265,17 @@ const Document = () => {
               <p>อัปโหลดไฟล์ <span className="required">*</span></p>
               <label htmlFor="file-input" className="custom-file-upload">
                 <img src={image} alt="Upload Icon" />
-                <p><strong>Drag & Drop</strong> <br />or <span className="browse">browse</span></p>
+                <p><strong style={{ color: '#4a90e2' }}>Upload File Here</strong></p>
                 <p className="file-types">Supports: PDF, DOC, DOCX, XLSX, XLS, PNG, JPG</p>
+                
               </label>
               <input
                 id="file-input"
                 type="file"
                 onChange={handleFileChange}
                 accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpg,.jpeg"
+                className={requiredFields.file ? "input-error" : ""}
+               
               />
             </div>
 
