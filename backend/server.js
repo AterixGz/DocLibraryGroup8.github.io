@@ -20,7 +20,6 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-
 // PostgreSQL connection
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -28,10 +27,17 @@ const pool = new Pool({
     rejectUnauthorized: false,
   },
 });
-//Timezone Thailand
+
+// Set timezone for all connections
 pool.on('connect', (client) => {
   client.query('SET timezone = "Asia/Bangkok"');
 });
+
+// Helper function to format dates consistently
+const formatDate = (date) => {
+  if (!date) return null;
+  return date.toISOString().replace('T', ' ').substring(0, 16);
+};
 
 // Multer config for file uploads
 const storage = multer.diskStorage({
@@ -69,7 +75,7 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
-// Get all files
+// Get all files - FIXED TIMEZONE
 app.get('/api/files', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -79,10 +85,10 @@ app.get('/api/files', async (req, res) => {
         url AS FileUrl, 
         file_type AS type,
         department, 
-        TO_CHAR(document_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS date,
+        TO_CHAR(document_date, 'YYYY-MM-DD HH24:MI') AS date,
         description,
         uploaded_by, 
-        TO_CHAR(uploaded_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS uploaded_at,
+        TO_CHAR(uploaded_at, 'YYYY-MM-DD HH24:MI') AS uploaded_at,
         status
       FROM files
       ORDER BY uploaded_at DESC
@@ -94,9 +100,7 @@ app.get('/api/files', async (req, res) => {
   }
 });
 
-
-// Get files uploaded by specific user
-// In your API route
+// Get files uploaded by specific user - FIXED TIMEZONE
 app.get('/api/files/user/:userId', async (req, res) => {
   const userId = parseInt(req.params.userId);
 
@@ -107,8 +111,8 @@ app.get('/api/files/user/:userId', async (req, res) => {
               url AS FileUrl,
               file_type AS type,
               department, 
-              TO_CHAR(document_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS date,
-              TO_CHAR(uploaded_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS uploaded_at_formatted,
+              TO_CHAR(document_date, 'YYYY-MM-DD HH24:MI') AS date,
+              TO_CHAR(uploaded_at, 'YYYY-MM-DD HH24:MI') AS uploaded_at_formatted,
               description,
               uploaded_by,
               uploaded_at,
@@ -131,7 +135,7 @@ app.get('/api/files/user/:userId', async (req, res) => {
   }
 });
 
-// เพิ่ม route สำหรับการอัปเดตไฟล์
+// Update file route
 app.put('/api/files/:id', async (req, res) => {
   const fileId = req.params.id;
   const { name, type, date, department } = req.body;
@@ -141,7 +145,7 @@ app.put('/api/files/:id', async (req, res) => {
       `UPDATE files 
        SET filename = $1, file_type = $2, document_date = $3, department = $4 
        WHERE id = $5 
-       RETURNING *`, // เปลี่ยนเป็นคืนทุก field
+       RETURNING *`,
       [name, type, date, department, fileId]
     );
 
@@ -150,21 +154,20 @@ app.put('/api/files/:id', async (req, res) => {
     }
 
     const fileData = result.rows[0];
-    fileData.FileUrl = fileData.url; // ⭐ เพิ่มให้ React ใช้ FileUrl ได้ทุกครั้ง
+    fileData.FileUrl = fileData.url;
 
-    res.json(fileData); // ส่งกลับให้ frontend ใช้ได้เลย
+    res.json(fileData);
   } catch (err) {
     console.error('Error updating file:', err);
     res.status(500).json({ message: 'Failed to update file' });
   }
 });
 
-
-// อัปเดต route การอัปโหลดไฟล์
+// Upload file route - FIXED TIMEZONE
 app.post('/api/files/upload', upload.single('file'), async (req, res) => {
   const file = req.file;
   const { name, type, department, date, description, uploadedBy } = req.body;
-
+  
   if (!file || !uploadedBy) {
     return res.status(400).json({ message: 'File and uploadedBy are required' });
   }
@@ -190,38 +193,33 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-// เพิ่ม route สำหรับการดาวน์โหลดไฟล์ที่จะตั้งค่า Content-Disposition
+// Download file route
 app.get('/api/files/download/:filename', (req, res) => {
   const filename = req.params.filename;
   const filePath = path.join(__dirname, 'uploads', filename);
 
-  // ตรวจสอบว่าไฟล์มีอยู่จริง
   if (!fs.existsSync(filePath)) {
     return res.status(404).send('File not found');
   }
 
-  // อ่านไฟล์
   const file = fs.readFileSync(filePath);
 
-  // กำหนดชนิดของไฟล์ (MIME type)
   const mimeType = path.extname(filename).toLowerCase();
-  let contentType = 'application/octet-stream'; // ค่าเริ่มต้น
+  let contentType = 'application/octet-stream';
 
-  // กำหนด content type ตามนามสกุลไฟล์
   if (mimeType === '.pdf') contentType = 'application/pdf';
   else if (mimeType === '.doc' || mimeType === '.docx') contentType = 'application/msword';
   else if (mimeType === '.xls' || mimeType === '.xlsx') contentType = 'application/vnd.ms-excel';
   else if (mimeType === '.png') contentType = 'image/png';
   else if (mimeType === '.jpg' || mimeType === '.jpeg') contentType = 'image/jpeg';
 
-  // ตั้งค่าส่วนหัวสำหรับการดาวน์โหลด
   res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
   res.setHeader('Content-Type', contentType);
   res.setHeader('Content-Length', file.length);
 
-  // ส่งไฟล์
   res.send(file);
 });
+
 // Delete file
 app.delete('/api/files/:id', async (req, res) => {
   const fileId = req.params.id;
@@ -257,7 +255,6 @@ app.post('/api/login', async (req, res) => {
 
     let token = user.token;
 
-    // ✅ ถ้ายังไม่มี token ให้สร้างใหม่
     if (!token) {
       const payload = {
         id: user.id,
@@ -270,7 +267,6 @@ app.post('/api/login', async (req, res) => {
       await pool.query(`UPDATE users SET token = $1 WHERE id = $2`, [token, user.id]);
     }
 
-    // ✅ ดึง permission name ของ role จาก role_permissions
     const permRes = await pool.query(`
       SELECT p.name FROM role_permissions rp
       JOIN permissions p ON rp.permission_id = p.id
@@ -292,7 +288,7 @@ app.post('/api/login', async (req, res) => {
         avatar: user.avatar,
         employee_id: user.employee_id,
         token,
-        permissions: permissionNames // ✅ เพิ่มตรงนี้
+        permissions: permissionNames
       }
     });
   } catch (err) {
@@ -300,7 +296,6 @@ app.post('/api/login', async (req, res) => {
     res.status(500).send('Login failed');
   }
 });
-
 
 // Get roles
 app.get('/api/roles', async (req, res) => {
@@ -313,10 +308,9 @@ app.get('/api/roles', async (req, res) => {
   }
 });
 
-
-
+// Get profile
 app.get('/api/profile', async (req, res) => {
-  const userId = req.query.userId; // Pass userId from the frontend as a query parameter
+  const userId = req.query.userId;
   if (!userId) {
     return res.status(400).json({ message: 'User ID is required' });
   }
@@ -336,7 +330,7 @@ app.get('/api/profile', async (req, res) => {
     res.json({
       id: user.id,
       username: user.username,
-      role: user.role_id, // Assuming role_id is used instead of role_name
+      role: user.role_id,
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
@@ -350,13 +344,13 @@ app.get('/api/profile', async (req, res) => {
   }
 });
 
-
-// Report Pages
+// Report Pages - FIXED TIMEZONE
 // Get latest files
 app.get('/api/files/latest', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id, filename, department, uploaded_at 
+      `SELECT id, filename, department, 
+       TO_CHAR(uploaded_at, 'YYYY-MM-DD HH24:MI') AS uploaded_at 
        FROM files 
        ORDER BY uploaded_at DESC 
        LIMIT 3`
@@ -368,7 +362,7 @@ app.get('/api/files/latest', async (req, res) => {
   }
 });
 
-
+// Upload summary
 app.get("/api/uploads-summary", (req, res) => {
   const uploadDir = path.join(__dirname, "uploads");
   fs.readdir(uploadDir, (err, files) => {
@@ -378,7 +372,6 @@ app.get("/api/uploads-summary", (req, res) => {
     }
     const summary = {};
     files.forEach((file) => {
-      // ดึงนามสกุลไฟล์ (แปลงเป็นตัวพิมพ์ใหญ่ และตัดเครื่องหมาย . ออก)
       const ext = path.extname(file).toUpperCase().replace(".", "");
       summary[ext] = (summary[ext] || 0) + 1;
     });
@@ -386,7 +379,7 @@ app.get("/api/uploads-summary", (req, res) => {
   });
 });
 
-// Endpoint สำหรับสรุปการอัพโหลดไฟล์ 30 วันที่ผ่านมา แบ่งกลุ่มตามชื่อคนที่อัพโหลด
+// Uploads by user - FIXED TIMEZONE
 app.get("/api/uploads-by-user", async (req, res) => {
   try {
     const query = `
@@ -436,10 +429,8 @@ app.post('/api/roles/:id/permissions', async (req, res) => {
   try {
     await client.query('BEGIN');
 
-    // ลบของเก่าออกก่อน
     await client.query('DELETE FROM role_permissions WHERE role_id = $1', [roleId]);
 
-    // ใส่ใหม่ทั้งหมด
     for (let permName of permissions) {
       const permRes = await client.query('SELECT id FROM permissions WHERE name = $1', [permName]);
       if (permRes.rows.length > 0) {
@@ -459,7 +450,7 @@ app.post('/api/roles/:id/permissions', async (req, res) => {
   }
 });
 
-
+// Get permissions
 app.get("/api/permissions", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM permissions ORDER BY module, name");
@@ -489,6 +480,7 @@ app.get('/api/roles/:id/permissions', async (req, res) => {
   }
 });
 
+// Get roles with authentication
 app.get('/api/roles', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM roles');
@@ -499,6 +491,7 @@ app.get('/api/roles', authenticateToken, async (req, res) => {
   }
 });
 
+// Get users with authentication
 app.get("/api/users", authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -514,11 +507,7 @@ app.get("/api/users", authenticateToken, async (req, res) => {
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
+// Soft delete - FIXED TIMEZONE
 app.delete('/api/files/soft-delete/:id', async (req, res) => {
   const { id } = req.params;
   console.log("👉 Soft delete request for ID:", id);
@@ -536,8 +525,7 @@ app.delete('/api/files/soft-delete/:id', async (req, res) => {
     await pool.query(`
       INSERT INTO deleted_files 
       (original_file_id, filename, url, uploaded_by, uploaded_at, file_type, department, document_date, description, deleted_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
-        TO_TIMESTAMP(TO_CHAR(NOW() AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI'), 'YYYY-MM-DD HH24:MI'))
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
     `, [
       file.id, file.filename, file.url, file.uploaded_by, file.uploaded_at,
       file.file_type, file.department, file.document_date, file.description
@@ -552,6 +540,7 @@ app.delete('/api/files/soft-delete/:id', async (req, res) => {
   }
 });
 
+// Restore file - FIXED TIMEZONE
 app.put('/api/files/restore/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -560,10 +549,10 @@ app.put('/api/files/restore/:id', async (req, res) => {
         filename,
         url,
         uploaded_by,
-        TO_CHAR(uploaded_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') as uploaded_at,
+        uploaded_at,
         file_type,
         department,
-        TO_CHAR(document_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') as document_date,
+        document_date,
         description
       FROM deleted_files 
       WHERE id = $1
@@ -579,7 +568,7 @@ app.put('/api/files/restore/:id', async (req, res) => {
       INSERT INTO files 
         (filename, url, uploaded_by, uploaded_at, file_type, department, document_date, description)
       VALUES 
-        ($1, $2, $3, TO_TIMESTAMP($4, 'YYYY-MM-DD HH24:MI'), $5, $6, TO_TIMESTAMP($7, 'YYYY-MM-DD HH24:MI'), $8)
+        ($1, $2, $3, $4, $5, $6, $7, $8)
     `, [
       file.filename,
       file.url,
@@ -598,6 +587,8 @@ app.put('/api/files/restore/:id', async (req, res) => {
     res.status(500).send('Restore failed');
   }
 });
+
+// Permanent delete
 app.delete('/api/files/permanent-delete/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -615,6 +606,7 @@ app.delete('/api/files/permanent-delete/:id', async (req, res) => {
   }
 });
 
+// Get trash - FIXED TIMEZONE
 app.get('/api/files/trash', async (req, res) => {
   const userId = req.query.userId;
 
@@ -628,11 +620,11 @@ app.get('/api/files/trash', async (req, res) => {
                url AS FileUrl, 
                file_type AS type, 
                department,
-               TO_CHAR(document_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS date,
+               TO_CHAR(document_date, 'YYYY-MM-DD HH24:MI') AS date,
                description, 
                uploaded_by,
-               TO_CHAR(uploaded_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS uploaded_at,
-               TO_CHAR(deleted_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS deleted_at
+               TO_CHAR(uploaded_at, 'YYYY-MM-DD HH24:MI') AS uploaded_at,
+               TO_CHAR(deleted_at, 'YYYY-MM-DD HH24:MI') AS deleted_at
         FROM deleted_files 
         WHERE uploaded_by = $1
         ORDER BY deleted_at DESC
@@ -648,6 +640,7 @@ app.get('/api/files/trash', async (req, res) => {
   }
 });
 
+// Get approved files - FIXED TIMEZONE
 app.get('/api/files/approved', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -656,8 +649,8 @@ app.get('/api/files/approved', async (req, res) => {
              url AS FileUrl, 
              file_type AS type, 
              department,
-             TO_CHAR(document_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS date,
-             TO_CHAR(uploaded_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS uploaded_at,
+             TO_CHAR(document_date, 'YYYY-MM-DD HH24:MI') AS date,
+             TO_CHAR(uploaded_at, 'YYYY-MM-DD HH24:MI') AS uploaded_at,
              description, 
              uploaded_by
       FROM files
@@ -670,9 +663,10 @@ app.get('/api/files/approved', async (req, res) => {
   }
 });
 
+// Approve file
 app.put('/api/files/approve/:id', async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body; // 'approved' หรือ 'rejected'
+  const { status } = req.body;
 
   if (!['approved', 'rejected'].includes(status)) {
     return res.status(400).json({ message: 'Invalid status' });
@@ -693,10 +687,11 @@ app.put('/api/files/approve/:id', async (req, res) => {
   }
 });
 
+// Create user
 app.post("/api/users/create", async (req, res) => {
   const {
     username, password, first_name, last_name,
-    email, department, role_id, employee_id // เพิ่มตรงนี้
+    email, department, role_id, employee_id
   } = req.body;
 
   try {
@@ -705,7 +700,7 @@ app.post("/api/users/create", async (req, res) => {
     await pool.query(
       `INSERT INTO users 
       (username, password, first_name, last_name, email, department, role_id, employee_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`, // เพิ่ม $8
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
       [username, hashedPassword, first_name, last_name, email, department, role_id, employee_id]
     );
 
@@ -716,6 +711,7 @@ app.post("/api/users/create", async (req, res) => {
   }
 });
 
+// Get departments
 app.get('/api/departments', async (req, res) => {
   try {
     const result = await pool.query('SELECT department_id, department_name FROM departments ORDER BY department_name');
@@ -726,6 +722,7 @@ app.get('/api/departments', async (req, res) => {
   }
 });
 
+// Update user
 app.put('/api/users/:id', async (req, res) => {
   const { id } = req.params;
   const { first_name, last_name, email, department, role_id, password } = req.body;
@@ -757,6 +754,7 @@ app.put('/api/users/:id', async (req, res) => {
   }
 });
 
+// Delete user
 app.delete("/api/users/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -771,4 +769,9 @@ app.delete("/api/users/:id", async (req, res) => {
     console.error("Error deleting user:", err);
     res.status(500).json({ error: "Failed to delete user" });
   }
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

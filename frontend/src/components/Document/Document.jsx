@@ -22,7 +22,9 @@ const Document = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const navigate = useNavigate();
-
+  const bangkokTime = new Date(currentTime.getTime() - (currentTime.getTimezoneOffset() * 60000))
+                         .toISOString()
+                         .replace('Z', '+07:00');
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("userData"));
     if (userData) {
@@ -51,12 +53,12 @@ const Document = () => {
   }, [navigate]);
 
   // Effect for real-time clock
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setCurrentTime(new Date());
+  //   }, 1000);
+  //   return () => clearInterval(timer);
+  // }, []);
 
   // Effect for notification
   useEffect(() => {
@@ -160,7 +162,7 @@ const Document = () => {
     formData.append("name", name);
     formData.append("type", type);
     formData.append("department", department);
-    formData.append("date", currentTime.toISOString()); // Changed from date to currentTime
+    formData.append("date", bangkokTime);
     formData.append("description", description);
     formData.append("uploadedBy", uploadedBy)
 
