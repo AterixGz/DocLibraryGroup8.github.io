@@ -15,6 +15,10 @@ function Sidebar({ user, onLogout }) {
     navigate("/login");
   };
 
+  const permissions = user?.permissions || [];
+
+  const hasPermission = (perm) => permissions.includes(perm);
+
   return (
     <div className="sidebar-container">
       {/* Logo Section */}
@@ -26,74 +30,78 @@ function Sidebar({ user, onLogout }) {
 
       {/* Menu Section */}
       <ul className="sidebar-menu">
-        <li className="menu-item">
-          <Link
-            to="/"
-            className={`sidebar-item ${isActive("/") ? "active" : ""}`}
-          >
-            <i class="fi fi-rr-home"></i> Home
-          </Link>
-        </li>
+        {hasPermission("document_access") && (
+          <li className="menu-item">
+            <Link
+              to="/"
+              className={`sidebar-item ${isActive("/") ? "active" : ""}`}
+            >
+              <i className="fi fi-rr-home"></i> Home
+            </Link>
+          </li>
+        )}
 
-        {/* แยกไอเท็ม Administrator ออกมาเป็นเมนูหลัก */}
-        <li className="menu-item">
-          <Link
-            to="/my-document"
-            className={`sidebar-item ${
-              isActive("/my-document") ? "active" : ""
-            }`}
-          >
-            <i class="fi fi-rr-document"></i> Document
-          </Link>
-        </li>
-        {/* <li className="menu-item">
-          <Link
-            to="/document"
-            className={`sidebar-item ${isActive("/document") ? "active" : ""}`}
-          >
-            <span className="icon">📁</span> Document Management
-          </Link>
-        </li> */}
-        <li className="menu-item">
-          <Link
-            to="/trash"
-            className={`sidebar-item ${isActive("/trash") ? "active" : ""}`}
-          >
-            <i class="fi fi-rr-trash"></i> Trash
-          </Link>
-        </li>
-        <li className="menu-item">
-          <Link
-            to="/approve"
-            className={`sidebar-item ${isActive("/approve") ? "active" : ""}`}
-          >
-            <i class="fi fi-rr-registration-paper"></i> Approve
-          </Link>
-        </li>
-        <li className="menu-item">
-          <Link
-            to="/permission"
-            className={`sidebar-item ${
-              isActive("/permission") ? "active" : ""
-            }`}
-          >
-            <i class="fi fi-rr-users-alt"></i> Permission Management
-          </Link>
-        </li>
-        <li className="menu-item">
-          <Link
-            to="/reports"
-            className={`sidebar-item ${isActive("/reports") ? "active" : ""}`}
-          >
-            <i class="fi fi-rr-newspaper"></i> Reports
-          </Link>
-        </li>
+        {hasPermission("document_manage") && (
+          <>
+            <li className="menu-item">
+              <Link
+                to="/my-document"
+                className={`sidebar-item ${isActive("/my-document") ? "active" : ""}`}
+              >
+                <i className="fi fi-rr-document"></i> Document
+              </Link>
+            </li>
+            <li className="menu-item">
+              <Link
+                to="/trash"
+                className={`sidebar-item ${isActive("/trash") ? "active" : ""}`}
+              >
+                <i className="fi fi-rr-trash"></i> Trash
+              </Link>
+            </li>
+          </>
+        )}
+
+        {hasPermission("document_approve") && (
+          <li className="menu-item">
+            <Link
+              to="/approve"
+              className={`sidebar-item ${isActive("/approve") ? "active" : ""}`}
+            >
+              <i className="fi fi-rr-registration-paper"></i> Approve
+            </Link>
+          </li>
+        )}
+
+        {hasPermission("user_admin") && (
+          <li className="menu-item">
+            <Link
+              to="/permission"
+              className={`sidebar-item ${isActive("/permission") ? "active" : ""}`}
+            >
+              <i className="fi fi-rr-users-alt"></i> Permission Management
+            </Link>
+          </li>
+        )}
+
+        {hasPermission("report_access") && (
+          <li className="menu-item">
+            <Link
+              to="/reports"
+              className={`sidebar-item ${isActive("/reports") ? "active" : ""}`}
+            >
+              <i className="fi fi-rr-newspaper"></i> Reports
+            </Link>
+          </li>
+        )}
+
+        {/* เมนูทั่วไปที่ไม่ต้องใช้ permission */}
         <li className="menu-item">
           <Link
             to="/about-me"
             className={`sidebar-item ${isActive("/about-me") ? "active" : ""}`}
           >
-            <i class="fi fi-rr-info"></i> About Me
+            <i className="fi fi-rr-info"></i> About Me
           </Link>
         </li>
         <li className="menu-item">
@@ -101,7 +109,7 @@ function Sidebar({ user, onLogout }) {
             to="/help"
             className={`sidebar-item ${isActive("/help") ? "active" : ""}`}
           >
-            <i class="fi fi-rr-interrogation"></i> Help
+            <i className="fi fi-rr-interrogation"></i> Help
           </Link>
         </li>
       </ul>
@@ -111,13 +119,8 @@ function Sidebar({ user, onLogout }) {
         <hr className="divider" />
         <Link to="/profile" className="footer-link">
           <span className="user-name">
-            {user ? `${user.firstName} ${user.lastName}` : "User Name"}
+            {user ? `${user.first_name} ${user.last_name}` : "User Name"}
           </span>
-          {/* <img
-            src={user?.avatar || "/img/default-avatar.png"}
-            alt="Profile"
-            className="footer-profile-image"
-          /> */}
         </Link>
         <button className="logout-button" onClick={handleLogout}>
           Log Out

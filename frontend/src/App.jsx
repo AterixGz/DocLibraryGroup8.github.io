@@ -22,13 +22,12 @@ import ApprovePage from "./components/Approve/ApprovePage.jsx";
 
 import { FileProvider } from "./components/FileContext/FileContext";
 import { AuthProvider, AuthContext } from "./contexts/AuthContext.jsx";
+import PermissionProtectedRoute from "./components/PermissionProtectedRoute";
 
 import "./App.css";
 
-
 function AppRoutes() {
-  const { role, username, logout } = useContext(AuthContext);
-  const { userData } = useContext(AuthContext);
+  const { role, username, logout, userData } = useContext(AuthContext);
 
   const handleLogout = () => {
     logout();
@@ -42,32 +41,76 @@ function AppRoutes() {
       )}
       <div className="content-container">
         <Routes>
-          <Route path="/home" element={<Home />} />
           <Route path="/" element={<Home />} />
+          <Route path="/home" element={
+            <PermissionProtectedRoute requiredPermission="document_access">
+              <Home />
+            </PermissionProtectedRoute>
+          } />
+
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+
+          {/* ✅ เฉพาะเมื่อ login แล้ว */}
           {role !== "guest" && (
             <>
               <Route path="/administrator" element={<Administrator />} />
-              <Route path="/my-document" element={<MyDocument />} />
-              <Route path="/document" element={<Document />} />
-              <Route path="/permission" element={<Permission />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/reports/addfilelist" element={<AddFileReport />} />
-              <Route
-                path="/reports/removefilelist"
-                element={<RemoveFileReport />}
-              />
+
+              <Route path="/my-document" element={
+                <PermissionProtectedRoute requiredPermission="document_manage">
+                  <MyDocument />
+                </PermissionProtectedRoute>
+              } />
+
+              <Route path="/document" element={
+                <PermissionProtectedRoute requiredPermission="document_manage">
+                  <Document />
+                </PermissionProtectedRoute>
+              } />
+
+              <Route path="/trash" element={
+                <PermissionProtectedRoute requiredPermission="document_manage">
+                  <Trash />
+                </PermissionProtectedRoute>
+              } />
+
+              <Route path="/approve" element={
+                <PermissionProtectedRoute requiredPermission="document_approve">
+                  <ApprovePage />
+                </PermissionProtectedRoute>
+              } />
+
+              <Route path="/permission" element={
+                <PermissionProtectedRoute requiredPermission="user_admin">
+                  <Permission />
+                </PermissionProtectedRoute>
+              } />
+
+              <Route path="/reports" element={
+                <PermissionProtectedRoute requiredPermission="report_access">
+                  <Reports />
+                </PermissionProtectedRoute>
+              } />
+
+              <Route path="/reports/addfilelist" element={
+                <PermissionProtectedRoute requiredPermission="report_access">
+                  <AddFileReport />
+                </PermissionProtectedRoute>
+              } />
+
+              <Route path="/reports/removefilelist" element={
+                <PermissionProtectedRoute requiredPermission="report_access">
+                  <RemoveFileReport />
+                </PermissionProtectedRoute>
+              } />
+
               <Route path="/help" element={<Help />} />
-              <Route
-                path="/profile"
-                element={<Profile username={username} />}
-              />
+              <Route path="/profile" element={<Profile username={username} />} />
               <Route path="/about-me" element={<AboutMe />} />
-              <Route path="/trash" element={<Trash />} />
-              <Route path="/approve" element={<ApprovePage />} />
             </>
           )}
+
+          {/* สำหรับ fallback */}
           <Route path="/aboutme" element={<AboutMe />} />
         </Routes>
       </div>

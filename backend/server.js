@@ -248,18 +248,27 @@ app.post('/api/login', async (req, res) => {
 
     let token = user.token;
 
-    // ✅ ถ้า user ยังไม่มี token → สร้างใหม่แล้วบันทึก
+    // ✅ ถ้ายังไม่มี token ให้สร้างใหม่
     if (!token) {
       const payload = {
         id: user.id,
         role: user.role_name,
-        timestamp: Date.now(), // randomizing
-        rand: Math.random().toString(36).substring(2), // ป้องกันการเดา
+        timestamp: Date.now(),
+        rand: Math.random().toString(36).substring(2),
       };
       token = jwt.sign(payload, SECRET_KEY, { expiresIn: '2h' });
 
       await pool.query(`UPDATE users SET token = $1 WHERE id = $2`, [token, user.id]);
     }
+
+    // ✅ ดึง permission name ของ role จาก role_permissions
+    const permRes = await pool.query(`
+      SELECT p.name FROM role_permissions rp
+      JOIN permissions p ON rp.permission_id = p.id
+      WHERE rp.role_id = $1
+    `, [user.role_id]);
+
+    const permissionNames = permRes.rows.map(p => p.name);
 
     res.json({
       message: 'Login successful',
@@ -273,7 +282,8 @@ app.post('/api/login', async (req, res) => {
         department: user.department,
         avatar: user.avatar,
         employee_id: user.employee_id,
-        token // ✅ ใช้ token เดิมหรือใหม่ตามกรณี
+        token,
+        permissions: permissionNames // ✅ เพิ่มตรงนี้
       }
     });
   } catch (err) {
@@ -281,6 +291,7 @@ app.post('/api/login', async (req, res) => {
     res.status(500).send('Login failed');
   }
 });
+
 
 // Get roles
 app.get('/api/roles', async (req, res) => {
