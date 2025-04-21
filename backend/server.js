@@ -73,9 +73,17 @@ app.get("/api/users", async (req, res) => {
 app.get('/api/files', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, filename AS name, url AS FileUrl, file_type AS type,
-             department, document_date AS date, description,
-             uploaded_by, uploaded_at, status
+      SELECT 
+        id, 
+        filename AS name, 
+        url AS FileUrl, 
+        file_type AS type,
+        department, 
+        TO_CHAR(document_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS date,
+        description,
+        uploaded_by, 
+        TO_CHAR(uploaded_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS uploaded_at,
+        status
       FROM files
       ORDER BY uploaded_at DESC
     `);
@@ -513,13 +521,13 @@ app.listen(PORT, () => {
 
 app.delete('/api/files/soft-delete/:id', async (req, res) => {
   const { id } = req.params;
-  console.log("👉 Soft delete request for ID:", id); // ✅ debug
+  console.log("👉 Soft delete request for ID:", id);
 
   try {
     const result = await pool.query('SELECT * FROM files WHERE id = $1', [id]);
 
     if (result.rows.length === 0) {
-      console.warn("❌ File not found for soft delete:", id); // log เพิ่มเติม
+      console.warn("❌ File not found for soft delete:", id);
       return res.status(404).json({ message: 'File not found' });
     }
 
@@ -528,7 +536,8 @@ app.delete('/api/files/soft-delete/:id', async (req, res) => {
     await pool.query(`
       INSERT INTO deleted_files 
       (original_file_id, filename, url, uploaded_by, uploaded_at, file_type, department, document_date, description, deleted_at)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW()) -- ✅ เพิ่ม deleted_at
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
+        TO_TIMESTAMP(TO_CHAR(NOW() AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI'), 'YYYY-MM-DD HH24:MI'))
     `, [
       file.id, file.filename, file.url, file.uploaded_by, file.uploaded_at,
       file.file_type, file.department, file.document_date, file.description
@@ -543,21 +552,43 @@ app.delete('/api/files/soft-delete/:id', async (req, res) => {
   }
 });
 
-
 app.put('/api/files/restore/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await pool.query('SELECT * FROM deleted_files WHERE id = $1', [id]);
-    if (result.rows.length === 0) return res.status(404).json({ message: 'Not found in trash' });
+    const result = await pool.query(`
+      SELECT 
+        filename,
+        url,
+        uploaded_by,
+        TO_CHAR(uploaded_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') as uploaded_at,
+        file_type,
+        department,
+        TO_CHAR(document_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') as document_date,
+        description
+      FROM deleted_files 
+      WHERE id = $1
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Not found in trash' });
+    }
 
     const file = result.rows[0];
 
     await pool.query(`
-      INSERT INTO files (filename, url, uploaded_by, uploaded_at, file_type, department, document_date, description)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      INSERT INTO files 
+        (filename, url, uploaded_by, uploaded_at, file_type, department, document_date, description)
+      VALUES 
+        ($1, $2, $3, TO_TIMESTAMP($4, 'YYYY-MM-DD HH24:MI'), $5, $6, TO_TIMESTAMP($7, 'YYYY-MM-DD HH24:MI'), $8)
     `, [
-      file.filename, file.url, file.uploaded_by, file.uploaded_at,
-      file.file_type, file.department, file.document_date, file.description
+      file.filename,
+      file.url,
+      file.uploaded_by,
+      file.uploaded_at,
+      file.file_type,
+      file.department,
+      file.document_date,
+      file.description
     ]);
 
     await pool.query('DELETE FROM deleted_files WHERE id = $1', [id]);
@@ -567,7 +598,6 @@ app.put('/api/files/restore/:id', async (req, res) => {
     res.status(500).send('Restore failed');
   }
 });
-
 app.delete('/api/files/permanent-delete/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -593,14 +623,21 @@ app.get('/api/files/trash', async (req, res) => {
 
     if (userId) {
       result = await pool.query(`
-        SELECT id, filename AS name, url AS FileUrl, file_type AS type, department,
-               document_date AS date, description, uploaded_by, uploaded_at, deleted_at 
+        SELECT id, 
+               filename AS name, 
+               url AS FileUrl, 
+               file_type AS type, 
+               department,
+               TO_CHAR(document_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS date,
+               description, 
+               uploaded_by,
+               TO_CHAR(uploaded_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS uploaded_at,
+               TO_CHAR(deleted_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS deleted_at
         FROM deleted_files 
         WHERE uploaded_by = $1
         ORDER BY deleted_at DESC
       `, [userId]);
     } else {
-      // fallback ถ้าไม่มี userId ก็ไม่คืนไฟล์เลย
       return res.status(400).json({ message: 'Missing user ID' });
     }
 
@@ -614,8 +651,15 @@ app.get('/api/files/trash', async (req, res) => {
 app.get('/api/files/approved', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, filename AS name, url AS FileUrl, file_type AS type, department,
-             document_date AS date, description, uploaded_by, uploaded_at
+      SELECT id, 
+             filename AS name, 
+             url AS FileUrl, 
+             file_type AS type, 
+             department,
+             TO_CHAR(document_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS date,
+             TO_CHAR(uploaded_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD HH24:MI') AS uploaded_at,
+             description, 
+             uploaded_by
       FROM files
       WHERE status = 'approved'
       ORDER BY uploaded_at DESC

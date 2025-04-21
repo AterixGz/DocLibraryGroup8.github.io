@@ -18,12 +18,8 @@ const Document = () => {
   const [success, setSuccess] = useState("");
   const [uploadedFileName, setUploadedFileName] = useState("");
   const [requiredFields, setRequiredFields] = useState({});
-
-  const [date, setDate] = useState(() => {
-    const now = new Date();
-    const thaiTime = new Date(now.getTime() + (7 * 60 * 60 * 1000));
-    return thaiTime.toISOString().slice(0, 16);
-  });
+  const [showNotification, setShowNotification] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   const navigate = useNavigate();
 
@@ -33,15 +29,45 @@ const Document = () => {
       const firstName = userData.first_name || userData.firstName;
       const lastName = userData.last_name || userData.lastName;
       const userId = userData.id;
-
       setUploadedBy(userId);
-
       const fullName = `${firstName} ${lastName}`;
       setUploadedByName(fullName);
     } else {
       navigate('/login');
     }
   }, [navigate]);
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    if (userData) {
+      const firstName = userData.first_name || userData.firstName;
+      const lastName = userData.last_name || userData.lastName;
+      const userId = userData.id;
+      setUploadedBy(userId);
+      const fullName = `${firstName} ${lastName}`;
+      setUploadedByName(fullName);
+    } else {
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  // Effect for real-time clock
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Effect for notification
+  useEffect(() => {
+    if (showNotification) {
+      const notificationTimer = setTimeout(() => {
+        setShowNotification(false);
+        setSuccess("");
+      }, 5000);
+      return () => clearTimeout(notificationTimer);
+    }
+  }, [showNotification]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -56,7 +82,7 @@ const Document = () => {
     // ตัดช่องว่างจากค่าที่กรอก
     const trimmedName = name?.trim();
     const trimmedDescription = description?.trim();
-  
+
     // ตรวจว่าทุกช่องว่างหมดเลย
     if (
       !file &&
@@ -68,37 +94,37 @@ const Document = () => {
       setError("กรุณากรอกข้อมูลทั้งหมด");
       return false;
     }
-  
-   
+
+
     if (!trimmedName) {
       setError("กรุณากรอกชื่อเอกสาร");
       return false;
     }
-  
+
     if (trimmedName.length < 3) {
       setError("ชื่อเอกสารต้องมีความยาวอย่างน้อย 3 ตัวอักษร");
       return false;
     }
-  
+
     if (!type) {
       setError("กรุณาเลือกประเภทเอกสาร");
       return false;
     }
-  
+
     if (!department) {
       setError("กรุณาเลือกแผนก");
       return false;
     }
-  
+
     if (!trimmedDescription) {
       setError("กรุณากรอกคำอธิบายของเอกสาร");
       return false;
     }
-     if (!file) {
+    if (!file) {
       setError("กรุณาเลือกไฟล์ที่ต้องการอัปโหลด");
       return false;
     }
-  
+
     // ตรวจสอบประเภทไฟล์
     const allowedTypes = ['.pdf', '.doc', '.docx', '.xlsx', '.xls', '.png', '.jpg', '.jpeg'];
     const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
@@ -106,19 +132,18 @@ const Document = () => {
       setError("ประเภทไฟล์ไม่ถูกต้อง กรุณาเลือกไฟล์ที่เป็น PDF, DOC, DOCX, XLS, XLSX, PNG หรือ JPG");
       return false;
     }
-  
+
     // ทุกอย่างผ่าน
     setError(null);
     return true;
   };
-  
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    
+
     if (!validateForm()) {
       return;
     }
@@ -135,9 +160,9 @@ const Document = () => {
     formData.append("name", name);
     formData.append("type", type);
     formData.append("department", department);
-    formData.append("date", date);
+    formData.append("date", currentTime.toISOString()); // Changed from date to currentTime
     formData.append("description", description);
-    formData.append("uploadedBy", uploadedBy);
+    formData.append("uploadedBy", uploadedBy)
 
     try {
       const response = await fetch("http://localhost:3000/api/files/upload", {
@@ -148,9 +173,9 @@ const Document = () => {
       const result = await response.json();
 
       if (response.ok) {
-        setSuccess("อัปโหลดเอกสารสำเร็จ!");
-        alert("อัปโหลดเอกสารสำเร็จ!");
-        
+        setSuccess("เอกสารถูกบันทึกเรียบร้อยแล้ว");
+        setShowNotification(true);
+
         // Reset form
         setFile(null);
         setName("");
@@ -190,7 +215,16 @@ const Document = () => {
         <div>
           <h3>อัพโหลดเอกสาร</h3>
           {error && <div className="error-message">{error}</div>}
-          {success && <div className="success-message">{success}</div>}
+          {success && showNotification && (
+            <div className="success-notification">
+              <div className="notification-content">
+                <div className="notification-message">
+                  <h4>✓ อัพโหลดสำเร็จ!</h4>
+                  <p>{success}</p>
+                </div>
+              </div>
+            </div>
+          )}
           <form onSubmit={handleSubmit}>
             <div>
               <label>ชื่อเอกสาร <span className="required">*</span></label>
@@ -234,9 +268,13 @@ const Document = () => {
                 <label>วันที่และเวลา</label>
                 <input
                   type="text"
-                  value={new Date(new Date(date).getTime() + 7 * 60 * 60 * 1000).toLocaleString('th-TH', {
-                    dateStyle: 'short',
-                    timeStyle: 'short',
+                  value={currentTime.toLocaleString('th-TH', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
                   })}
                   readOnly
                   className="date-display"
@@ -267,7 +305,7 @@ const Document = () => {
                 <img src={image} alt="Upload Icon" />
                 <p><strong style={{ color: '#4a90e2' }}>Upload File Here</strong></p>
                 <p className="file-types">Supports: PDF, DOC, DOCX, XLSX, XLS, PNG, JPG</p>
-                
+
               </label>
               <input
                 id="file-input"
@@ -275,7 +313,7 @@ const Document = () => {
                 onChange={handleFileChange}
                 accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpg,.jpeg"
                 className={requiredFields.file ? "input-error" : ""}
-               
+
               />
             </div>
 
@@ -301,7 +339,7 @@ const Document = () => {
                 )}
               </div>
             )}
-            
+
             {showPreview && file && (
               <div className="preview-popup-overlay" style={{
                 position: 'fixed',

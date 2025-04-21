@@ -9,6 +9,7 @@ const TrashPage = () => {
   const [alertMessage, setAlertMessage] = useState(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   const userId = localStorage.getItem("userData")
     ? JSON.parse(localStorage.getItem("userData")).id
@@ -31,7 +32,13 @@ const TrashPage = () => {
   useEffect(() => {
     fetchTrash();
   }, [userId]);
-
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+  
+    return () => clearInterval(timer);
+  }, []);
   const handlePreview = (fileUrl) => {
     if (!fileUrl) {
       setAlertMessage("ไม่พบ URL สำหรับ preview");
