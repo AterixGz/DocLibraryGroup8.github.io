@@ -173,13 +173,42 @@ const PermissionPage = () => {
       if (editPassword.trim()) {
         updatedUser.password = editPassword;
       }
-      await axios.put(
+  
+      const res = await axios.put(
         `http://localhost:3000/api/users/${editUser.id}`,
         updatedUser,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+  
+      // ✅ ถ้าแก้ user ตัวเอง ให้รีข้อมูลใหม่จาก backend
+      if (editUser.id === currentUserId) {
+        // 🔁 ดึง permission ใหม่
+        const permRes = await axios.get(
+          `http://localhost:3000/api/users/${userData.id}/permissions`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+  
+        const roleName =
+          roles.find((r) => r.id === res.data.role_id)?.name || userData.role;
+  
+        const updatedLocalUser = {
+          ...userData,
+          first_name: res.data.first_name,
+          last_name: res.data.last_name,
+          email: res.data.email,
+          department: res.data.department,
+          role: roleName,
+          permissions: permRes.data, // 🔄 set ใหม่
+        };
+  
+        localStorage.setItem("userData", JSON.stringify(updatedLocalUser));
+        setUserData(updatedLocalUser);
+      }
+  
       showNotification("✅ แก้ไขข้อมูลสําเร็จ", "success");
       setShowEditForm(null);
       setEditPassword("");
@@ -189,6 +218,8 @@ const PermissionPage = () => {
       showNotification("❌ แก้ไขข้อมูลไม่สำเร็จ", "error");
     }
   };
+  
+  
 
   const deleteUser = async (userId) => {
     if (userId === currentUserId) {
@@ -197,6 +228,18 @@ const PermissionPage = () => {
         "error"
       );
     }
+
+    const userToDelete = users.find((u) => u.id === userId);
+    const isTargetAdmin = userToDelete?.role_name === "admin";
+    const isCurrentAdmin = userData?.role === "admin";
+
+    if (isTargetAdmin && !isCurrentAdmin) {
+      return showNotification(
+        "❌ คุณไม่มีสิทธิ์ลบผู้ใช้งานระดับ admin",
+        "error"
+      );
+    }
+
     try {
       await axios.delete(`http://localhost:3000/api/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -426,17 +469,28 @@ const PermissionPage = () => {
                         </div>
                         {dropdownOpen === user.id && (
                           <div className="perm-dropdown-menu flat">
-                            <button
-                              onClick={() => {
-                                setEditUser(user);
-                                setShowEditForm(true);
-                              }}
-                            >
-                              แก้ไข
-                            </button>
-                            <button onClick={() => setShowConfirmDelete(user)}>
-                              ลบ
-                            </button>
+                            {userData?.role === "admin" ||
+                            user.role_name !== "admin" ? (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    setEditUser(user);
+                                    setShowEditForm(true);
+                                  }}
+                                >
+                                  แก้ไข
+                                </button>
+                                <button
+                                  onClick={() => setShowConfirmDelete(user)}
+                                >
+                                  ลบ
+                                </button>
+                              </>
+                            ) : (
+                              <div className="perm-dropdown-disabled">
+                                คุณไม่มีสิทธิ์
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
