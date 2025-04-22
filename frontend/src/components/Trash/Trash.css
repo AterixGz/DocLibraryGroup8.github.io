@@ -7,7 +7,55 @@
     margin: 0 auto;
     margin-top: 2rem;
 }
+/* เพิ่ม CSS ส่วนนี้ในไฟล์ Trash.css */
 
+.trashpage-info-banner {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #e7f3ff;
+    border-left: 4px solid #1e88e5;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+  }
+  
+  .trashpage-info-banner i {
+    margin-right: 10px;
+    font-size: 1.1rem;
+    color: #1e88e5;
+  }
+  
+  .trashpage-expire-normal {
+    color: #2e7d32;
+  }
+  
+  .trashpage-expire-warning {
+    color: #ff8f00;
+    font-weight: 500;
+  }
+  
+  .trashpage-expire-critical {
+    color: #d32f2f;
+    font-weight: 700;
+  }
+  
+  .trashpage-row-expire-soon td {
+    background-color: #fff8e1;
+  }
+  
+  /* ทำให้แถวไฟล์ที่ใกล้หมดอายุ highlight เมื่อ hover */
+  .trashpage-row-expire-soon:hover td {
+    background-color: #ffecb3;
+  }
+  
+  /* ข้อความบอกวันลบอัตโนมัติที่ column header */
+  .trashpage-auto-delete-info {
+    font-size: 0.8rem;
+    color: #757575;
+    display: block;
+    font-weight: normal;
+  }
 .trashpage-title {
     font-size: 36px;
     margin-bottom: 1.5rem;
