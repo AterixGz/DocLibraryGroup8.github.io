@@ -361,7 +361,7 @@ const Home = ({ role: propRole }) => {
               <option value="รายงานปริมาณการผลิตรายเดือน">
                 รายงานปริมาณการผลิตรายเดือน
               </option>
-              <option value="การขาย มูลค่า และค่าภาคหลวง">
+              <option value="การขายมูลค่าและค่าภาคหลวง">
                 การขาย มูลค่า และค่าภาคหลวง
               </option>
               <option value="การจัดสรรค่าภาคหลวงให้ท้องถิ่น">
@@ -371,6 +371,10 @@ const Home = ({ role: propRole }) => {
               <option value="ปริมาณสำรองปิโตรเลียม">
                 ปริมาณสำรองปิโตรเลียม
               </option>
+              <option value="การขนถ่ายปิโตรเลียมในอ่าวไทย">
+                การขนถ่ายปิโตรเลียมในอ่าวไทย
+              </option>
+              <option value="รายชื่อผู้มีสิทธิสำรวจและผลิตปิโตรเลียม">รายชื่อผู้มีสิทธิสำรวจและผลิตปิโตรเลียม</option>
             </select>
             {/* <span className='items-per-page'>
                         <label className='filter-label'>แสดงข้อมูล:</label>
