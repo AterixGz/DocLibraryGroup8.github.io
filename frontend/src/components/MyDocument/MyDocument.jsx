@@ -683,12 +683,13 @@ const MyDocument = () => {
                         className="form-input"
                         defaultValue={documentToEdit.type}
                       >
+                        <option value="">เลือกประเภทเอกสาร</option>
                         <option value="ผลการดำเนินงาน">ผลการดำเนินงาน</option>
                         <option value="รายงานประจำปี">รายงานประจำปี</option>
                         <option value="รายงานปริมาณการผลิตรายเดือน">
                           รายงานปริมาณการผลิตรายเดือน
                         </option>
-                        <option value="การขาย มูลค่า และค่าภาคหลวง">
+                        <option value="การขายมูลค่าและค่าภาคหลวง">
                           การขาย มูลค่า และค่าภาคหลวง
                         </option>
                         <option value="การจัดสรรค่าภาคหลวงให้ท้องถิ่น">
@@ -699,6 +700,12 @@ const MyDocument = () => {
                         </option>
                         <option value="ปริมาณสำรองปิโตรเลียม">
                           ปริมาณสำรองปิโตรเลียม
+                        </option>
+                        <option value="การขนถ่ายปิโตรเลียมในอ่าวไทย">
+                          การขนถ่ายปิโตรเลียมในอ่าวไทย
+                        </option>
+                        <option value="รายชื่อผู้มีสิทธิสำรวจและผลิตปิโตรเลียม">
+                          รายชื่อผู้มีสิทธิสำรวจและผลิตปิโตรเลียม
                         </option>
                       </select>
                     </div>
