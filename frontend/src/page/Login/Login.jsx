@@ -196,11 +196,46 @@ function Login() {
           <div className="or">หรือ</div>
 
           <button
-            onClick={handleGuestLogin}
             className="guest-login"
-            disabled={isLoading}
+            onClick={async () => {
+              try {
+                // ดึง role_id ของ guest
+                const roleRes = await axios.get(
+                  "http://localhost:3000/api/roles"
+                );
+                const guestRole = roleRes.data.find((r) => r.name === "guest");
+                if (!guestRole) {
+                  alert("ไม่พบบทบาท guest ในระบบ");
+                  return;
+                }
+
+                // ดึง permission จาก backend
+                const permRes = await axios.get(
+                  `http://localhost:3000/api/roles/${guestRole.id}/permissions`
+                );
+
+                const permissions = permRes.data.map((p) => p.name); // [ "document_access", ... ]
+
+                const guestData = {
+                  id: 0,
+                  username: "guest",
+                  role: "guest",
+                  role_id: guestRole.id,
+                  first_name: "ผู้เยี่ยมชม",
+                  last_name: "",
+                  permissions,
+                };
+
+                localStorage.setItem("token", "GUEST_MODE");
+                localStorage.setItem("userData", JSON.stringify(guestData));
+                window.location.href = "/home";
+              } catch (err) {
+                console.error("⚠️ Guest login failed:", err);
+                alert("ไม่สามารถเข้าสู่ระบบแบบ guest ได้");
+              }
+            }}
           >
-            เข้าสู่ระบบโดยไม่ต้องลงชื่อเข้าใช้
+            เข้าสู่ระบบแบบไม่ต้องลงชื่อเข้าใช้
           </button>
         </div>
         <div className="login-bg"></div>
