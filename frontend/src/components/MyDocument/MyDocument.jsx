@@ -30,6 +30,7 @@ const MyDocument = () => {
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [documentToEdit, setDocumentToEdit] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [departments, setDepartments] = useState([]);
 
   const userId = localStorage.getItem("userData")
     ? JSON.parse(localStorage.getItem("userData")).id
@@ -45,13 +46,12 @@ const MyDocument = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-  
+
     const formData = new FormData(e.currentTarget);
     const name = formData.get("name");
     const type = formData.get("type");
-    const date = formData.get("date");
     const department = formData.get("department");
-  
+
     try {
       const response = await fetch(
         `http://localhost:3000/api/files/${documentToEdit.id}`,
@@ -63,19 +63,18 @@ const MyDocument = () => {
           body: JSON.stringify({
             name,
             type,
-            date,
             department,
           }),
         }
       );
-  
+
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-  
+
       // ✅ เรียกข้อมูลใหม่จาก backend
       await fetchUserFiles();
-  
+
       setToastMessage(`แก้ไขเอกสาร "${name}" สำเร็จ!`);
       setTimeout(() => setToastMessage(null), 3000);
       closeEditPopup();
@@ -87,7 +86,6 @@ const MyDocument = () => {
       setIsSubmitting(false);
     }
   };
-  
 
   const openEditPopup = (doc) => {
     setDocumentToEdit(doc);
@@ -99,18 +97,15 @@ const MyDocument = () => {
     setDocumentToEdit(null);
   };
   useEffect(() => {
-    
     fetchUserFiles();
   }, [userId]);
-  
+
   const fetchUserFiles = async () => {
     try {
       // ตรวจสอบว่ามี userId ก่อนที่จะดึงข้อมูล
       if (!userId) return;
 
-      const res = await fetch(
-        `http://localhost:3000/api/files/user/${userId}`
-      );
+      const res = await fetch(`http://localhost:3000/api/files/user/${userId}`);
       if (!res.ok) throw new Error("Failed to fetch user files");
 
       const data = await res.json();
@@ -119,6 +114,20 @@ const MyDocument = () => {
       console.error("Failed to fetch user files:", err);
     }
   };
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/departments");
+        const data = await res.json();
+        setDepartments(data);
+      } catch (err) {
+        console.error("Error fetching departments:", err);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
 
   const sortDocuments = (documents, option, order) => {
     return documents.sort((a, b) => {
@@ -509,7 +518,7 @@ const MyDocument = () => {
               </thead>
             </table>
             <Link to="/document" className="add-document-btn">
-            ✙ เพิ่มเอกสารใหม่
+              ✙ เพิ่มเอกสารใหม่
             </Link>
           </div>
 
@@ -688,18 +697,6 @@ const MyDocument = () => {
                       </select>
                     </div>
                     <div className="form-group">
-                      <label className="label-edit" htmlFor="date">
-                        วันที่ลงเอกสาร
-                      </label>
-                      <input
-                        type="date"
-                        id="date"
-                        name="date"
-                        className="form-input"
-                        defaultValue={documentToEdit.date}
-                      />
-                    </div>
-                    <div className="form-group">
                       <label className="label-edit" htmlFor="department">
                         หน่วยงาน
                       </label>
@@ -709,9 +706,18 @@ const MyDocument = () => {
                         className="form-input"
                         defaultValue={documentToEdit.department}
                       >
-                        <option value="กรมเชื้อเพลิงธรรมชาติ">
-                          กรมเชื้อเพลิงธรรมชาติ
-                        </option>
+                        {departments.length === 0 ? (
+                          <option disabled>ไม่มีข้อมูลหน่วยงาน</option>
+                        ) : (
+                          departments.map((dep) => (
+                            <option
+                              key={dep.department_id}
+                              value={dep.department_name}
+                            >
+                              {dep.department_name}
+                            </option>
+                          ))
+                        )}
                       </select>
                     </div>
                     <div className="form-group">

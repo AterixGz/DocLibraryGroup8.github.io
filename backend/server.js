@@ -164,16 +164,24 @@ app.get('/api/files/user/:userId', async (req, res) => {
 // Update file route
 app.put('/api/files/:id', async (req, res) => {
   const fileId = req.params.id;
-  const { name, type, date, department } = req.body;
+  const { name, type, department, date } = req.body;
 
   try {
-    const result = await pool.query(
-      `UPDATE files 
-       SET filename = $1, file_type = $2, document_date = $3, department = $4 
-       WHERE id = $5 
-       RETURNING *`,
-      [name, type, date, department, fileId]
-    );
+    let query = `
+      UPDATE files 
+      SET filename = $1, file_type = $2, department = $3
+    `;
+    const values = [name, type, department];
+
+    if (date) {
+      query += `, document_date = $4 WHERE id = $5 RETURNING *`;
+      values.push(date, fileId);
+    } else {
+      query += ` WHERE id = $4 RETURNING *`;
+      values.push(fileId);
+    }
+
+    const result = await pool.query(query, values);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'File not found' });
@@ -188,6 +196,7 @@ app.put('/api/files/:id', async (req, res) => {
     res.status(500).json({ message: 'Failed to update file' });
   }
 });
+
 
 
 // Upload file route - FIXED TIMEZONE
