@@ -3,8 +3,10 @@ import "./Home.css";
 import { FileContext } from "../FileContext/FileContext";
 import { motion as m } from "framer-motion";
 
-const Home = ({ role }) => {
+const Home = ({ role: propRole }) => {
   const { uploadedFiles } = useContext(FileContext);
+  const [role, setRole] = useState(propRole || "");
+
   const [documents, setDocuments] = useState([]);
   const [previewFile, setPreviewFile] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,13 +27,23 @@ const Home = ({ role }) => {
   const [isSingleDownload, setIsSingleDownload] = useState(false);
   const [downloadPopups, setDownloadPopups] = useState([]);
 
-  // 🔄 โหลดไฟล์ทั้งหมดจาก backend
+  // ตรวจ role จาก localStorage หากไม่ได้ส่ง prop เข้ามา
+  useEffect(() => {
+    if (!propRole) {
+      const userData = localStorage.getItem("userData");
+      if (userData) {
+        const parsed = JSON.parse(userData);
+        setRole(parsed.role || "guest");
+      }
+    }
+  }, [propRole]);
+
   useEffect(() => {
     const fetchFiles = async () => {
       try {
         const res = await fetch("http://localhost:3000/api/files/approved");
         const data = await res.json();
-        setDocuments(data); // Combine with files from context
+        setDocuments(data);
       } catch (err) {
         console.error("Failed to fetch files:", err);
       }
@@ -158,36 +170,38 @@ const Home = ({ role }) => {
 
   const handleDownloadSelected = () => {
     setIsSingleDownload(false);
-  
+
     const filesToDownload = documents.filter((doc) =>
       selectedDocuments.includes(doc.id)
     );
-  
+
     const newPopup = {
       id: Date.now(),
       message: `ดาวน์โหลดเอกสารทั้งหมด ${selectedDocuments.length} รายการเสร็จสิ้น`,
       isSingle: false,
     };
-  
+
     setDownloadPopups((prev) => [...prev, newPopup]);
-  
+
     setTimeout(() => {
       setDownloadPopups((prev) =>
         prev.filter((popup) => popup.id !== newPopup.id)
       );
     }, 5000);
-  
+
     filesToDownload.forEach((file, index) => {
       const url = file.fileurl || file.FileUrl || file.url;
-  
+
       if (!url) {
         console.warn("⚠️ ไม่มี URL สำหรับไฟล์:", file);
         return; // ข้ามไฟล์ที่ไม่มี URL
       }
-  
+
       const filename = url.split("/").pop();
-      const downloadUrl = `http://localhost:3000/api/files/download/${encodeURIComponent(filename)}`;
-  
+      const downloadUrl = `http://localhost:3000/api/files/download/${encodeURIComponent(
+        filename
+      )}`;
+
       setTimeout(() => {
         const link = document.createElement("a");
         link.href = downloadUrl;
@@ -198,8 +212,6 @@ const Home = ({ role }) => {
       }, index * 300); // มี delay ป้องกัน browser block
     });
   };
-  
-  
 
   // Function to close popup by ID
   const closeDownloadPopup = (id) => {
@@ -291,12 +303,22 @@ const Home = ({ role }) => {
             ค้นหาเอกสารทั้งหมด
             {role === "guest" && (
               <>
-                <a href="/">
+                <a
+                  onClick={() => (
+                    localStorage.removeItem("userData"),
+                    localStorage.removeItem("token"),
+                    (window.location.href = "/login")
+                  )}
+                >
                   <img src="./img/Logo2.png" alt="Logo" className="logo" />
                 </a>
                 <button
                   className="back-to-login-btn"
-                  onClick={() => (window.location.href = "/login")}
+                  onClick={() => (
+                    localStorage.removeItem("userData"),
+                    localStorage.removeItem("token"),
+                    (window.location.href = "/login")
+                  )}
                 >
                   กลับไปหน้า Login
                 </button>
