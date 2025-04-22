@@ -143,7 +143,7 @@ const SliderComponent = () => {
   const goToSlide = (index) => {
     setCurrentSlide(index);
   };
-
+//สวัสดีชาวโลก
   // อัปเดตเวลาใน realtime (สำหรับแสดงวันที่/เวลา)
   const [currentTime, setCurrentTime] = useState(new Date());
   useEffect(() => {
