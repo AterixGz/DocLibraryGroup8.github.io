@@ -92,6 +92,7 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
+//Home
 // Get all files - FIXED TIMEZONE
 app.get('/api/files', async (req, res) => {
   try {
@@ -106,7 +107,8 @@ app.get('/api/files', async (req, res) => {
         description,
         uploaded_by, 
         TO_CHAR(uploaded_at, 'YYYY-MM-DD HH24:MI') AS uploaded_at,
-        status
+        status,
+        COALESCE(download_count, 0) AS download_count
       FROM files
       ORDER BY uploaded_at DESC
     `);
@@ -180,6 +182,7 @@ app.put('/api/files/:id', async (req, res) => {
   }
 });
 
+
 // Upload file route - FIXED TIMEZONE
 app.post('/api/files/upload', upload.single('file'), async (req, res) => {
   const file = req.file;
@@ -211,12 +214,23 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
 });
 
 // Download file route
-app.get('/api/files/download/:filename', (req, res) => {
+app.get('/api/files/download/:filename', async (req, res) => {
   const filename = req.params.filename;
   const filePath = path.join(__dirname, 'uploads', filename);
 
   if (!fs.existsSync(filePath)) {
     return res.status(404).send('File not found');
+  }
+
+  // เพิ่ม: อัปเดต download_count ในฐานข้อมูล
+  try {
+    await pool.query(
+      `UPDATE files SET download_count = COALESCE(download_count, 0) + 1 WHERE url LIKE $1`,
+      [`%/${filename}`]
+    );
+  } catch (err) {
+    console.error('Error updating download_count:', err);
+    // ไม่ต้อง return error ให้ user
   }
 
   const file = fs.readFileSync(filePath);

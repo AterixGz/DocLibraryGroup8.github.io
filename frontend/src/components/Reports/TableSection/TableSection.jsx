@@ -4,7 +4,7 @@ import "./TableSection.css";
 function TableSection() {
   const [departments, setDepartments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 4;
 
   useEffect(() => {
     fetch("http://localhost:3000/api/files")

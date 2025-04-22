@@ -17,9 +17,12 @@ const SliderComponent = () => {
     fetch("http://localhost:3000/api/files")
       .then((response) => response.json())
       .then((files) => {
-        // สถิติสำหรับ Slide 1
+        // รวมยอดดาวน์โหลด
+        const downloads = files.reduce(
+          (sum, file) => sum + (file.download_count || 0),
+          0
+        );
         const totalDocuments = files.length;
-        const downloads = 0;
         const websiteViews = 0;
 
         // สถิติสำหรับ Slide 2 (เอกสารย้อนหลัง 3 ปี)
@@ -90,7 +93,7 @@ const SliderComponent = () => {
       title: 'ข้อมูลทั่วไป',
       description: 'ข้อมูลสถิติการดาวน์โหลดไฟล์',
       stats: [
-        { value: sliderStats.slide1.downloads.toLocaleString(), label: 'ยอดดาวน์โหลด', unit: 'ครั้ง' },
+        { value: sliderStats.slide1.downloads.toLocaleString(), label: 'ยอดดาวน์โหลดทั้งหมด', unit: 'ครั้ง' },
         { value: sliderStats.slide1.totalDocuments.toLocaleString(), label: 'ยอดเอกสารทั้งหมด', unit: 'ฉบับ' },
         { value: sliderStats.slide1.websiteViews.toLocaleString(), label: 'ยอดเข้าชมเว็บไซต์', unit: 'ครั้ง' },
       ],
