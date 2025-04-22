@@ -20,24 +20,21 @@ const Document = () => {
   const [requiredFields, setRequiredFields] = useState({});
   const [showNotification, setShowNotification] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [departments, setDepartments] = useState([]);
 
   const navigate = useNavigate();
   const bangkokTime = new Date(currentTime.getTime() - (currentTime.getTimezoneOffset() * 60000))
-                         .toISOString()
-                         .replace('Z', '+07:00');
-  useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("userData"));
-    if (userData) {
-      const firstName = userData.first_name || userData.firstName;
-      const lastName = userData.last_name || userData.lastName;
-      const userId = userData.id;
-      setUploadedBy(userId);
-      const fullName = `${firstName} ${lastName}`;
-      setUploadedByName(fullName);
-    } else {
-      navigate('/login');
-    }
-  }, [navigate]);
+    .toISOString()
+    .replace('Z', '+07:00');
+// เพิ่ม useEffect สำหรับอัพเดทเวลาทุกวินาที
+useEffect(() => {
+  const timer = setInterval(() => {
+    setCurrentTime(new Date());
+  }, 1000);
+  return () => clearInterval(timer);
+}, []);
+
+  // โหลดข้อมูลผู้ใช้จาก localStorage
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("userData"));
     if (userData) {
@@ -52,13 +49,24 @@ const Document = () => {
     }
   }, [navigate]);
 
-  // Effect for real-time clock
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     setCurrentTime(new Date());
-  //   }, 1000);
-  //   return () => clearInterval(timer);
-  // }, []);
+  // โหลดข้อมูลแผนกจาก API
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/departments");
+        if (response.ok) {
+          const data = await response.json();
+          setDepartments(data);
+        } else {
+          console.error("Failed to fetch departments");
+        }
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
 
   // Effect for notification
   useEffect(() => {
@@ -164,7 +172,7 @@ const Document = () => {
     formData.append("department", department);
     formData.append("date", bangkokTime);
     formData.append("description", description);
-    formData.append("uploadedBy", uploadedBy)
+    formData.append("uploadedBy", uploadedBy);
 
     try {
       const response = await fetch("http://localhost:3000/api/files/upload", {
@@ -182,6 +190,7 @@ const Document = () => {
         setFile(null);
         setName("");
         setType("");
+        setDepartment("");
         setDescription("");
         setUploadedFileName("");
         setFileMimeType("");
@@ -259,11 +268,11 @@ const Document = () => {
                   className={requiredFields.department ? "input-error" : ""}
                 >
                   <option value="">เลือกแผนก</option>
-                  <option value="การเงิน">การเงิน</option>
-                  <option value="ทรัพยากรบุคคล">ทรัพยากรบุคคล</option>
-                  <option value="ไอที">ไอที</option>
-                  <option value="การตลาด">การตลาด</option>
-                  <option value="อื่นๆ">อื่นๆ</option>
+                  {departments.map((dept) => (
+                    <option key={dept.department_id} value={dept.department_name}>
+                      {dept.department_name}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="form-item">
