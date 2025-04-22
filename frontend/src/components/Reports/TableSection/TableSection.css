@@ -26,19 +26,20 @@ tr {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    background-color: #d4d4d4;
-    color: white;
+    background-color: #ffffff;
+    border: 1px solid #BBBBBB;
+    color: rgb(0, 0, 0);
     border-radius: 15px;
     padding: 10px 15px;
     height: 35px;
     margin: 20px 10px 0 10px;
-    border: none;
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .pagination-button-report:hover:not(:disabled) {
-    background-color: #005a9e;
+    /* color: white; */
+    background-color: #ececec71;
 }
 
 .pagination-button-report:active:not(:disabled) {

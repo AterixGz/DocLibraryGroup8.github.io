@@ -383,22 +383,40 @@ app.get('/api/files/latest', async (req, res) => {
 });
 
 // Upload summary
-app.get("/api/uploads-summary", (req, res) => {
-  const uploadDir = path.join(__dirname, "uploads");
-  fs.readdir(uploadDir, (err, files) => {
-    if (err) {
-      console.error("Error reading uploads directory:", err);
-      return res.status(500).json({ error: "Unable to read uploads directory" });
-    }
-    const summary = {};
-    files.forEach((file) => {
-      const ext = path.extname(file).toUpperCase().replace(".", "");
-      summary[ext] = (summary[ext] || 0) + 1;
-    });
-    res.json(summary);
-  });
-});
+// Update the uploads-summary endpoint
+// Uploads by user - approved files only
 
+const uploadsDir = path.join(__dirname, 'uploads');
+
+app.get("/api/approved-file-extensions-from-folder", async (req, res) => {
+  try {
+    // ดึง url ของไฟล์ที่ status = 'approved' จากฐานข้อมูล
+    const dbResult = await pool.query(`
+      SELECT url FROM files WHERE status = 'approved'
+    `);
+
+    // นับจำนวนแต่ละนามสกุลไฟล์จาก url
+    const extCount = {};
+    dbResult.rows.forEach(row => {
+      const url = row.url;
+      const match = url.match(/\.([a-zA-Z0-9]+)(\?|$)/);
+      if (match) {
+        const ext = match[1].toUpperCase();
+        extCount[ext] = (extCount[ext] || 0) + 1;
+      }
+    });
+
+    // แปลงเป็น array และเรียงลำดับ
+    const result = Object.entries(extCount)
+      .map(([extension, count]) => ({ extension, count }))
+      .sort((a, b) => b.count - a.count);
+
+    res.json(result);
+  } catch (err) {
+    console.error("Error fetching approved file extensions from url:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 // Uploads by user - FIXED TIMEZONE
 app.get("/api/uploads-by-user", async (req, res) => {
   try {

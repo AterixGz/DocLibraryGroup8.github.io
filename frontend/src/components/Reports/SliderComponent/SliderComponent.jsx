@@ -9,34 +9,51 @@ const SliderComponent = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sliderStats, setSliderStats] = useState({
     slide1: { downloads: 0, totalDocuments: 0, websiteViews: 0 },
-    slide2: { doc2567: 0, doc2566: 0, doc2565: 0 },
+    slide2: { yearStats: [] },
     slide3: { weekDocuments: 0, yearDocuments: 0, monthDocuments: 0 },
   });
 
-  // ดึงข้อมูลไฟล์จาก API แล้วคำนวณสถิติ
   useEffect(() => {
     fetch("http://localhost:3000/api/files")
       .then((response) => response.json())
       .then((files) => {
         // สถิติสำหรับ Slide 1
         const totalDocuments = files.length;
-        const downloads = 0; // ยังไม่มีข้อมูลจริง
-        const websiteViews = 0; // ยังไม่มีข้อมูลจริง
+        const downloads = 0;
+        const websiteViews = 0;
 
-        // สถิติสำหรับ Slide 2 (เอกสารแต่ละปี)
-        // ใช้ document_date หากมี หากไม่มีก็ใช้ uploaded_at และแปลงเป็น พ.ศ.
-        const countByYear = { '2567': 0, '2566': 0, '2565': 0 };
-        // ภายใน useEffect หลังจาก forEach ของ countByYear
+        // สถิติสำหรับ Slide 2 (เอกสารย้อนหลัง 3 ปี)
+        const currentYear = new Date().getFullYear() + 543; // ปีปัจจุบันเป็น พ.ศ.
+        const countByYear = {
+          [currentYear]: 0,
+          [currentYear - 1]: 0,
+          [currentYear - 2]: 0
+        };
+
         files.forEach((file) => {
-          let date = file.document_date ? new Date(file.document_date) : new Date(file.uploaded_at);
-          if (!isNaN(date.getTime())) {
-            const beYear = date.getFullYear() + 543;
-            if (beYear === 2567) countByYear['2567']++;
-            else if (beYear === 2566) countByYear['2566']++;
-            else if (beYear === 2565) countByYear['2565']++;
+          const uploadDate = new Date(file.uploaded_at);
+          if (!isNaN(uploadDate.getTime())) {
+            const thaiYear = uploadDate.getFullYear() + 543;
+            if (countByYear.hasOwnProperty(thaiYear)) {
+              countByYear[thaiYear]++;
+            }
           }
         });
-        console.log("countByYear:", countByYear);
+
+        // เรียงปีจากปัจจุบันย้อนหลัง 3 ปี
+        const yearStats = Object.entries(countByYear)
+          .sort((a, b) => b[0] - a[0])
+          .map(([year, count]) => ({
+            year: year,
+            count: count
+          }));
+
+        setSliderStats(prev => ({
+          ...prev,
+          slide2: {
+            yearStats: yearStats
+          }
+        }));
 
         // สถิติสำหรับ Slide 3 ("เอกสารในปีนี้")
         const now = new Date();
@@ -56,7 +73,9 @@ const SliderComponent = () => {
 
         setSliderStats({
           slide1: { downloads, totalDocuments, websiteViews },
-          slide2: { doc2567: countByYear['2567'] || 0, doc2566: countByYear['2566'] || 0, doc2565: countByYear['2565'] || 0 },
+          slide2: {
+            yearStats: yearStats
+          },
           slide3: { weekDocuments, yearDocuments, monthDocuments },
         });
       })
@@ -80,12 +99,16 @@ const SliderComponent = () => {
       image: Image2,
       subtitle: 'สถิติ',
       title: 'เอกสารแต่ละปี',
-      description: 'ข้อมูลเอกสารแยกตามปี',
-      stats: [
-        { value: sliderStats.slide2.doc2567.toLocaleString(), label: 'เอกสารปี 2567', unit: 'ฉบับ' },
-        { value: sliderStats.slide2.doc2566.toLocaleString(), label: 'เอกสารปี 2566', unit: 'ฉบับ' },
-        { value: sliderStats.slide2.doc2565.toLocaleString(), label: 'เอกสารปี 2565', unit: 'ฉบับ' },
-      ],
+      description: 'ข้อมูลการอัพโหลดเอกสารแยกตามปี',
+      stats: sliderStats.slide2.yearStats ? sliderStats.slide2.yearStats.map(stat => ({
+        value: stat.count.toLocaleString(),
+        label: `เอกสารปี ${stat.year}`,
+        unit: 'ฉบับ'
+      })) : [
+        { value: '0', label: 'เอกสารปี -', unit: 'ฉบับ' },
+        { value: '0', label: 'เอกสารปี -', unit: 'ฉบับ' },
+        { value: '0', label: 'เอกสารปี -', unit: 'ฉบับ' }
+      ]
     },
     {
       image: Image3,
@@ -154,7 +177,7 @@ const SliderComponent = () => {
                 ))}
               </div>
               <p>
-                วันที่ {currentTime.toLocaleDateString("th-TH", { day: 'numeric', month: 'long', year: 'numeric' })}
+                วันที่ {currentTime.toLocaleDateString("th-TH", { day: 'numeric', month: 'long', year: 'numeric' })}{" "}
                 เวลา {currentTime.toLocaleTimeString("en-GB")} น.
               </p>
             </div>
