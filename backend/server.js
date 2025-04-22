@@ -8,7 +8,8 @@ const fs = require('fs');
 const bcrypt = require('bcrypt');
 const rateLimit = require('express-rate-limit');
 const cron = require('node-cron');
-
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swaggerOptions');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +18,620 @@ const authenticateToken = require('./middleware/authenticate');
 
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = process.env.SECRET_KEY || 'your-secret-key';
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+
+/**
+ * @swagger
+ * /api/test-db:
+ *   get:
+ *     summary: Test database connection
+ *     responses:
+ *       200:
+ *         description: Current database time
+ */
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Get all users
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of users
+ */
+/**
+ * @swagger
+ * /api/files:
+ *   get:
+ *     summary: Get all files
+ *     responses:
+ *       200:
+ *         description: List of files
+ */
+/**
+ * @swagger
+ * /api/files/user/{userId}:
+ *   get:
+ *     summary: Get files uploaded by a specific user
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: List of files by user
+ */
+/**
+ * @swagger
+ * /api/files/{id}:
+ *   put:
+ *     summary: Update file info
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: File ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *               department:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Updated file
+ */
+/**
+ * @swagger
+ * /api/files/upload:
+ *   post:
+ *     summary: Upload a file
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *               name:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *               department:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               uploadedBy:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: File uploaded
+ */
+/**
+ * @swagger
+ * /api/files/download/{filename}:
+ *   get:
+ *     summary: Download file by filename
+ *     parameters:
+ *       - in: path
+ *         name: filename
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: File name
+ *     responses:
+ *       200:
+ *         description: File download
+ */
+/**
+ * @swagger
+ * /api/files/{id}:
+ *   delete:
+ *     summary: Delete file permanently
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: File ID
+ *     responses:
+ *       200:
+ *         description: File deleted
+ */
+/**
+ * @swagger
+ * /api/login:
+ *   post:
+ *     summary: Login
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login success
+ */
+/**
+ * @swagger
+ * /api/roles:
+ *   get:
+ *     summary: Get all roles
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of roles
+ */
+/**
+ * @swagger
+ * /api/profile:
+ *   get:
+ *     summary: Get user profile
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User profile
+ */
+/**
+ * @swagger
+ * /api/files/latest:
+ *   get:
+ *     summary: Get latest files
+ *     responses:
+ *       200:
+ *         description: Latest files
+ */
+/**
+ * @swagger
+ * /api/approved-file-extensions-from-folder:
+ *   get:
+ *     summary: Get approved file extensions summary
+ *     responses:
+ *       200:
+ *         description: File extension summary
+ */
+/**
+ * @swagger
+ * /api/uploads-by-user:
+ *   get:
+ *     summary: Get uploads by user (last 30 days)
+ *     responses:
+ *       200:
+ *         description: Uploads by user
+ */
+/**
+ * @swagger
+ * /api/users/{id}/permissions:
+ *   get:
+ *     summary: Get user permissions by user ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: List of permissions
+ */
+/**
+ * @swagger
+ * /api/roles/{id}/permissions:
+ *   get:
+ *     summary: Get permissions by role ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Role ID
+ *     responses:
+ *       200:
+ *         description: List of permissions for role
+ *   post:
+ *     summary: Set permissions for role
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Role ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               permissions:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Permissions updated
+ */
+/**
+ * @swagger
+ * /api/permissions:
+ *   get:
+ *     summary: Get all permissions
+ *     responses:
+ *       200:
+ *         description: List of permissions
+ */
+/**
+ * @swagger
+ * /api/files/soft-delete/{id}:
+ *   delete:
+ *     summary: Soft delete file (move to trash)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: File ID
+ *     responses:
+ *       200:
+ *         description: File moved to trash
+ */
+/**
+ * @swagger
+ * /api/files/restore/{id}:
+ *   put:
+ *     summary: Restore file from trash
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Trash file ID
+ *     responses:
+ *       200:
+ *         description: File restored
+ */
+/**
+ * @swagger
+ * /api/files/permanent-delete/{id}:
+ *   delete:
+ *     summary: Permanently delete file from trash
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Trash file ID
+ *     responses:
+ *       200:
+ *         description: File permanently deleted
+ */
+/**
+ * @swagger
+ * /api/files/trash:
+ *   get:
+ *     summary: Get trash files for user
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: Trash files
+ */
+/**
+ * @swagger
+ * /api/files/approved:
+ *   get:
+ *     summary: Get all approved files
+ *     responses:
+ *       200:
+ *         description: Approved files
+ */
+/**
+ * @swagger
+ * /api/files/approve/{id}:
+ *   put:
+ *     summary: Approve or reject file
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: File ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [approved, rejected]
+ *               reason:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: File status updated
+ */
+/**
+ * @swagger
+ * /api/users/create:
+ *   post:
+ *     summary: Create user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               first_name:
+ *                 type: string
+ *               last_name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               department:
+ *                 type: string
+ *               role_id:
+ *                 type: integer
+ *               employee_id:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User created
+ */
+/**
+ * @swagger
+ * /api/departments:
+ *   get:
+ *     summary: Get all departments
+ *     responses:
+ *       200:
+ *         description: List of departments
+ */
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   put:
+ *     summary: Update user
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               first_name:
+ *                 type: string
+ *               last_name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               department:
+ *                 type: string
+ *               role_id:
+ *                 type: integer
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User updated
+ *   delete:
+ *     summary: Delete user
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User deleted
+ */
+/**
+ * @swagger
+ * /api/profile/{id}:
+ *   put:
+ *     summary: Update own profile
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               first_name:
+ *                 type: string
+ *               last_name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               avatar:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Profile updated
+ */
+/**
+ * @swagger
+ * /api/profile/upload-avatar/{id}:
+ *   post:
+ *     summary: Upload avatar
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Avatar uploaded
+ */
+/**
+ * @swagger
+ * /api/request-otp:
+ *   post:
+ *     summary: Request OTP for password reset
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: OTP sent
+ */
+/**
+ * @swagger
+ * /api/verify-otp:
+ *   post:
+ *     summary: Verify OTP
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               otp:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: OTP valid
+ */
+/**
+ * @swagger
+ * /api/reset-password:
+ *   post:
+ *     summary: Reset password with OTP
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               otp:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password reset
+ */
+/**
+ * @swagger
+ * /api/website-view:
+ *   post:
+ *     summary: Record website view
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: View recorded
+ */
+/**
+ * @swagger
+ * /api/website-views/count:
+ *   get:
+ *     summary: Get website views count
+ *     responses:
+ *       200:
+ *         description: Website views count
+ */
 
 // Middleware
 app.use(cors());
