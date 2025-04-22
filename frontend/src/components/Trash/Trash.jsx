@@ -124,7 +124,7 @@ const TrashPage = () => {
                 <td>{doc.type}</td>
                 <td>{doc.date}</td>
                 <td>{doc.department}</td>
-                <td>{new Date(doc.deleted_at).toLocaleString("th-TH")}</td>
+                <td>{doc.deleted_at}</td>
                 <td>
                   <button
                     className="trashpage-btn-restore"

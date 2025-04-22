@@ -26,6 +26,15 @@ const Document = () => {
   const bangkokTime = new Date(currentTime.getTime() - (currentTime.getTimezoneOffset() * 60000))
     .toISOString()
     .replace('Z', '+07:00');
+
+//     const thaiYear = currentTime.getFullYear() + 543;
+// const month = currentTime.getMonth() + 1;
+// const day = currentTime.getDate();
+// const hours = currentTime.getHours();
+// const minutes = currentTime.getMinutes();
+// const seconds = currentTime.getSeconds();
+// const bangkokTime = `${thaiYear}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')} ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}+07:00`;
+
 // เพิ่ม useEffect สำหรับอัพเดทเวลาทุกวินาที
 useEffect(() => {
   const timer = setInterval(() => {

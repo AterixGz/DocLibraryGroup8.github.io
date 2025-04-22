@@ -94,6 +94,7 @@ app.get("/api/users", async (req, res) => {
 
 //Home
 // Get all files - FIXED TIMEZONE
+// แก้ไขส่วนของ Get all files
 app.get('/api/files', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -184,6 +185,7 @@ app.put('/api/files/:id', async (req, res) => {
 
 
 // Upload file route - FIXED TIMEZONE
+// แก้ไขที่ฟังก์ชัน upload file route
 app.post('/api/files/upload', upload.single('file'), async (req, res) => {
   const file = req.file;
   const { name, type, department, date, description, uploadedBy } = req.body;
@@ -194,13 +196,32 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
 
   try {
     const url = `http://localhost:3000/uploads/${file.filename}`;
+    
+    // แปลงวันที่จาก ค.ศ. เป็น พ.ศ.
+    let documentDate = date;
+    if (date) {
+      const dateObj = new Date(date);
+      if (!isNaN(dateObj.getTime())) {
+        // เพิ่ม 543 ปีเข้าไปในปี ค.ศ. เพื่อให้เป็น พ.ศ.
+        const thaiYear = dateObj.getFullYear() + 543;
+        const month = dateObj.getMonth() + 1;
+        const day = dateObj.getDate();
+        const hours = dateObj.getHours();
+        const minutes = dateObj.getMinutes();
+        
+        // จัดรูปแบบเป็น YYYY-MM-DD HH:MM สำหรับเก็บในฐานข้อมูล
+        documentDate = `${thaiYear}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')} ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      }
+    }
 
+    // ใช้ฟังก์ชัน NOW() ของ PostgreSQL และแปลงเป็น พ.ศ. โดยใช้ฟังก์ชันของ PostgreSQL
     const result = await pool.query(
       `INSERT INTO files 
         (filename, url, file_type, department, document_date, description, uploaded_by, uploaded_at, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), 'pending')
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 
+        (NOW() AT TIME ZONE 'Asia/Bangkok')::timestamp + INTERVAL '543 years', 'pending')
        RETURNING *`,
-      [name || file.originalname, url, type, department, date, description, uploadedBy]
+      [name || file.originalname, url, type, department, documentDate, description, uploadedBy]
     );
 
     const fileData = result.rows[0];
@@ -212,7 +233,6 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
     res.status(500).json({ message: 'Failed to upload file' });
   }
 });
-
 // Download file route
 app.get('/api/files/download/:filename', async (req, res) => {
   const filename = req.params.filename;
@@ -566,6 +586,7 @@ app.get("/api/users", authenticateToken, async (req, res) => {
 });
 
 // Soft delete - FIXED TIMEZONE
+// Soft delete - FIXED TIMEZONE
 app.delete('/api/files/soft-delete/:id', async (req, res) => {
   const { id } = req.params;
   console.log("👉 Soft delete request for ID:", id);
@@ -583,7 +604,8 @@ app.delete('/api/files/soft-delete/:id', async (req, res) => {
     await pool.query(`
       INSERT INTO deleted_files 
       (original_file_id, filename, url, uploaded_by, uploaded_at, file_type, department, document_date, description, deleted_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 
+        (NOW() AT TIME ZONE 'Asia/Bangkok')::timestamp + INTERVAL '543 years')
     `, [
       file.id, file.filename, file.url, file.uploaded_by, file.uploaded_at,
       file.file_type, file.department, file.document_date, file.description
@@ -597,7 +619,6 @@ app.delete('/api/files/soft-delete/:id', async (req, res) => {
     res.status(500).send('Soft delete failed');
   }
 });
-
 // Restore file - FIXED TIMEZONE
 app.put('/api/files/restore/:id', async (req, res) => {
   const { id } = req.params;
