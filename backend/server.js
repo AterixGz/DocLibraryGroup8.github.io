@@ -841,6 +841,113 @@ app.post('/api/profile/upload-avatar/:id', avatarUpload.single('avatar'), async 
   }
 });
 
+app.post("/api/request-otp", async (req, res) => {
+  const { email } = req.body;
+  const nodemailer = require("nodemailer");
+
+  try {
+    // ✅ ตรวจสอบว่ามี user จริง
+    const userRes = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    const user = userRes.rows[0];
+    if (!user) return res.status(404).json({ message: "ไม่พบบัญชีอีเมลนี้" });
+
+    // ✅ สร้าง OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = new Date(Date.now() + 5 * 60 * 1000); // หมดอายุใน 5 นาที
+
+    // ✅ บันทึก OTP ลง DB
+    await pool.query(
+      "INSERT INTO password_resets (user_id, email, otp_code, expires_at) VALUES ($1, $2, $3, $4)",
+      [user.id, email, otp, expires]
+    );
+
+    // ✅ สร้าง transporter ด้วย Gmail
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    // ✅ ตรวจสอบว่า transporter พร้อมใช้
+    await transporter.verify();
+
+    // ✅ ส่งอีเมลจริง
+    const mailOptions = {
+      from: `"ระบบ OTP" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "รหัส OTP สำหรับรีเซ็ตรหัสผ่าน",
+      html: `
+        <div style="font-family: Arial, sans-serif;">
+          <h2>สวัสดีคุณ ${user.first_name || ''} ${user.last_name || ''}</h2>
+          <p>รหัส OTP สำหรับรีเซ็ตรหัสผ่านของคุณคือ:</p>
+          <h1 style="color: #1d72b8;">${otp}</h1>
+          <p>รหัสนี้จะหมดอายุใน 5 นาที</p>
+        </div>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log("✅ Email sent:", info.response);
+    res.json({ message: "ส่ง OTP ไปยังอีเมลเรียบร้อยแล้ว" });
+  } catch (err) {
+    console.error("❌ OTP ส่งไม่สำเร็จ:", err);
+    res.status(500).json({ message: "เกิดข้อผิดพลาดขณะส่ง OTP" });
+  }
+});
+
+
+app.post("/api/verify-otp", async (req, res) => {
+  const { email, otp } = req.body;
+  try {
+    const result = await pool.query(
+      `SELECT * FROM password_resets 
+       WHERE email = $1 AND otp_code = $2 AND expires_at > NOW()
+       ORDER BY created_at DESC LIMIT 1`,
+      [email, otp]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(400).json({ message: "OTP ไม่ถูกต้องหรือหมดอายุ" });
+    }
+
+    res.json({ message: "OTP ถูกต้อง" });
+  } catch (err) {
+    console.error("OTP verify error:", err);
+    res.status(500).json({ message: "เกิดข้อผิดพลาด" });
+  }
+});
+
+app.post("/api/reset-password", async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+
+  try {
+    const result = await pool.query(
+      `SELECT * FROM password_resets 
+       WHERE email = $1 AND otp_code = $2 AND expires_at > NOW()
+       ORDER BY created_at DESC LIMIT 1`,
+      [email, otp]
+    );
+
+    const resetRequest = result.rows[0];
+    if (!resetRequest) {
+      return res.status(400).json({ message: "OTP ไม่ถูกต้องหรือหมดอายุ" });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+
+    await pool.query("UPDATE users SET password = $1 WHERE email = $2", [hashed, email]);
+    await pool.query("DELETE FROM password_resets WHERE email = $1", [email]); // ลบ OTP หลังใช้
+
+    res.json({ message: "รีเซ็ตรหัสผ่านเรียบร้อยแล้ว" });
+  } catch (err) {
+    console.error("Reset password error:", err);
+    res.status(500).json({ message: "เกิดข้อผิดพลาด" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
 });

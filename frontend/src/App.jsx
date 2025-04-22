@@ -14,7 +14,7 @@ import RemoveFileReport from "./components/Reports/removeFileList/removeFile";
 import Help from "./components/Help/Help";
 import Profile from "./components/Profile/Profile";
 import Login from "./page/Login/Login";
-import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
+import ResetPassword from "./components/ResetPassword/ResetPassword.jsx";
 import MyDocument from "./components/MyDocument/MyDocument";
 import AboutMe from "./components/Aboutme/Aboutme";
 import Trash from "./components/Trash/Trash";
@@ -49,7 +49,7 @@ function AppRoutes() {
           } />
 
           <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/forgot-password" element={<ResetPassword />} />
 
           {/* ✅ เฉพาะเมื่อ login แล้ว */}
           {role !== "guest" && (
