@@ -44,7 +44,7 @@ function TableSection() {
   // ฟังก์ชั่นสำหรับจัดรูปแบบวันที่
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("th-TH");
+    return date.toLocaleDateString("en-TH");
   };
 
   // Pagination calculations
@@ -81,9 +81,14 @@ function TableSection() {
               </tr>
             ))
           ) : (
-            <tr>
-              <td colSpan="3">Loading...</td>
-            </tr>
+            // สร้าง 4 แถวว่าง
+            Array.from({ length: 4 }).map((_, idx) => (
+              <tr key={idx} className="border-bottom-document-report">
+                <td style={{ textAlign: "left", color: "#ccc" }}>-</td>
+                <td style={{ color: "#ccc" }}>-</td>
+                <td style={{ color: "#ccc" }}>-</td>
+              </tr>
+            ))
           )}
         </tbody>
       </table>
@@ -124,4 +129,4 @@ function TableSection() {
   );
 }
 
-export default TableSection;  
+export default TableSection;

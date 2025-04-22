@@ -33,16 +33,17 @@ function FileSummary() {
           <li>Loading...</li>
         )}
       </ul>
-      <p className="title-filesummary">
-        รายชื่อผู้ที่อัพโหลดมากที่สุด
-      </p>
+      <p className="title-filesummary">รายชื่อผู้ที่อัพโหลดมากที่สุด</p>
       <ul>
         {uploadsByUser.length ? (
-          uploadsByUser.slice(0, 3).map((item, index) => (
-            <li key={index}>
-              {item.uploader}: {item.count} ฉบับ
-            </li>
-          ))
+          uploadsByUser
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 3)
+            .map((item, index) => (
+              <li key={index}>
+                {item.uploader}: {item.count} ฉบับ
+              </li>
+            ))
         ) : (
           <li>Loading...</li>
         )}

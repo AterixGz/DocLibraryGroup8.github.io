@@ -9,8 +9,6 @@ import Administrator from "./components/Administrator/Administrator";
 import Document from "./components/Document/Document";
 import Permission from "./components/Permission/Permission";
 import Reports from "./components/Reports/Reports";
-import AddFileReport from "./components/Reports/addFileList/addFile";
-import RemoveFileReport from "./components/Reports/removeFileList/removeFile";
 import Help from "./components/Help/Help";
 import Profile from "./components/Profile/Profile";
 import Login from "./page/Login/Login";
@@ -19,6 +17,7 @@ import MyDocument from "./components/MyDocument/MyDocument";
 import AboutMe from "./components/Aboutme/Aboutme";
 import Trash from "./components/Trash/Trash";
 import ApprovePage from "./components/Approve/ApprovePage.jsx";
+import DocumentList from "./components/Reports/Documentlist/DocumentList"; // เพิ่มบรรทัดนี้
 
 import { FileProvider } from "./components/FileContext/FileContext";
 import { AuthProvider, AuthContext } from "./contexts/AuthContext.jsx";
@@ -51,11 +50,14 @@ function AppRoutes() {
       <div className="content-container">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/home" element={
-            <PermissionProtectedRoute requiredPermission="document_access">
-              <Home />
-            </PermissionProtectedRoute>
-          } />
+          <Route
+            path="/home"
+            element={
+              <PermissionProtectedRoute requiredPermission="document_access">
+                <Home />
+              </PermissionProtectedRoute>
+            }
+          />
 
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ResetPassword />} />
@@ -65,56 +67,75 @@ function AppRoutes() {
             <>
               <Route path="/administrator" element={<Administrator />} />
 
-              <Route path="/my-document" element={
-                <PermissionProtectedRoute requiredPermission="document_manage">
-                  <MyDocument />
-                </PermissionProtectedRoute>
-              } />
+              <Route
+                path="/my-document"
+                element={
+                  <PermissionProtectedRoute requiredPermission="document_manage">
+                    <MyDocument />
+                  </PermissionProtectedRoute>
+                }
+              />
 
-              <Route path="/document" element={
-                <PermissionProtectedRoute requiredPermission="document_manage">
-                  <Document />
-                </PermissionProtectedRoute>
-              } />
+              <Route
+                path="/document"
+                element={
+                  <PermissionProtectedRoute requiredPermission="document_manage">
+                    <Document />
+                  </PermissionProtectedRoute>
+                }
+              />
 
-              <Route path="/trash" element={
-                <PermissionProtectedRoute requiredPermission="document_manage">
-                  <Trash />
-                </PermissionProtectedRoute>
-              } />
+              <Route
+                path="/trash"
+                element={
+                  <PermissionProtectedRoute requiredPermission="document_manage">
+                    <Trash />
+                  </PermissionProtectedRoute>
+                }
+              />
 
-              <Route path="/approve" element={
-                <PermissionProtectedRoute requiredPermission="document_approve">
-                  <ApprovePage />
-                </PermissionProtectedRoute>
-              } />
+              <Route
+                path="/approve"
+                element={
+                  <PermissionProtectedRoute requiredPermission="document_approve">
+                    <ApprovePage />
+                  </PermissionProtectedRoute>
+                }
+              />
 
-              <Route path="/permission" element={
-                <PermissionProtectedRoute requiredPermission="user_admin">
-                  <Permission />
-                </PermissionProtectedRoute>
-              } />
+              <Route
+                path="/permission"
+                element={
+                  <PermissionProtectedRoute requiredPermission="user_admin">
+                    <Permission />
+                  </PermissionProtectedRoute>
+                }
+              />
 
-              <Route path="/reports" element={
-                <PermissionProtectedRoute requiredPermission="report_access">
-                  <Reports />
-                </PermissionProtectedRoute>
-              } />
+              <Route
+                path="/reports"
+                element={
+                  <PermissionProtectedRoute requiredPermission="report_access">
+                    <Reports />
+                  </PermissionProtectedRoute>
+                }
+              />
 
-              <Route path="/reports/addfilelist" element={
-                <PermissionProtectedRoute requiredPermission="report_access">
-                  <AddFileReport />
-                </PermissionProtectedRoute>
-              } />
+              <Route
+                path="/reports/documentlist"
+                element={
+                  <PermissionProtectedRoute requiredPermission="report_access">
+                    <DocumentList role={role} />
+                  </PermissionProtectedRoute>
+                }
+              />
 
-              <Route path="/reports/removefilelist" element={
-                <PermissionProtectedRoute requiredPermission="report_access">
-                  <RemoveFileReport />
-                </PermissionProtectedRoute>
-              } />
 
               <Route path="/help" element={<Help />} />
-              <Route path="/profile" element={<Profile username={username} />} />
+              <Route
+                path="/profile"
+                element={<Profile username={username} />}
+              />
               <Route path="/about-me" element={<AboutMe />} />
             </>
           )}

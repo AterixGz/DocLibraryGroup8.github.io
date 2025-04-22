@@ -38,7 +38,9 @@ function Profile() {
             last_name: res.data.last_name || "",
             email: res.data.email || "",
           });
-          setAvatarPreview(res.data.avatar || "http://localhost:3000/Avatar/user.jpg");
+          setAvatarPreview(
+            res.data.avatar || "http://localhost:3000/Avatar/user.jpg"
+          );
         })
         .catch((err) => {
           console.error("Failed to load profile:", err);
@@ -139,9 +141,16 @@ function Profile() {
       <h1 className="profile__header">โปรไฟล์</h1>
       <hr className="dividermain" />
 
-      <div className="profile__avatar-container">
+      <div
+        className="profile__avatar-container"
+        style={{ position: "relative" }}
+      >
         <label htmlFor="avatar-upload" className="profile__avatar-label">
           <img src={avatarPreview} alt="Profile" className="profile__avatar" />
+          <i
+            className="fi fi-rr-pencil profile__avatar-edit"
+            title="เปลี่ยนรูปโปรไฟล์"
+          ></i>
         </label>
         <input
           id="avatar-upload"
@@ -204,7 +213,7 @@ function Profile() {
           className="profile__save-button"
           onClick={() => setShowConfirm(true)}
         >
-          💾 บันทึก
+          บันทึก
         </button>
 
         {showConfirm && (

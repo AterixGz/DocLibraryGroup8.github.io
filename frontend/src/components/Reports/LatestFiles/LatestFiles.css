@@ -31,3 +31,18 @@
 .button-see-more:active {
     background-color: #dadada;
 }
+
+.filename-ellipsis-department {
+    max-width: 180px;      /* ปรับตามความเหมาะสม */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+
+.filename-ellipsis-filename {
+    max-width: 180px;      /* ปรับตามความเหมาะสม */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }

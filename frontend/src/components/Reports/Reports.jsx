@@ -3,10 +3,11 @@ import { useLocation } from 'react-router-dom';
 import SliderComponent from "./SliderComponent/SliderComponent"
 import FileSummary from "./FileSummary/FileSummary";
 import LatestFiles from "./LatestFiles/LatestFiles";
-import RemoveLatestFiles from "./LatestFiles/RemoveLatestFiles";
+import DocumentList from './DocumentList/DocumentList';
 import './Reports.css';
 import TableSection from "./TableSection/TableSection";
 import { motion } from 'framer-motion'
+
 
 const Reports = () => {
   const location = useLocation();
@@ -31,7 +32,7 @@ const Reports = () => {
               <LatestFiles title="ไฟล์ที่เพิ่มล่าสุด" />
             </div>
             <div className="Document-Delete">
-              <RemoveLatestFiles title="ไฟล์ที่ลบล่าสุด" />
+            <LatestFiles title="ไฟล์ที่ลบล่าสุด" />
             </div>
           </div>
         </div>

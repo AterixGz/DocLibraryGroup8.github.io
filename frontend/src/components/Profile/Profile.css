@@ -22,7 +22,34 @@
 .profile__avatar-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 3rem;  /* Adjusted the margin for better spacing */
+  margin-bottom: 2rem;
+}
+
+.profile__avatar-label {
+  position: relative;
+  display: inline-block;
+}
+
+.profile__avatar-edit {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  background: #fff;
+  height: 35px;
+  width: 35px;
+  color: #F14D31;
+  border-radius: 50%;
+  padding: 7px;
+  font-size: 1.3rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  z-index: 2;
+}
+
+.profile__avatar-edit:hover {
+  background: #F14D31;
+  color: #fff;
 }
 
 .profile__avatar {
@@ -156,9 +183,6 @@
   transition: transform 0.3s ease-in-out;
 }
 
-.profile__avatar:hover {
-  transform: rotate(10deg) scale(1.1);
-}
 
 /* Divider */
 .dividermain {
@@ -183,7 +207,14 @@
   box-shadow: 0 0 5px rgba(255, 77, 2, 0.3);
 }
 
-
+.profile__form-group input[readonly]:hover,
+.profile__form-group input[readonly]:focus,
+.profile__form-group input:disabled:hover,
+.profile__form-group input:disabled:focus {
+  border-color: #ddd !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+}
 
 /* ปุ่มเลือกภาพซ่อนอยู่ */
 #avatar-upload {
@@ -198,13 +229,9 @@
   object-fit: cover;
   border: 3px solid #F14D31;
   cursor: pointer;
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  /* transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; */
 }
 
-.profile__avatar:hover {
-  transform: scale(1.1);
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-}
 
 /* ตัวห่อภาพ */
 .profile__avatar-container {
