@@ -7,6 +7,8 @@ const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcrypt');
 const rateLimit = require('express-rate-limit');
+const cron = require('node-cron');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,6 +44,40 @@ pool.on('connect', (client) => {
   client.query('SET timezone = "Asia/Bangkok"');
 });
 
+const cleanupTrash = async () => {
+  console.log('🧹 เริ่มทำความสะอาดถังขยะ...');
+  try {
+    // หาไฟล์ที่อยู่ในถังขยะเกิน 30 วัน
+    const result = await pool.query(`
+      SELECT id, url 
+      FROM deleted_files 
+      WHERE deleted_at < NOW() - INTERVAL '30 days'
+    `);
+    
+    if (result.rows.length === 0) {
+      console.log('✅ ไม่พบไฟล์ที่ต้องลบ');
+      return;
+    }
+    
+    console.log(`🗑️ พบไฟล์ที่ต้องลบ ${result.rows.length} ไฟล์`);
+    
+    // ลบไฟล์จริงในระบบไฟล์
+    for (const file of result.rows) {
+      const filePath = path.join(__dirname, 'uploads', path.basename(file.url));
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        console.log(`🗑️ ลบไฟล์: ${path.basename(file.url)}`);
+      }
+      
+      // ลบข้อมูลไฟล์จากฐานข้อมูล
+      await pool.query('DELETE FROM deleted_files WHERE id = $1', [file.id]);
+    }
+    
+    console.log(`✅ ลบไฟล์ทั้งหมด ${result.rows.length} ไฟล์เรียบร้อยแล้ว`);
+  } catch (err) {
+    console.error('❌ เกิดข้อผิดพลาดในการทำความสะอาดถังขยะ:', err);
+  }
+};
 // Helper function to format dates consistently
 const formatDate = (date) => {
   if (!date) return null;
@@ -164,24 +200,16 @@ app.get('/api/files/user/:userId', async (req, res) => {
 // Update file route
 app.put('/api/files/:id', async (req, res) => {
   const fileId = req.params.id;
-  const { name, type, department, date } = req.body;
+  const { name, type, date, department } = req.body;
 
   try {
-    let query = `
-      UPDATE files 
-      SET filename = $1, file_type = $2, department = $3
-    `;
-    const values = [name, type, department];
-
-    if (date) {
-      query += `, document_date = $4 WHERE id = $5 RETURNING *`;
-      values.push(date, fileId);
-    } else {
-      query += ` WHERE id = $4 RETURNING *`;
-      values.push(fileId);
-    }
-
-    const result = await pool.query(query, values);
+    const result = await pool.query(
+      `UPDATE files 
+       SET filename = $1, file_type = $2, document_date = $3, department = $4 
+       WHERE id = $5 
+       RETURNING *`,
+      [name, type, date, department, fileId]
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'File not found' });
@@ -196,7 +224,6 @@ app.put('/api/files/:id', async (req, res) => {
     res.status(500).json({ message: 'Failed to update file' });
   }
 });
-
 
 
 // Upload file route - FIXED TIMEZONE
@@ -600,7 +627,7 @@ app.get("/api/users", authenticateToken, async (req, res) => {
   }
 });
 
-// Soft delete - FIXED TIMEZONE
+
 // Soft delete - FIXED TIMEZONE
 app.delete('/api/files/soft-delete/:id', async (req, res) => {
   const { id } = req.params;
@@ -699,7 +726,26 @@ app.delete('/api/files/permanent-delete/:id', async (req, res) => {
     res.status(500).send('Permanent delete failed');
   }
 });
-
+app.post('/api/admin/cleanup-trash', authenticateToken, async (req, res) => {
+  try {
+    // ตรวจสอบว่าผู้ใช้เป็น admin หรือไม่
+    const userRole = req.user.role;
+    if (userRole !== 'admin') {
+      return res.status(403).json({ message: 'ไม่มีสิทธิ์เข้าถึง' });
+    }
+    
+    await cleanupTrash();
+    res.json({ message: 'ลบไฟล์ในถังขยะที่เกิน 30 วันเรียบร้อยแล้ว' });
+  } catch (err) {
+    console.error('Error in manual trash cleanup:', err);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดในการลบไฟล์ในถังขยะ' });
+  }
+});
+// Cleanup trash - FIXED TIMEZONE
+cron.schedule('0 0 * * *', () => {
+  console.log('🕛 เริ่มงานทำความสะอาดถังขยะประจำวัน');
+  cleanupTrash();
+});
 // Get trash - FIXED TIMEZONE
 app.get('/api/files/trash', async (req, res) => {
   const userId = req.query.userId;
@@ -718,11 +764,23 @@ app.get('/api/files/trash', async (req, res) => {
                description, 
                uploaded_by,
                TO_CHAR(uploaded_at, 'YYYY-MM-DD HH24:MI') AS uploaded_at,
-               TO_CHAR(deleted_at, 'YYYY-MM-DD HH24:MI') AS deleted_at
+               TO_CHAR(deleted_at, 'YYYY-MM-DD HH24:MI') AS deleted_at,
+               deleted_at AS raw_deleted_at,
+               (deleted_at + INTERVAL '30 days') AS expiry_date,
+               TO_CHAR((deleted_at + INTERVAL '30 days'), 'YYYY-MM-DD HH24:MI') AS formatted_expiry_date,
+               -- แก้การคำนวณวันที่เหลือ โดยใช้ NOW() เทียบกับวันหมดอายุโดยตรง
+               EXTRACT(DAY FROM ((deleted_at + INTERVAL '30 days') - (NOW() AT TIME ZONE 'Asia/Bangkok')::timestamp)) AS days_left
         FROM deleted_files 
         WHERE uploaded_by = $1
         ORDER BY deleted_at DESC
       `, [userId]);
+
+      // เพิ่มข้อมูลวันหมดอายุและจำนวนวันที่เหลือ
+      result.rows = result.rows.map(row => ({
+        ...row,
+        days_left: Math.ceil(row.days_left),
+        will_delete_soon: row.days_left <= 7
+      }));
     } else {
       return res.status(400).json({ message: 'Missing user ID' });
     }

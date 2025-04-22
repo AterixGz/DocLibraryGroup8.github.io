@@ -32,6 +32,7 @@ const TrashPage = () => {
   useEffect(() => {
     fetchTrash();
   }, [userId]);
+  
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -39,6 +40,7 @@ const TrashPage = () => {
   
     return () => clearInterval(timer);
   }, []);
+  
   const handlePreview = (fileUrl) => {
     if (!fileUrl) {
       setAlertMessage("ไม่พบ URL สำหรับ preview");
@@ -86,10 +88,40 @@ const TrashPage = () => {
       setConfirmDeleteId(null);
     }
   };
+  const getRemainingDaysText = (file) => {
+    // คำนวณจำนวนวันที่เหลือด้วยตัวเอง
+    const expiryDate = new Date(file.formatted_expiry_date);
+    
+    // แปลงจาก พ.ศ. เป็น ค.ศ.
+    expiryDate.setFullYear(expiryDate.getFullYear() - 543);
+    
+    const now = new Date();
+    const diffTime = expiryDate - now;
+    const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    
+    if (daysLeft <= 0) {
+      return <span className="trashpage-expire-critical">จะถูกลบเร็วๆ นี้</span>;
+    } else if (daysLeft === 1) {
+      return <span className="trashpage-expire-critical">จะถูกลบภายใน 1 วัน</span>;
+    } else if (daysLeft <= 7) {
+      return <span className="trashpage-expire-warning">จะถูกลบภายใน {daysLeft} วัน</span>;
+    } else {
+      return <span className="trashpage-expire-normal">จะถูกลบภายใน {daysLeft} วัน</span>;
+    }
+    
+  };
+
 
   return (
     <div className="trashpage-container">
       <h1 className="trashpage-title">ถังขยะเอกสาร</h1>
+      
+      <div className="trashpage-info-banner">
+        <i className="bi bi-info-circle"></i>
+        <span>ไฟล์ในถังขยะจะถูกลบอัตโนมัติหลังจาก 30 วัน</span>
+      </div>
+      
       {loading ? (
         <p>กำลังโหลด...</p>
       ) : deletedFiles.length === 0 ? (
@@ -103,12 +135,13 @@ const TrashPage = () => {
               <th>วันที่ลง</th>
               <th>หน่วยงาน</th>
               <th>วันที่ลบ</th>
+              <th>สถานะ</th>
               <th>การดำเนินการ</th>
             </tr>
           </thead>
           <tbody>
             {deletedFiles.map((doc) => (
-              <tr key={doc.id}>
+              <tr key={doc.id} className={doc.days_left <= 7 ? "trashpage-row-expire-soon" : ""}>
                 <td>
                   <a
                     href="#"
@@ -125,6 +158,7 @@ const TrashPage = () => {
                 <td>{doc.date}</td>
                 <td>{doc.department}</td>
                 <td>{doc.deleted_at}</td>
+                <td>{getRemainingDaysText(doc)}</td>
                 <td>
                   <button
                     className="trashpage-btn-restore"
