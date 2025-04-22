@@ -6,6 +6,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcrypt');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,7 +22,12 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/Avatar', express.static(path.join(__dirname, 'Avatar')));
 
-
+// จำกัด 1 request ต่อ 10 วินาที ต่อ IP สำหรับการนับ view
+const viewLimiter = rateLimit({
+  windowMs: 10 * 1000, // 10 วินาที
+  max: 1, // 1 ครั้งต่อ window
+  message: { error: 'Too many views from this IP, please try again later.' }
+});
 
 // PostgreSQL connection
 const pool = new Pool({
@@ -998,6 +1004,42 @@ app.post("/api/reset-password", async (req, res) => {
   } catch (err) {
     console.error("Reset password error:", err);
     res.status(500).json({ message: "เกิดข้อผิดพลาด" });
+  }
+});
+
+function isBot(userAgent) {
+  return /bot|crawl|spider|slurp|curl|wget|python|scrapy/i.test(userAgent);
+}
+
+app.post('/api/website-view', viewLimiter, async (req, res) => {
+  const { user_id } = req.body;
+  const userAgent = req.headers['user-agent'] || '';
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+  // กัน bot/crawler
+  if (isBot(userAgent)) {
+    return res.status(200).json({ message: 'Bot ignored' });
+  }
+
+  try {
+    await pool.query(
+      `INSERT INTO website_views (user_id, user_agent, ip_address) VALUES ($1, $2, $3)`,
+      [user_id || null, userAgent, ip]
+    );
+    res.json({ message: 'View recorded' });
+  } catch (err) {
+    console.error('Error recording website view:', err);
+    res.status(500).json({ error: 'Failed to record view' });
+  }
+});
+
+app.get('/api/website-views/count', async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT COUNT(*) AS count FROM website_views`);
+    res.json({ count: parseInt(result.rows[0].count) });
+  } catch (err) {
+    console.error('Error fetching website views count:', err);
+    res.status(500).json({ error: 'Failed to fetch count' });
   }
 });
 

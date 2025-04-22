@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -33,6 +33,15 @@ function AppRoutes() {
     logout();
     window.location.href = "/login";
   };
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    fetch("http://localhost:3000/api/website-view", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: userData?.id }),
+    });
+  }, []);
 
   return (
     <div className="d-flex">

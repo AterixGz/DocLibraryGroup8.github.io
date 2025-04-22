@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './SliderComponent.css';
 
 import Image1 from '../ReportsImage/LaptopBG.jpg';
@@ -13,74 +13,75 @@ const SliderComponent = () => {
     slide3: { weekDocuments: 0, yearDocuments: 0, monthDocuments: 0 },
   });
 
+  const intervalRef = useRef(null);
+
   useEffect(() => {
+    let downloads = 0;
+    let totalDocuments = 0;
+
+    // ดึงข้อมูลไฟล์
     fetch("http://localhost:3000/api/files")
       .then((response) => response.json())
       .then((files) => {
-        // รวมยอดดาวน์โหลด
-        const downloads = files.reduce(
+        downloads = files.reduce(
           (sum, file) => sum + (file.download_count || 0),
           0
         );
-        const totalDocuments = files.length;
-        const websiteViews = 0;
+        totalDocuments = files.length;
 
-        // สถิติสำหรับ Slide 2 (เอกสารย้อนหลัง 3 ปี)
-        const currentYear = new Date().getFullYear() + 543; // ปีปัจจุบันเป็น พ.ศ.
-        const countByYear = {
-          [currentYear]: 0,
-          [currentYear - 1]: 0,
-          [currentYear - 2]: 0
-        };
+        // ดึงยอดเข้าชมเว็บไซต์
+        fetch("http://localhost:3000/api/website-views/count")
+          .then((res) => res.json())
+          .then((viewData) => {
+            const websiteViews = viewData.count || 0;
 
-        files.forEach((file) => {
-          const uploadDate = new Date(file.uploaded_at);
-          if (!isNaN(uploadDate.getTime())) {
-            const thaiYear = uploadDate.getFullYear() + 543;
-            if (countByYear.hasOwnProperty(thaiYear)) {
-              countByYear[thaiYear]++;
-            }
-          }
-        });
+            // สถิติสำหรับ Slide 2 (เอกสารย้อนหลัง 3 ปี)
+            const currentYear = new Date().getFullYear() + 543;
+            const countByYear = {
+              [currentYear]: 0,
+              [currentYear - 1]: 0,
+              [currentYear - 2]: 0
+            };
 
-        // เรียงปีจากปัจจุบันย้อนหลัง 3 ปี
-        const yearStats = Object.entries(countByYear)
-          .sort((a, b) => b[0] - a[0])
-          .map(([year, count]) => ({
-            year: year,
-            count: count
-          }));
+            files.forEach((file) => {
+              const uploadDate = new Date(file.uploaded_at);
+              if (!isNaN(uploadDate.getTime())) {
+                const thaiYear = uploadDate.getFullYear() + 543;
+                if (countByYear.hasOwnProperty(thaiYear)) {
+                  countByYear[thaiYear]++;
+                }
+              }
+            });
 
-        setSliderStats(prev => ({
-          ...prev,
-          slide2: {
-            yearStats: yearStats
-          }
-        }));
+            const yearStats = Object.entries(countByYear)
+              .sort((a, b) => b[0] - a[0])
+              .map(([year, count]) => ({
+                year: year,
+                count: count
+              }));
 
-        // สถิติสำหรับ Slide 3 ("เอกสารในปีนี้")
-        const now = new Date();
-        const oneWeekAgo = new Date(now);
-        oneWeekAgo.setDate(now.getDate() - 7);
-        let weekDocuments = 0, yearDocuments = 0, monthDocuments = 0;
-        files.forEach((file) => {
-          let date = new Date(file.uploaded_at);
-          if (!isNaN(date.getTime())) {
-            if (date >= oneWeekAgo) weekDocuments++;
-            if (date.getFullYear() === now.getFullYear()) {
-              yearDocuments++;
-              if (date.getMonth() === now.getMonth()) monthDocuments++;
-            }
-          }
-        });
+            // Slide 3
+            const now = new Date();
+            const oneWeekAgo = new Date(now);
+            oneWeekAgo.setDate(now.getDate() - 7);
+            let weekDocuments = 0, yearDocuments = 0, monthDocuments = 0;
+            files.forEach((file) => {
+              let date = new Date(file.uploaded_at);
+              if (!isNaN(date.getTime())) {
+                if (date >= oneWeekAgo) weekDocuments++;
+                if (date.getFullYear() === now.getFullYear()) {
+                  yearDocuments++;
+                  if (date.getMonth() === now.getMonth()) monthDocuments++;
+                }
+              }
+            });
 
-        setSliderStats({
-          slide1: { downloads, totalDocuments, websiteViews },
-          slide2: {
-            yearStats: yearStats
-          },
-          slide3: { weekDocuments, yearDocuments, monthDocuments },
-        });
+            setSliderStats({
+              slide1: { downloads, totalDocuments, websiteViews },
+              slide2: { yearStats },
+              slide3: { weekDocuments, yearDocuments, monthDocuments },
+            });
+          });
       })
       .catch((err) => console.error("Error fetching files:", err));
   }, []);
@@ -95,7 +96,7 @@ const SliderComponent = () => {
       stats: [
         { value: sliderStats.slide1.downloads.toLocaleString(), label: 'ยอดดาวน์โหลดทั้งหมด', unit: 'ครั้ง' },
         { value: sliderStats.slide1.totalDocuments.toLocaleString(), label: 'ยอดเอกสารทั้งหมด', unit: 'ฉบับ' },
-        { value: sliderStats.slide1.websiteViews.toLocaleString(), label: 'ยอดเข้าชมเว็บไซต์', unit: 'ครั้ง' },
+        { value: sliderStats.slide1.websiteViews.toLocaleString(), label: 'ยอดการเข้าเว็บไซต์', unit: 'ครั้ง' },
       ],
     },
     {
@@ -126,27 +127,41 @@ const SliderComponent = () => {
     },
   ];
 
-  // Auto Slide ทุก 10 วินาที
-  useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
+  // ฟังก์ชันสำหรับเปลี่ยนสไลด์และ reset interval
+  const resetInterval = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 10000);
-
-    return () => clearInterval(interval);
-  }, [slides.length]);
+  };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    setCurrentSlide((prev) => {
+      const next = (prev + 1) % slides.length;
+      return next;
+    });
+    resetInterval();
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    setCurrentSlide((prev) => {
+      const next = (prev - 1 + slides.length) % slides.length;
+      return next;
+    });
+    resetInterval();
   };
 
   const goToSlide = (index) => {
     setCurrentSlide(index);
+    resetInterval();
   };
-//สวัสดีชาวโลก
+
+  // ตั้ง interval เมื่อ slides.length เปลี่ยน หรือ component mount
+  useEffect(() => {
+    resetInterval();
+    return () => clearInterval(intervalRef.current);
+  }, [slides.length]);
+
   // อัปเดตเวลาใน realtime (สำหรับแสดงวันที่/เวลา)
   const [currentTime, setCurrentTime] = useState(new Date());
   useEffect(() => {
