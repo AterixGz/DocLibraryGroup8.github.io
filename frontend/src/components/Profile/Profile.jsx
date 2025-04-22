@@ -38,7 +38,7 @@ function Profile() {
             last_name: res.data.last_name || "",
             email: res.data.email || "",
           });
-          setAvatarPreview(res.data.avatar || "/img/default-avatar.png");
+          setAvatarPreview(res.data.avatar || "http://localhost:3000/Avatar/user.jpg");
         })
         .catch((err) => {
           console.error("Failed to load profile:", err);
