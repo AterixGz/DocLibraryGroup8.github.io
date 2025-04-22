@@ -46,7 +46,7 @@ const SliderComponent = () => {
             files.forEach((file) => {
               const uploadDate = new Date(file.uploaded_at);
               if (!isNaN(uploadDate.getTime())) {
-                const thaiYear = uploadDate.getFullYear() + 543;
+                const thaiYear = uploadDate.getFullYear() ;
                 if (countByYear.hasOwnProperty(thaiYear)) {
                   countByYear[thaiYear]++;
                 }
@@ -68,8 +68,12 @@ const SliderComponent = () => {
             files.forEach((file) => {
               let date = new Date(file.uploaded_at);
               if (!isNaN(date.getTime())) {
+                // แปลงปี พ.ศ. เป็น ค.ศ. ถ้าปีมากกว่า 2500
+                let fileYear = date.getFullYear();
+                if (fileYear > 2500) fileYear -= 543;
+            
                 if (date >= oneWeekAgo) weekDocuments++;
-                if (date.getFullYear() === now.getFullYear()) {
+                if (fileYear === now.getFullYear()) {
                   yearDocuments++;
                   if (date.getMonth() === now.getMonth()) monthDocuments++;
                 }

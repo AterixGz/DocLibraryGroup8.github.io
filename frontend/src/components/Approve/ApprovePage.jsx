@@ -8,6 +8,7 @@ const ApprovePage = () => {
   const [actionType, setActionType] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
   const [previewFile, setPreviewFile] = useState(null);
+  const [rejectReason, setRejectReason] = useState(""); // เพิ่ม state
 
   const fetchPendingFiles = async () => {
     try {
@@ -27,27 +28,33 @@ const ApprovePage = () => {
   const openPopup = (file, type) => {
     setSelectedFile(file);
     setActionType(type);
+    setRejectReason(""); // reset เหตุผลทุกครั้งที่เปิด popup
   };
 
   const closePopup = () => {
     setSelectedFile(null);
     setActionType(null);
+    setRejectReason("");
   };
 
   const handleConfirmAction = async () => {
     if (!selectedFile || !actionType) return;
+    if (actionType === "rejected" && !rejectReason.trim()) {
+      alert("กรุณาระบุเหตุผลในการไม่อนุมัติ");
+      return;
+    }
     try {
       const res = await fetch(
         `http://localhost:3000/api/files/approve/${selectedFile.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: actionType }),
+          body: JSON.stringify({ status: actionType, reason: rejectReason }),
         }
       );
       if (res.ok) {
         setToastMessage(
-          `เอกสาร "${selectedFile.name}" ได้รับการ$${
+          `เอกสาร "${selectedFile.name}" ได้รับการ${
             actionType === "approved" ? "อนุมัติ" : "ไม่อนุมัติ"
           }แล้ว`
         );
@@ -150,6 +157,24 @@ const ApprovePage = () => {
                 คุณแน่ใจหรือไม่ว่าจะ
                 {actionType === "approved" ? "อนุมัติ" : "ไม่อนุมัติ"}เอกสาร: <b>{selectedFile.name}</b>?
               </p>
+              {actionType === "rejected" && (
+                <div style={{ margin: "16px 0" }}>
+                  <textarea
+                    value={rejectReason}
+                    onChange={e => setRejectReason(e.target.value)}
+                    placeholder="กรุณาระบุเหตุผลในการไม่อนุมัติ"
+                    rows={3}
+                    style={{
+                      width: "100%",
+                      borderRadius: 6,
+                      border: "1px solid #ccc",
+                      padding: 8,
+                      fontFamily: "inherit",
+                      fontSize: "1rem"
+                    }}
+                  />
+                </div>
+              )}
               <div className="approve-popup-buttons">
                 <button className="approve-confirm-btn" onClick={handleConfirmAction}>
                   ยืนยัน

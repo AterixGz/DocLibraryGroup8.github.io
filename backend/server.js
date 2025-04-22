@@ -178,7 +178,8 @@ app.get('/api/files/user/:userId', async (req, res) => {
               description,
               uploaded_by,
               uploaded_at,
-              status
+              status,
+              reason_status
        FROM files
        WHERE uploaded_by = $1
        ORDER BY uploaded_at DESC`,
@@ -818,7 +819,7 @@ app.get('/api/files/approved', async (req, res) => {
 // Approve file
 app.put('/api/files/approve/:id', async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { status, reason } = req.body; // เพิ่ม reason
 
   if (!['approved', 'rejected'].includes(status)) {
     return res.status(400).json({ message: 'Invalid status' });
@@ -826,8 +827,8 @@ app.put('/api/files/approve/:id', async (req, res) => {
 
   try {
     const result = await pool.query(
-      `UPDATE files SET status = $1 WHERE id = $2 RETURNING *`,
-      [status, id]
+      `UPDATE files SET status = $1, reason_status = $2 WHERE id = $3 RETURNING *`,
+      [status, reason || null, id] // เพิ่ม reason_status
     );
     if (result.rows.length === 0)
       return res.status(404).json({ message: 'File not found' });

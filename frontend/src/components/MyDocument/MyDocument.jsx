@@ -31,6 +31,8 @@ const MyDocument = () => {
   const [documentToEdit, setDocumentToEdit] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [departments, setDepartments] = useState([]);
+  const [showRejectReason, setShowRejectReason] = useState(false);
+  const [rejectReasonText, setRejectReasonText] = useState("");
 
   const userId = localStorage.getItem("userData")
     ? JSON.parse(localStorage.getItem("userData")).id
@@ -585,6 +587,30 @@ const MyDocument = () => {
                         ? "รออนุมัติ"
                         : "ไม่อนุมัติ"}
                     </span>
+                    {/* แสดงลิงก์ดูเหตุผลเมื่อไม่อนุมัติ */}
+                    {doc.status === "rejected" && doc.reason_status && (
+                      <div style={{ marginTop: 4 }}>
+                        <button
+                          className="view-reason-btn"
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "#d32f2f",
+                            textDecoration: "underline",
+                            cursor: "pointer",
+                            fontSize: "0.95em",
+                            padding: 0,
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setRejectReasonText(doc.reason_status);
+                            setShowRejectReason(true);
+                          }}
+                        >
+                          ดูเหตุผล
+                        </button>
+                      </div>
+                    )}
                   </td>
 
                   <td className="action-buttons">
@@ -866,6 +892,35 @@ const MyDocument = () => {
               <div className="progress-bar"></div>
             </div>
           ))}
+          {showRejectReason && (
+  <div className="alert-modal" onClick={() => setShowRejectReason(false)}>
+    <div
+      className="modal-content"
+      onClick={e => e.stopPropagation()}
+      style={{
+        maxWidth: 350,
+        minWidth: 300,
+        width: "auto",
+        textAlign: "center",
+        padding: "24px 108px",
+        borderRadius: "10px",
+        height: "auto",
+      }}
+    >
+      <button
+        onClick={() => setShowRejectReason(false)}
+        className="close-button"
+      >
+        ปิด
+      </button>
+      <p style={{ color: "#d32f2f", marginTop: 16, wordBreak: "break-word" }}>
+        <b>เหตุผลที่ไม่อนุมัติ:</b>
+        <br />
+        {rejectReasonText}
+      </p>
+    </div>
+  </div>
+)}
         </div>
       </div>
     </m.div>

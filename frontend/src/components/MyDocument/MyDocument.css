@@ -8,6 +8,16 @@
   position: relative;
 }
 
+.view-reason-btn {
+  background: none;
+  border: none;
+  color: #d32f2f;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.95em;
+  padding: 0;
+}
+
 /* หัวข้อ */
 .my-document-title {
   font-size: 2rem;

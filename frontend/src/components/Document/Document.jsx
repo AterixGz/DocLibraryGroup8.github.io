@@ -203,6 +203,11 @@ useEffect(() => {
         setDescription("");
         setUploadedFileName("");
         setFileMimeType("");
+
+        // Redirect ไปหน้า MyDocument หลังอัปโหลดสำเร็จ
+        setTimeout(() => {
+          navigate("/my-document");
+        }, 1200); // รอ 1.2 วินาทีให้ผู้ใช้เห็นข้อความสำเร็จ
       } else {
         setError("การอัปโหลดล้มเหลว: " + (result.message || "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ"));
       }
