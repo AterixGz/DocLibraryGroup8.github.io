@@ -3,7 +3,7 @@
     background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    max-width: 1200px;
+    max-width: 1300px;
     margin: 0 auto;
     margin-top: 2rem;
 }
@@ -13,18 +13,18 @@
     display: flex;
     align-items: center;
     padding: 10px 15px;
-    background-color: #e7f3ff;
-    border-left: 4px solid #1e88e5;
+    background-color: #ffebee; /* สีพื้นหลังแดงอ่อน */
+    border-left: 4px solid #e53935; /* สีเส้นขอบซ้ายแดงเข้ม */
     border-radius: 4px;
     margin-bottom: 20px;
     font-size: 0.9rem;
-  }
+}
   
-  .trashpage-info-banner i {
+.trashpage-info-banner i {
     margin-right: 10px;
     font-size: 1.1rem;
-    color: #1e88e5;
-  }
+    color: #d32f2f; /* สีไอคอนแดง */
+}
   
   .trashpage-expire-normal {
     color: #2e7d32;

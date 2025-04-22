@@ -51,7 +51,7 @@ const cleanupTrash = async () => {
     const result = await pool.query(`
       SELECT id, url 
       FROM deleted_files 
-      WHERE deleted_at < NOW() - INTERVAL '30 days'
+       WHERE deleted_at < (NOW() + INTERVAL '543 years') - INTERVAL '30 days'
     `);
     
     if (result.rows.length === 0) {

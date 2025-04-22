@@ -105,9 +105,9 @@ const TrashPage = () => {
     } else if (daysLeft === 1) {
       return <span className="trashpage-expire-critical">จะถูกลบภายใน 1 วัน</span>;
     } else if (daysLeft <= 7) {
-      return <span className="trashpage-expire-warning">จะถูกลบภายใน {daysLeft} วัน</span>;
+      return <span className="trashpage-expire-warning">ถูกลบภายใน {daysLeft} วัน</span>;
     } else {
-      return <span className="trashpage-expire-normal">จะถูกลบภายใน {daysLeft} วัน</span>;
+      return <span className="trashpage-expire-normal">ถูกลบภายใน {daysLeft} วัน</span>;
     }
     
   };
