@@ -12,6 +12,7 @@ const ResetPassword = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const sendOTP = async () => {
     setLoading(true);
@@ -103,80 +104,109 @@ const ResetPassword = () => {
 
   return (
     <div className="reset-page">
-    <div className="reset-container">
-      <div className="reset-form">
-        <img src={logo} alt="Logo" className="reset-logo" />
-        <h2 className="reset-title">รีเซ็ตรหัสผ่าน</h2>
-        <p className="reset-description">
-          {step === "email"
-            ? "กรอกอีเมลของคุณเพื่อรับรหัส OTP"
-            : step === "otp"
-            ? "กรอกรหัส OTP ที่ส่งไปยังอีเมลของคุณ"
-            : "กรอกรหัสผ่านใหม่ของคุณ"}
-        </p>
+      <div className="reset-container">
+        <div className="reset-form">
+          <img src={logo} alt="Logo" className="reset-logo" />
+          <h2 className="reset-title">รีเซ็ตรหัสผ่าน</h2>
+          <p className="reset-description">
+            {step === "email"
+              ? "กรอกอีเมลของคุณเพื่อรับรหัส OTP"
+              : step === "otp"
+              ? "กรอกรหัส OTP ที่ส่งไปยังอีเมลของคุณ"
+              : "กรอกรหัสผ่านใหม่ของคุณ"}
+          </p>
 
-        {step === "email" && (
-          <>
-            <input
-              className="reset-input"
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <button className="reset-button" onClick={sendOTP} disabled={loading}>
-              {loading ? "กำลังส่ง..." : "ส่งรหัส OTP"}
-            </button>
-          </>
-        )}
+          {step === "email" && (
+            <>
+              <input
+                className="reset-input"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <button
+                className="reset-button"
+                onClick={sendOTP}
+                disabled={loading}
+              >
+                {loading ? "กำลังส่ง..." : "ส่งรหัส OTP"}
+              </button>
+            </>
+          )}
 
-        {step === "otp" && (
-          <>
-            <div className="otp-group">
-              {otp.map((digit, i) => (
+          {step === "otp" && (
+            <>
+              <div className="otp-group">
+                {otp.map((digit, i) => (
+                  <input
+                    key={i}
+                    id={`otp-${i}`}
+                    type="text"
+                    maxLength={1}
+                    className="otp-input"
+                    value={digit}
+                    onChange={(e) => handleChangeOtp(i, e.target.value)}
+                  />
+                ))}
+              </div>
+              <button
+                className="reset-button"
+                onClick={verifyOTP}
+                disabled={loading}
+              >
+                {loading ? "กำลังตรวจสอบ..." : "ยืนยันรหัส OTP"}
+              </button>
+              <p className="reset-resend">
+                ไม่ได้รับรหัส? <span onClick={resendOTP}>ส่งใหม่</span>
+              </p>
+            </>
+          )}
+
+          {step === "newPassword" && (
+            <>
+              <div className="password-container">
                 <input
-                  key={i}
-                  id={`otp-${i}`}
-                  type="text"
-                  maxLength={1}
-                  className="otp-input"
-                  value={digit}
-                  onChange={(e) => handleChangeOtp(i, e.target.value)}
+                  className="reset-input password-input"
+                  type={showNewPassword ? "text" : "password"}
+                  placeholder="รหัสผ่านใหม่"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
                 />
-              ))}
-            </div>
-            <button className="reset-button" onClick={verifyOTP} disabled={loading}>
-              {loading ? "กำลังตรวจสอบ..." : "ยืนยันรหัส OTP"}
-            </button>
-            <p className="reset-resend">
-              ไม่ได้รับรหัส? <span onClick={resendOTP}>ส่งใหม่</span>
-            </p>
-          </>
-        )}
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowNewPassword((prev) => !prev)}
+                  style={{ marginTop: "0.5rem" }}
+                >
+                  <i
+                    className={
+                      showNewPassword ? "bi bi-eye" : "bi bi-eye-slash"
+                    }
+                  ></i>
+                </button>
+              </div>
+              <button
+                className="reset-button"
+                onClick={resetPassword}
+                disabled={loading}
+              >
+                {loading ? "กำลังรีเซ็ต..." : "รีเซ็ตรหัสผ่าน"}
+              </button>
+            </>
+          )}
 
-        {step === "newPassword" && (
-          <>
-            <input
-              className="reset-input"
-              type="password"
-              placeholder="รหัสผ่านใหม่"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-            <button className="reset-button" onClick={resetPassword} disabled={loading}>
-              {loading ? "กำลังรีเซ็ต..." : "รีเซ็ตรหัสผ่าน"}
-            </button>
-          </>
-        )}
+          {message && <p className="reset-message">{message}</p>}
 
-        {message && <p className="reset-message">{message}</p>}
-
-        <button onClick={() => navigate("/login")} className="reset-back">
-          กลับเข้าสู่ระบบ
-        </button>
+          <button onClick={() => navigate("/login")} className="reset-back">
+            กลับเข้าสู่ระบบ
+          </button>
+        </div>
+        <div
+          className="reset-bg"
+          style={{ backgroundImage: `url(${bg})` }}
+        ></div>
       </div>
-      <div className="reset-bg" style={{ backgroundImage: `url(${bg})` }}></div>
-    </div>
     </div>
   );
 };
